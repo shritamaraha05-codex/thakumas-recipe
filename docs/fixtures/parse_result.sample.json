@@ -1,0 +1,113 @@
+{
+  "recipe": {
+    "title": "Sample (synthetic)",
+    "language": "bn-IN",
+    "base_servings": 4,
+    "steps": [
+      {
+        "idx": 1,
+        "text": "ekta kodai e ek chamoch tel dao",
+        "timer_seconds": null,
+        "quantities": [
+          {
+            "id": "q1",
+            "ingredient": "oil",
+            "ingredient_class": "liquid",
+            "qty": 1,
+            "qty_max": null,
+            "unit": "spoon",
+            "to_taste": false,
+            "raw_phrase": "ek chamoch tel",
+            "confidence": 0.9,
+            "source": "both",
+            "range": {
+              "lo": 5,
+              "hi": 15,
+              "unit": "ml",
+              "basis": "typical"
+            },
+            "clarification": {
+              "id": "c1",
+              "kind": "unit_spoon",
+              "question": "Chaa-er chamoch na bhaat-er chamoch?",
+              "options": [
+                "tsp",
+                "tbsp"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "idx": 2,
+        "text": "tarpor ek muthi chal ar ek chimti nun dao, jol ta jemon lage",
+        "timer_seconds": null,
+        "quantities": [
+          {
+            "id": "q2",
+            "ingredient": "rice",
+            "ingredient_class": "grain",
+            "qty": 1,
+            "qty_max": null,
+            "unit": "muthi",
+            "to_taste": false,
+            "raw_phrase": "ek muthi chal",
+            "confidence": 0.95,
+            "source": "both",
+            "range": {
+              "lo": 33,
+              "hi": 44,
+              "unit": "g",
+              "basis": "yours"
+            },
+            "clarification": null
+          },
+          {
+            "id": "q3",
+            "ingredient": "salt",
+            "ingredient_class": "salt",
+            "qty": 1,
+            "qty_max": null,
+            "unit": "chimti",
+            "to_taste": false,
+            "raw_phrase": "ek chimti nun",
+            "confidence": 0.95,
+            "source": "rules",
+            "range": {
+              "lo": 0.3,
+              "hi": 1,
+              "unit": "g",
+              "basis": "typical"
+            },
+            "clarification": null
+          },
+          {
+            "id": "q4",
+            "ingredient": "water",
+            "ingredient_class": "liquid",
+            "qty": null,
+            "qty_max": null,
+            "unit": null,
+            "to_taste": true,
+            "raw_phrase": "jol ta jemon lage",
+            "confidence": 0.8,
+            "source": "rules",
+            "range": null,
+            "clarification": null
+          }
+        ]
+      },
+      {
+        "idx": 3,
+        "text": "dosh minute dhimi anche ranna koro",
+        "timer_seconds": 600,
+        "quantities": []
+      }
+    ]
+  },
+  "meta": {
+    "parser_mode": "hybrid",
+    "llm_provider": "gemini",
+    "replayed": false
+  }
+}

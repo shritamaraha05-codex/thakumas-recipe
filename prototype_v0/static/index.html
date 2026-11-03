@@ -1,0 +1,89 @@
+<!doctype html><html lang="bn"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="dark">
+<title>Thakuma's Recipe</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600&family=Tiro+Bangla&display=swap" rel="stylesheet">
+<style>
+:root{--leaf:#12301f;--leaf2:#1b4430;--line:#2d5a42;--chalk:#f3efe2;--mist:#a9c1b0;--haldi:#f2b51b}
+*{box-sizing:border-box}body{margin:0;background:var(--leaf);color:var(--chalk);font:17px/1.6 "Hind Siliguri",system-ui,sans-serif}
+main{max-width:860px;margin:0 auto;padding:2.5rem 1.25rem 5rem}
+h1{font:400 clamp(2.8rem,10vw,5rem)/1.05 "Tiro Bangla",serif;margin:0}
+h2{font:400 1.5rem "Tiro Bangla",serif;margin:0 0 .6rem}
+.sub{color:var(--mist);max-width:36rem;margin:.6rem 0 2.2rem}section{border-top:1px solid var(--line);padding:1.6rem 0}section .sub{margin-bottom:1rem}
+textarea,select,input{width:100%;background:var(--leaf2);color:inherit;border:1px solid #3a6b50;border-radius:6px;padding:.65rem .8rem;font:inherit}
+textarea{min-height:9rem;resize:vertical}.row{display:flex;gap:.6rem;flex-wrap:wrap;margin-top:.8rem;align-items:center}.row>select,.row>input{width:auto}
+button{font-family:inherit;font-weight:600;font-size:1rem;border-radius:6px;padding:.6rem 1.1rem;cursor:pointer;border:1px solid var(--haldi);background:none;color:var(--haldi)}
+button.go{background:var(--haldi);color:#2a1d00}button:disabled{opacity:.4;cursor:not-allowed}
+:focus-visible{outline:3px solid var(--chalk);outline-offset:2px}
+.note{color:var(--mist);min-height:1.6rem;margin:.6rem 0 0}
+.step{display:flex;gap:1rem;margin:1.3rem 0}.step:before{content:"";width:3px;flex:none;background:var(--haldi);border-radius:2px}.step p{margin:0 0 .3rem;font-size:1.15rem}
+.m{display:flex;align-items:center;gap:.7rem;flex-wrap:wrap;color:var(--mist);font-size:.95rem}.m b{color:var(--chalk);font-weight:600}
+.bar{position:relative;width:120px;height:6px;background:var(--line);border-radius:3px}.bar i{position:absolute;top:0;bottom:0;background:var(--haldi);border-radius:3px}
+.tag{font-size:.8rem;border:1px solid #3a6b50;border-radius:99px;padding:0 .55rem}.tag.yours{border-color:var(--haldi);color:var(--haldi)}
+ul{padding:0;list-style:none}li{padding:.5rem 0;border-bottom:1px solid var(--line);display:flex;gap:.8rem;justify-content:space-between;align-items:center}
+#cook{position:fixed;inset:0;background:var(--leaf);display:none;flex-direction:column;padding:1.4rem;z-index:9;overflow:auto}#cook.on{display:flex}
+#ctext{font:400 clamp(1.8rem,5.5vw,3.2rem)/1.3 "Tiro Bangla",serif;margin:auto 0 1rem}#cm .m{font-size:1.1rem}
+.ctl{display:flex;gap:.6rem;flex-wrap:wrap;margin-top:1.4rem}.ctl button{flex:1;min-width:7rem;padding:1rem}
+</style></head><body><main>
+<h1>ঠাকুমার রান্না</h1>
+<p class="sub">Say the recipe the way she did: “ek muthi chal, ek chimti nun, jol ta jemon lage.” Get steps with honest ranges, then cook without touching the screen.</p>
+<section><h2>Tell the recipe</h2>
+<textarea id="text" placeholder="Record it, or type it. Words like muthi, chimti, kap, chamoch, tarpor all work, in Bengali script or Roman letters."></textarea>
+<div class="row"><select id="lang" aria-label="Spoken language"><option value="indic-auto">Auto-detect</option><option value="bn-IN,en-IN">Bengali + English</option><option value="bn-IN">Bengali</option><option value="hi-IN,en-IN">Hindi + English</option></select>
+<button class="go" id="rec">Record narration</button><button id="sample">Use a sample</button><button class="go" id="make">Make steps</button></div>
+<p class="note" id="note"></p></section>
+<section id="out" hidden><h2>Steps</h2><p class="sub">These are ranges, not exact grams. A muthi is not a measuring cup, and the bars show how wide the guess is.</p><div id="steps"></div><div class="row"><button class="go" id="cookbtn">Cook hands-free</button></div></section>
+<section><h2>Weigh your own handful</h2><p class="sub">Weigh one muthi of rice once and every rice step gets a tighter range. Weigh it a few times and the range is your own spread.</p>
+<div class="row"><select id="cu" aria-label="Unit"><option>muthi</option><option>chimti</option><option>cup</option><option>spoon</option><option>bowl</option><option>glass</option></select>
+<select id="ci" aria-label="Ingredient"><option value="any">any ingredient</option><option>rice</option><option>lentils</option><option>flour</option><option>salt</option><option>sugar</option><option>oil</option><option>water</option><option>milk</option><option>turmeric</option><option>chilli</option><option>cumin</option></select>
+<input id="cg" type="number" min="0.1" step="0.1" placeholder="grams (ml for liquids)" aria-label="Weighed amount"><button class="go" id="cadd">Add weighing</button></div><ul id="calist"></ul></section>
+</main>
+<div id="cook" role="dialog" aria-label="Cooking mode"><div class="row" style="margin:0;justify-content:space-between"><span id="cprog" class="note"></span><label class="note"><input type="checkbox" id="auto" checked style="width:auto"> Read aloud</label><button id="cclose">Close</button></div>
+<div id="ctext"></div><div id="cm"></div><div class="ctl"><button id="cprev">Back</button><button id="crep">Repeat</button><button class="go" id="cnext">Next step</button></div>
+<div class="ctl"><button id="ctimer"></button><button id="cmd">Say a command (next, back, repeat, stop)</button></div><p class="note" id="cnote"></p></div>
+<script>
+const $=id=>document.getElementById(id),esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+let steps=[],cur=0,cal={},rec=null,cfg={gnani:false},audio=null,tm=null;
+try{cal=JSON.parse(localStorage.getItem("cal")||"{}")}catch(e){}
+const save=()=>{try{localStorage.setItem("cal",JSON.stringify(cal))}catch(e){}},note=t=>$("note").textContent=t,rd=x=>x<10?+x.toFixed(1):Math.round(x);
+const fmt=r=>r.lo===r.hi?`${r.lo} ${r.unit}`:`${r.lo}–${r.hi} ${r.unit}`;
+function measure(it){if(it.to_taste)return `<div class="m"><b>${esc(it.ingredient)}</b> to taste. Add a little, then taste.</div>`;
+ const q=`${it.qty} ${it.unit==="pc"?"":it.unit} ${it.ingredient||""}`.replace(/\s+/g," ").trim();if(!it.range)return `<div class="m"><b>${esc(q)}</b></div>`;
+ const r=it.range,sp=r.hi*1.4,bar=r.lo===r.hi?"":`<span class="bar"><i style="left:${r.lo/sp*100}%;width:${(r.hi-r.lo)/sp*100}%"></i></span>`;
+ return `<div class="m"><b>${esc(q)}</b> about ${fmt(r)} ${bar}<span class="tag ${r.basis}">${{typical:"typical",yours:"from your weighing",exact:"exact"}[r.basis]}</span></div>`}
+async function make(){const t=$("text").value.trim();if(!t){note("Record or type a narration first.");return}
+ const r=await fetch("/api/parse",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({text:t,calibration:cal})});steps=(await r.json()).steps;
+ $("out").hidden=!steps.length;$("steps").innerHTML=steps.map(s=>`<div class="step"><div><p>${esc(s.text)}</p>${s.items.map(measure).join("")}${s.timer_min?`<div class="m">Timer: ${s.timer_min} min</div>`:""}</div></div>`).join("");note(steps.length?"":"No steps found. Try adding a full stop or the word tarpor between steps.")}
+function renderCal(){const k=Object.keys(cal);$("calist").innerHTML=k.length?k.map(x=>{const v=cal[x],[u,i]=x.split("|"),lo=v.length>1?Math.min(...v)*.95:v[0]*.85,hi=v.length>1?Math.max(...v)*1.05:v[0]*1.15;
+ return `<li><span><b>1 ${u}${i==="any"?"":" of "+i}</b> is about ${rd(lo)}–${rd(hi)} (${v.join(", ")} weighed)</span><button data-k="${x}">Remove</button></li>`}).join(""):"<li>Nothing weighed yet.</li>"}
+$("cadd").onclick=()=>{const g=parseFloat($("cg").value);if(!(g>0))return;const k=`${$("cu").value}|${$("ci").value}`;cal[k]=[...(cal[k]||[]),g].slice(-8);save();renderCal();$("cg").value="";if(steps.length)make()};
+$("calist").onclick=e=>{const k=e.target.dataset.k;if(k){delete cal[k];save();renderCal();if(steps.length)make()}};
+function wav(f){const n=f.length,b=new ArrayBuffer(44+n*2),v=new DataView(b),w=(o,s)=>[...s].forEach((c,i)=>v.setUint8(o+i,c.charCodeAt(0)));
+ w(0,"RIFF");v.setUint32(4,36+n*2,true);w(8,"WAVEfmt ");v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,1,true);v.setUint32(24,16000,true);v.setUint32(28,32000,true);v.setUint16(32,2,true);v.setUint16(34,16,true);w(36,"data");v.setUint32(40,n*2,true);
+ for(let i=0;i<n;i++){const s=Math.max(-1,Math.min(1,f[i]));v.setInt16(44+i*2,s<0?s*32768:s*32767,true)}return b}
+async function wavChunks(blob){const ac=new AudioContext(),buf=await ac.decodeAudioData(await blob.arrayBuffer()),off=new OfflineAudioContext(1,Math.ceil(buf.duration*16000),16000),src=off.createBufferSource();
+ src.buffer=buf;src.connect(off.destination);src.start();const pcm=(await off.startRendering()).getChannelData(0),out=[],st=25*16000;for(let i=0;i<pcm.length;i+=st)out.push(wav(pcm.subarray(i,i+st)));return out}
+async function record(ms){const s=await navigator.mediaDevices.getUserMedia({audio:true}),ch=[];rec=new MediaRecorder(s);rec.ondataavailable=e=>ch.push(e.data);
+ return new Promise(res=>{rec.onstop=()=>{s.getTracks().forEach(t=>t.stop());res(new Blob(ch,{type:rec.mimeType}))};rec.start();if(ms)setTimeout(()=>rec.state==="recording"&&rec.stop(),ms)})}
+async function send(blob,url){let text="";for(const c of await wavChunks(blob)){const fd=new FormData();fd.append("audio",new Blob([c],{type:"audio/wav"}),"clip.wav");fd.append("language",$("lang").value);
+ const r=await fetch(url,{method:"POST",body:fd}),j=await r.json();if(!r.ok)throw new Error(j.detail||"Request failed");if("command"in j)return j;text+=(j.transcript||"")+" . "}return{transcript:text}}
+$("rec").onclick=async()=>{const b=$("rec");if(rec&&rec.state==="recording"){rec.stop();return}
+ if(!cfg.gnani){note("Add GNANI_API_KEY to .env to use the microphone. You can type or paste the narration instead.");return}
+ b.textContent="Stop recording";try{const blob=await record();b.textContent="Transcribing…";const j=await send(blob,"/api/transcribe");$("text").value=($("text").value+" "+j.transcript).trim();note("Check the text. Fix any word it misheard, then make steps.")}catch(e){note(e.message)}b.textContent="Record narration"};
+$("sample").onclick=()=>{$("text").value="ekta kodai e ek chamoch tel dao. tarpor ek muthi chal ar ek chimti nun dao, jol ta jemon lage. dosh minute dhimi anche ranna koro. tarpor adha kap dudh ar sarhe tin chamoch chini dao.";make()};
+$("make").onclick=make;
+async function say(t){try{audio&&audio.pause();speechSynthesis.cancel()}catch(e){}
+ try{const r=await fetch("/api/speak",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({text:t,language:"auto"})});if(!r.ok)throw 0;audio=new Audio(URL.createObjectURL(await r.blob()));await audio.play()}
+ catch(e){const u=new SpeechSynthesisUtterance(t);u.lang="bn-IN";speechSynthesis.speak(u)}}
+function show(){clearInterval(tm);const s=steps[cur];$("cprog").textContent=`Step ${cur+1} of ${steps.length}`;$("ctext").textContent=s.text;$("cm").innerHTML=s.items.map(measure).join("");
+ $("ctimer").style.display=s.timer_min?"":"none";$("ctimer").textContent=s.timer_min?`Start ${s.timer_min} min timer`:"";if($("auto").checked)say(s.text)}
+const go=d=>{cur=Math.max(0,Math.min(steps.length-1,cur+d));show()};
+$("cookbtn").onclick=()=>{cur=0;$("cook").classList.add("on");show()};$("cclose").onclick=()=>{$("cook").classList.remove("on");clearInterval(tm);try{audio&&audio.pause();speechSynthesis.cancel()}catch(e){}};
+$("cprev").onclick=()=>go(-1);$("cnext").onclick=()=>go(1);$("crep").onclick=()=>say(steps[cur].text);
+function beep(){const c=new AudioContext(),o=c.createOscillator();o.connect(c.destination);o.frequency.value=880;o.start();setTimeout(()=>o.stop(),900)}
+$("ctimer").onclick=()=>{clearInterval(tm);let n=Math.round(steps[cur].timer_min*60);tm=setInterval(()=>{n--;$("ctimer").textContent=`${Math.floor(n/60)}:${String(n%60).padStart(2,"0")} left`;if(n<=0){clearInterval(tm);$("ctimer").textContent="Time is up";beep()}},1000)};
+$("cmd").onclick=async()=>{$("cnote").textContent="Listening…";try{const j=await send(await record(3500),"/api/command");$("cnote").textContent=j.command?`Heard: ${j.transcript}`:`Did not catch a command. Heard: ${j.transcript||"nothing"}`;
+ if(j.command==="next")go(1);else if(j.command==="prev")go(-1);else if(j.command==="repeat")say(steps[cur].text);else if(j.command==="stop"){try{audio&&audio.pause();speechSynthesis.cancel()}catch(e){}}}catch(e){$("cnote").textContent=e.message}};
+document.addEventListener("keydown",e=>{if(!$("cook").classList.contains("on"))return;if(e.key==="ArrowRight")go(1);else if(e.key==="ArrowLeft")go(-1);else if(e.key==="Escape")$("cclose").click()});
+fetch("/api/config").then(r=>r.json()).then(c=>{cfg=c;if(!c.gnani){$("cmd").disabled=true;note("Voice is off until GNANI_API_KEY is set. Typing and “Use a sample” still work.")}}).catch(()=>{});
+renderCal();
+</script></body></html>
