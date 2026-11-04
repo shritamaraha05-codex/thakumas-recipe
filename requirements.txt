@@ -1,0 +1,10 @@
+# Runtime dependencies for the Thakuma's Recipe backend.
+# Install:  pip install -r requirements.txt
+# Tests/lint dev tools are in requirements-dev.txt.
+
+fastapi>=0.111          # HTTP framework (docs/02 stack)
+uvicorn[standard]>=0.29 # ASGI server + reload/watchfiles
+pydantic>=2.7           # v2 request/response models (M-04)
+pydantic-settings>=2.2  # environment-based configuration (M-02)
+python-dotenv>=1.0      # lets pydantic-settings read a local .env
+httpx>=0.27             # required by FastAPI's TestClient; future HTTP client

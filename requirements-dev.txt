@@ -1,0 +1,5 @@
+# Development dependencies (tests and lint).
+# Install:  pip install -r requirements-dev.txt
+
+pytest>=8.0   # test runner (docs/02 testing)
+ruff>=0.5     # linter (docs/02 stack)

@@ -1,0 +1,21 @@
+# Secrets and local state must never be committed.
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# Test / lint caches
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# SQLite databases
+*.db
+*.sqlite
+*.sqlite3
