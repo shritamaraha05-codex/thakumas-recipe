@@ -108,6 +108,8 @@
   "meta": {
     "parser_mode": "hybrid",
     "llm_provider": "gemini",
-    "replayed": false
+    "replayed": false,
+    "mock": false,
+    "mock_source": null
   }
 }

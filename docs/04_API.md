@@ -3,7 +3,7 @@
 JSON everywhere unless noted. Errors: `{"error":{"code":"...","message":"...","hint":"..."}}` with codes `INVALID_INPUT, AUDIO_TOO_LONG, NO_API_KEY, UPSTREAM_BUSY, UPSTREAM_ERROR, LLM_UNAVAILABLE, CONSENT_REQUIRED, NOT_FOUND`. A sample `ParseResult` lives in `docs/fixtures/parse_result.sample.json`; the frontend builds against it from day 1.
 
 ## System
-- `GET /api/health` -> `{ok, db, gnani:{configured, mock}, llm:{chain:[..], healthy:[..]}}`
+- `GET /api/health` -> `{ok, db:{status,path,note}, gnani:{configured, mock}, llm:{chain:[..], healthy:[..], providers:[{name,configured,healthy,note}]}}`. `ok` means the app process is up, **not** that external providers work. `healthy` lists only providers confirmed on this request (currently `rules`); external providers report `healthy:null` ("not probed") and are never marked healthy just because a key exists.
 - `GET /api/llm/status` -> per provider `{name, ok, latency_ms, last_error}`
 
 ## Capture and parse
@@ -11,8 +11,9 @@ JSON everywhere unless noted. Errors: `{"error":{"code":"...","message":"...","h
 - `POST /api/parse` `{text, mode:"auto|rules|llm", hand_profile_id?, servings?}` -> `ParseResult`
 - `POST /api/parse/resolve` `{draft: ParseResult, answers:[{clarification_id, answer}], hand_profile_id?}` -> recomputed `ParseResult` (stateless)
 
-`ParseResult`: `{recipe:{title, language, base_servings, steps:[{idx, text, timer_seconds, quantities:[Quantity]}]}, meta:{parser_mode, llm_provider, replayed}}`
+`ParseResult`: `{recipe:{title, language, base_servings, steps:[{idx, text, timer_seconds, quantities:[Quantity]}]}, meta:{parser_mode, llm_provider, replayed, mock, mock_source}}`
 `Quantity`: `{id, ingredient, ingredient_class, qty, qty_max, unit, to_taste, raw_phrase, confidence, source, range:{lo,hi,unit,basis}|null, clarification:{id,kind,question,options[]}|null}` where `basis` is `exact|yours|typical`.
+`meta.mock` is `true` when the response is fixture/mock data rather than real parser/provider output; `meta.mock_source` names that source (currently the sample fixture). Until the parser exists, `POST /api/parse` returns `meta:{parser_mode:"rules", llm_provider:null, mock:true, mock_source:"docs/fixtures/parse_result.sample.json"}` for all modes; no LLM or Gnani call is made.
 
 ## Recipes
 - `POST /api/recipes` `{title, draft, cook_person_id?, narrator_person_id?, tags[]}` -> `{id, version}`

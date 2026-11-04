@@ -88,14 +88,16 @@ This is the answer to “who starts what?” Both people start in parallel after
 
 ### Day 1 exit gate (Tuesday 3 Nov)
 
-- [ ] `uvicorn backend.app.main:app --reload` starts.
-- [ ] `GET /api/health` returns `ok: true`.
-- [ ] `pytest -q` runs without network access.
-- [ ] Frontend opens and renders the fixture correctly.
-- [ ] Manual transcript input reaches the mock `/api/parse` endpoint.
+- [x] `uvicorn backend.app.main:app --reload` starts. (backend)
+- [x] `GET /api/health` returns `ok: true`. (backend)
+- [x] `pytest -q` runs without network access. (backend: 36 passed, 5 of them the frozen prototype suite)
+- [ ] Frontend opens and renders the fixture correctly. (S)
+- [ ] Manual transcript input reaches the mock `/api/parse` endpoint. (needs S-04 UI; endpoint itself verified)
 - [ ] Both teammates can identify their next three task IDs without waiting for one another.
 
 If any of these fail, fix them before adding features.
+
+**Backend status (2026-11-03): M-01, M-02, M-03, M-04 done.** `docs/PROTOTYPE_AUDIT.md` records the prototype pass/fail state and reusable functions; `backend/` has an offline FastAPI app with `GET /api/health` and a fixture-backed mock `POST /api/parse` (contract in `docs/04_API.md`). Evidence: `pytest -q` = 36 passed, `ruff check .` clean. Frontend tasks S-01..S-04 and J-02 remain; no live Gemini/Gnani/SQLite work was started.
 
 ---
 
