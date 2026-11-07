@@ -14,15 +14,19 @@ This replaces the previous broad task list. Work from the task IDs below. A task
 
 The week is too short to build every feature in `01_PRODUCT.md`. We will ship one complete, believable user journey:
 
-1. A family cook narrates a Bengali / Benglish recipe, or the user enters a transcript manually.
-2. The app transcribes audio using **Gnani Prisma** (manual text is always available as fallback).
-3. The user reviews and corrects the transcript.
-4. The parser turns it into ordered cooking steps and ingredient quantities.
-5. Vague quantities are shown as honest ranges, with `typical` or `yours` clearly labelled. Ambiguous units ask a question instead of guessing.
-6. The user can calibrate one or more of their own measures by weighing them.
-7. The user saves the recipe and opens it later.
-8. Cook mode reads steps aloud using **Gnani Timbre** where available, with visible controls and timers as fallback.
-9. The demo shows the real product and a small, honestly reported evaluation.
+1. User signs in.
+2. User enters or reviews a Bengali transcript.
+3. Backend parses the recipe.
+4. User saves the recipe.
+5. Recipe appears in that user's library.
+6. User can close and reopen the application.
+7. Saved recipe remains available.
+8. Another account cannot access that recipe.
+9. User can edit, version and delete their own recipes.
+
+That nine-step list is the **minimum release journey and the P0 acceptance gate** for persistence. Cook mode (Day 4) is still demo scope, but it is not required for the persistence gate; the sign-in → transcript → parse → save → library → restart journey must be green first.
+
+**Architecture correction (2026-11-08):** storage is **Supabase PostgreSQL** and accounts are **Supabase Auth** — not SQLite, and no custom password handling anywhere. Frontend is **React** (Vite) with the Supabase Auth client; the frontend never writes to the database directly, it always goes through FastAPI with the user's access token. Schema: `docs/03_DATA_MODEL.md`; API: `docs/04_API.md`. M-18A/M-18B/M-19/M-20 below replace the old SQLite M-18/M-19/M-20.
 
 ### Must ship (P0)
 
@@ -31,16 +35,27 @@ The week is too short to build every feature in `01_PRODUCT.md`. We will ship on
 - Bengali / Roman Bengali normalisation, basic step segmentation, quantities, ingredients and duration extraction.
 - Quantity ranges from a reference table; exact metric quantities remain exact; unverified estimates are labelled.
 - At least two clarification types: ambiguous `chamoch` (tsp/tbsp) and unknown/uncalibrated `cup` (cup type). A user answer must recompute the result.
-- A simple hand profile and weighing flow; a single measurement narrows the range but is still labelled as a personal estimate.
 - Prisma STT integration for short clips and sequential chunk upload for longer clips; transcript editing before parsing.
-- Recipe save/list/open using SQLite.
+- Supabase Auth sign-in/sign-up with session persistence and logout (frontend), verified access tokens on every protected route (backend).
+- Recipe save / list / open / version / delete on Supabase PostgreSQL, scoped to the signed-in owner; the saved recipe survives an app restart and is invisible to every other account.
 - Cook mode with step navigation, repeat, timers and speech playback/fallback.
 - Consent before capturing another person's voice; audio is not retained by default.
 - Automated tests, an evaluation note with sample size and limitations, working demo video, public post and submission materials.
 
+### Moved to postponed (2026-11-08 planning correction — do not start until the journey above is green)
+
+- Personal measurement calibration (M-17, S-12; QTY-2) and the weighing repository (M-17).
+- Full person / profile / consent management (M-18's original person/consent scope and the people/consent API).
+- Recipe scaling, including servings UI and salt-like staged guidance (S-13; QTY-3, QTY-4).
+- Pantry search (LIB-2).
+- Collections (LIB-3).
+- Advanced evaluation dashboard (TRU-2).
+
+**Preserved and not touched by this correction:** the parser (M-05..M-09), the Gemini provider (M-10) and the evaluation harness (M-11) are complete and stay exactly as they are. Rows below are marked `POSTPONED` where their only purpose was postponed work.
+
 ### Explicitly not on the critical path (P2 — do not start before P0 works)
 
-- Evon / Kaggle hosting or tunnel, realtime STT WebSocket, two-speaker diarisation, OCR/photo import, nutrition, family tree, pantry search, collections, voice rescue, sophisticated animations, and a full analytics dashboard.
+- Evon / Kaggle hosting or tunnel, realtime STT WebSocket, two-speaker diarisation, OCR/photo import, nutrition, family tree, voice rescue, sophisticated animations, and a full analytics dashboard.
 - If all P0 checks are green by Sunday evening, choose **one** small optional feature. Do not start several half-finished features.
 
 ### Scope decisions
@@ -49,7 +64,7 @@ The week is too short to build every feature in `01_PRODUCT.md`. We will ship on
 - Build the frontend against `docs/fixtures/parse_result.sample.json` on Day 1. It must not wait for a live backend.
 - Build and test against `GNANI_MOCK=1` first. A real Gnani request is a manual smoke test only.
 - Use Prisma as the essential Gnani integration. Timbre is included for the cook-mode demo if the live endpoint/credits permit; browser speech is the fallback. Never claim a model worked unless a real call was made and heard/checked.
-- Keep the first useful UI deliberately small: Capture → Review → Recipe → Cook. Do not design a library product before this path works.
+- The frontend is React (Vite) and uses the Supabase Auth client for sign-in/session. It calls FastAPI for every read and write and never writes to Supabase directly (no bypassing business logic, no privileged keys in `VITE_` variables or the bundle). First useful path: Sign in → Capture/Review → Recipe → Library, then Cook.
 
 ---
 
@@ -57,7 +72,7 @@ The week is too short to build every feature in `01_PRODUCT.md`. We will ship on
 
 | Person | Owns implementation | Does not wait for | Must hand over |
 |---|---|---|---|
-| **Mrinmoy (M)** | `backend/`, parser, units, Gnani gateway, SQLite, API contracts and backend tests | Frontend; Shritama uses the fixture | OpenAPI/API responses, mock endpoints, test command, known limitations |
+| **Mrinmoy (M)** | `backend/`, parser, units, Gnani gateway, Supabase PostgreSQL + Supabase Auth, API contracts and backend tests | Frontend; Shritama uses the fixture | OpenAPI/API responses, mock endpoints, test command, known limitations |
 | **Shritama (S)** | `frontend/`, UI, capture flow, evaluation data/report, demo assets and user-facing docs | Backend; start with fixture + mock API adapter | Working screens, sample data, evaluation evidence, demo video/post links |
 | **Both (J)** | API contract freeze, integration, bug bash, demo rehearsal, contribution and submission checklist | — | A runnable build and accurate individual contribution evidence |
 
@@ -138,9 +153,25 @@ Task sizes are intended to be roughly 30 minutes to 3 hours. A task must not be 
 | S-09 | S | Create `eval/cases/cases.csv` header, weighing protocol and consent notes; start collecting the first real cases while implementation continues | J-01 | CSV schema and protocol exist; every real measurement has person/case/replicate metadata and consent |
 | J-03 | Both | Test full capture → merged transcript → editable transcript → parse in mock mode | M-08, M-11, S-08 | No external service required; transcript can be edited before parsing |
 
+**Backend status (2026-11-04): M-05 done.** `backend/app/parse/normalize.py` implements the normaliser (pure functions, offline); 31 unit tests cover Bengali digits/decimals, Devanagari digits, Roman Bengali, mixed script, punctuation, whitespace, negations, unit aliases and original-text preservation. Evidence: `pytest -q` = 67 passed, `ruff check .` clean.
+
+**Backend status (2026-11-04): M-06 done.** `backend/app/parse/segment.py` segments `NormalizedText` into ordered `Segment`s (sentence punctuation + connectors only; conditionals, commas and negations never split; `conditional`/`connector` metadata preserved). 34 unit tests include a full Chitol Macher Muitha narration regression (`backend/tests/fixtures/chitol_macher_muitha_narration.txt`) verifying meaningful boundaries, source spans, ordering and complete coverage. Evidence: `pytest -q` = 101 passed, `ruff check .` clean.
+
+**Backend status (2026-11-06): M-07 done.** `backend/app/parse/lexicon.py` implements the offline Bengali/Roman-Bengali vocabulary layer (ingredient / measure / number / duration groups, 79 canonical entries) with deterministic exact -> alias -> numeric -> conservative-suffix -> longest-phrase matching, original-surface and source-span preservation, ambiguity metadata (plain `chamoch`, uncalibrated `cup`), and fuzzy candidates exposed only through `suggest` (never applied during a scan). 119 unit tests cover every required group, spelling variants, numeric/spoken ranges, Devanagari case 22, suffix safety (`মুইঠা` is never a handful), unknown-word preservation and the Chitol Macher Muitha narration regression. Evidence: `pytest -q` = 220 passed, `ruff check .` clean.
+
+**Backend status (2026-11-06): M-08 done.** `backend/app/parse/schema.py` defines the internal provenance-rich `IngredientMention` / `Quantity` / `Duration` / `RecipeStep` / `ParseResult` dataclasses (reusing `models.Clarification`, `Source`, `ParserMode`). `backend/app/parse/rules.py` exposes `parse_rules(NormalizedText) -> ParseResult` and `parse_rules_text(str)`; it consumes M-05/M-06/M-07 unchanged, attaches a quantity to an ingredient only on direct adjacency, records durations separately (never converting to seconds), preserves original surfaces and spans, emits deterministic `unit_spoon_N` / `unit_cup_N` clarifications, and never fuzzy-corrects or invents values. 42 tests cover all required quantity kinds, ambiguity, negation/conditional preservation, source spans, determinism and the Chitol Macher Muitha narration. Public `/api/parse` is untouched. Evidence: `pytest -q` = 262 passed, `ruff check .` clean.
+
+**Backend status (2026-11-06): M-09 done.** `POST /api/parse` now runs the real M-08 rules parser instead of returning the sample fixture. New `backend/app/parse/serialize.py` converts the internal result to the public Pydantic models (adding `kind`, `raw_unit`, `classifier`, `orig_start`/`orig_end`, step spans and a `Duration` model, per `docs/04_API.md`); modes are `rules` (implemented), `auto` (resolves to the first implemented provider in `LLM_CHAIN` -> `rules`) and an explicit `llm` which returns `501 LLM_UNAVAILABLE` rather than silently falling back. Whitespace-only text is rejected, `hand_profile_id`/`servings` remain unimplemented-but-accepted, and `docs/fixtures/parse_result.sample.json` is now the verbatim live response for a documented narration (test-enforced). Evidence: `pytest -q` = 277 passed, `ruff check .` clean.
+
+**Backend status (2026-11-07): M-10 done (Gemini provider integration).** Added the first real LLM provider on the official `google-genai` SDK (`requirements.txt`), configured by `GEMINI_API_KEY` and `GEMINI_MODEL` (default `gemini-3.5-flash-lite`). New `backend/app/providers/` holds a replaceable provider protocol plus `gemini.py`; `backend/app/parse/llm_schema.py` is the structured-output schema and `backend/app/parse/llm.py` builds request-local evidence ids from the unchanged M-05/M-06/M-07 pipeline, validates every selected id (existence, category, same-segment, no duplicates) and constructs the existing internal `ParseResult` from verified evidence only. Gemini never supplies wording, numbers, labels or offsets. `mode="llm"` uses Gemini, `mode="rules"` stays fully offline and deterministic, and `mode="auto"` walks `LLM_CHAIN` (e.g. `gemini,rules` selects Gemini first); an explicit `llm` request is never downgraded. Metadata is truthful (`parser_mode`, `llm_provider`, `mock=false`). Missing key -> `503 LLM_UNAVAILABLE`, timeout -> `504 UPSTREAM_BUSY`, rate limit -> `503 UPSTREAM_BUSY`, provider/invalid-output -> `502 UPSTREAM_ERROR`; raw provider messages, keys and transcripts are never exposed. All provider tests run offline with an injected fake provider / mocked SDK. Note: the Day-2 **M-10** row above is the Gnani Prisma/Timbre smoke test; it is a separate task and is not claimed here. Evidence: `pytest -q` = 322 passed, `ruff check .` clean.
+
+Manual Gemini smoke test (not run automatically, no key needed to run the suite): set `GEMINI_API_KEY` and `GEMINI_MODEL=gemini-3.5-flash-lite`, start `uvicorn backend.app.main:app`, then `POST /api/parse` with `{"text": "<chitol macher muitha narration>", "mode": "llm"}` and inspect the JSON for ingredients, quantities, durations, ambiguity and original wording.
+
+**Backend status (2026-11-07): M-11 done (parser evaluation harness).** Added `backend/evaluation/` with a 21-case curated golden dataset (`dataset/recipes.jsonl`, `DATASET_VERSION=1.0.0`), a parser-independent evaluation schema (`schema.py`), a loader that rejects duplicate ids and evidence phrases that are not literal transcript substrings (`loader.py`), metrics (`metrics.py`), JSON + Markdown reports (`report.py`) and a CLI (`runner.py`). `python -m backend.evaluation.runner --provider rules` is fully offline; Gemini evaluation requires `--confirm-live-api`, valid credentials, makes one request per case with no retries, and reports failed cases as not evaluated instead of substituting rules. Metrics cover ingredient P/R/F1, quantity accuracy/association/range/unit/vague/taste, duration recall/value/unit and misattachments, clarification preservation, negative expectations, evidence grounding and unsupported-assertion rate (kept separate from F1). Rules baseline on the golden set: ingredient P/R/F1 = 100%, quantity accuracy 17/18 (94.4%, the miss is the documented `panch-chhoy ta lonka` classifier case), duration recall 100%, clarifications 3/3, negatives 10/10, evidence grounding 100%, unsupported 0/47. No production parser behaviour changed. Evidence: `pytest -q` = 344 passed, `ruff check .` clean. See `docs/15_EVALUATION_HARNESS.md`.
+
 **Day 2 stop rule:** If live Prisma is not working after the smoke test and one focused fix, keep mock/manual capture working and investigate the upstream issue separately. Do not block parser or UI work on the provider.
 
-### Day 3 — Thu 5 Nov: honest quantity ranges + clarification + calibration
+### Day 3 — Thu 5 Nov: honest quantity ranges + clarification
 
 | ID | Owner | Task / exact output | Depends on | Acceptance check |
 |---|---|---|---|---|
@@ -149,29 +180,30 @@ Task sizes are intended to be roughly 30 minutes to 3 hours. A task must not be 
 | M-14 | M | Implement ingredient classes and range lookup fallback | M-12, M-13 | Rice, flour, salt, liquid and unknown ingredient paths have tests |
 | M-15 | M | Implement ambiguity detection for spoon and cup, with stable IDs/questions/options | M-08, M-13 | Ambiguous spoon/cup creates clarification rather than choosing a default |
 | M-16 | M | Implement `/api/parse/resolve` as a stateless recomputation from draft + answers | M-15 | Selecting tsp/tbsp or cup type changes the parsed result and clears resolved clarification |
-| M-17 | M | Implement hand profile + weighing repository/service; one weighing uses a visibly labelled personal interval | M-13 | Weighing persists; recalculation changes only the matching profile/unit/ingredient range |
+| M-17 | M | **POSTPONED** (2026-11-08 correction) hand profile + weighing repository/service; one weighing uses a visibly labelled personal interval | M-13 | Weighing persists; recalculation changes only the matching profile/unit/ingredient range |
 | S-10 | S | Build Recipe Review screen: ordered steps, ingredient chips, range bars, raw phrase and `typical/yours/exact` labels | S-03, M-04 | UI displays all fields from response; no frontend-invented quantity values |
 | S-11 | S | Build clarification cards with answer options and Resolve action | S-10, M-16 | User answers each clarification and sees updated ranges |
-| S-12 | S | Build hand calibration wizard (choose unit → enter weighed amount → save → refresh range) | S-10, M-17 | A measurement updates only that user's matching range |
-| S-13 | S | Add servings control and display scaled low/high interval, preserving unit and rounding | S-10, M-13 | 2x servings doubles both bounds; `start low, taste, add more` appears for scaled salt/spice/chilli |
+| S-12 | S | **POSTPONED** (2026-11-08 correction) hand calibration wizard (choose unit → enter weighed amount → save → refresh range) | S-10, M-17 | A measurement updates only that user's matching range |
+| S-13 | S | **POSTPONED** (2026-11-08 correction) servings control and display scaled low/high interval, preserving unit and rounding | S-10, M-13 | 2x servings doubles both bounds; `start low, taste, add more` appears for scaled salt/spice/chilli |
 | S-14 | S | Continue evaluation collection toward the target in `10_EVAL_PLAN.md` (25 cases × 3 replicates); if time/access prevents this, report the actual smaller n as a pilot | S-09 | Measurements include unit, ingredient, cook/person, replicate and date; do not fabricate missing data |
-| J-04 | Both | Integrate parser + ranges + clarifications + calibration in the real UI | M-16, M-17, S-13 | A typed Bengali/Benglish sample becomes editable steps with labelled ranges and answerable ambiguity |
+| J-04 | Both | Integrate parser + ranges + clarifications in the real UI (calibration and scaling are postponed) | M-16 | A typed Bengali/Benglish sample becomes editable steps with labelled ranges and answerable ambiguity |
 
-### Day 4 — Fri 6 Nov: persistence + cook mode + P0 integration
+### Day 4 — Fri 6 Nov: Supabase auth + persistence + cook mode + P0 integration
 
 | ID | Owner | Task / exact output | Depends on | Acceptance check |
 |---|---|---|---|---|
-| M-18 | M | Create SQLite schema and DB initialisation for consent, person/profile, weighing, recipe, recipe_version, step and quantity | M-02, M-17 | Fresh database initialises; foreign keys are on; schema matches `03_DATA_MODEL.md` |
-| M-19 | M | Implement repository methods with tests: create/check/revoke consent; create person/profile/weighing; create recipe/version; list/get/delete recipes | M-18 | CRUD tests pass; deleting a recipe removes child rows |
-| M-20 | M | Add consent/person endpoints from `04_API.md` plus `POST /api/recipes`, `GET /api/recipes`, `GET /api/recipes/{id}`, `DELETE /api/recipes/{id}` | M-19 | API contract tests pass; original transcript and version are retained |
+| M-18A | M | Supabase project + database foundation: project configuration, PostgreSQL connection config (`SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_DB_URL` placeholders in `.env.example`), the initial SQL migration creating `profiles`, `recipes`, `recipe_versions` with foreign keys and indexes, RLS ownership policies, and a connection verification | M-02 | A fresh Supabase database initialises from the migration; tables and relationships are verified; RLS ownership policies are present; no secrets are committed |
+| M-18B | M | Supabase Auth integration: access-token verification dependency (signature via the project's signing keys/JWKS, plus `exp`/`iss`/`aud` checks), current-user dependency deriving the id from the token's `sub`, user/profile resolution, protected `GET /api/me`, clear 401 behaviour | M-02, M-18A | A valid access token identifies the correct user; missing, invalid and expired tokens are rejected with `401 UNAUTHORIZED`; user ids are never taken from untrusted client input; no custom password authentication is introduced |
+| M-19 | M | User-scoped recipe repository on PostgreSQL: create recipe, list recipes for one user, retrieve a user's recipe, create a new version, delete recipe; every read/update/delete enforces ownership in application code (the service key bypasses RLS); preserve the exact original transcript and the complete JSONB draft | M-18A, M-18B | Two test users cannot read or modify each other's recipes; recipe versions are retained; deletion cascades to versions; data survives a backend restart |
+| M-20 | M | Protected recipe API: `POST /api/recipes`, `GET /api/recipes`, `GET /api/recipes/{id}`, `PUT /api/recipes/{id}`, `DELETE /api/recipes/{id}`, each behind the M-18B auth dependency and owner-scoped | M-19, M-18B | All endpoints require authentication; every operation is scoped to the authenticated owner; the existing parser APIs are unchanged; a recipe can be saved and retrieved after restarting the application |
 | M-21 | M | Add `/api/speak` with Timbre client, text/voice/language cache and browser-speech fallback signal | M-11 | Mock TTS returns audio; live TTS result is verified manually or clearly marked unavailable |
 | M-22 | M | Add cook command normaliser for keyboard/button commands; keep voice command clips optional | M-08 | `next`, `prev`, `repeat`, `stop` map to stable command names |
-| S-15 | S | Add Save Recipe flow, title field, saved confirmation and list/open/delete saved recipes | S-10, M-20 | Saved recipe survives app reload and can be reopened |
+| S-15 | S | Supabase Auth + recipe library: sign-in/sign-up screen with the Supabase Auth client (Google login if enabled on the project, email/password otherwise), session persistence across reloads, logout; save recipe flow (title + tags from a parse result), library list, open recipe, delete recipe. The frontend forwards the access token to protected FastAPI routes and never writes to the database directly | S-10, M-20, M-18B | A signed-in user saves a recipe, sees it in the library after closing and reopening the app, opens and deletes it; another account's recipes are never listed or openable |
 | S-16 | S | Build Cook Mode: one step at a time, large Next/Back/Repeat buttons, progress indicator and keep-screen-awake attempt | S-15 | Navigation works by touch and keyboard; does not require microphone permission |
 | S-17 | S | Add one or more timers with visible countdown and completion alert | S-16 | Two timers can run independently; timer state does not reset on step navigation |
 | S-18 | S | Connect step speech playback to `/api/speak`; fall back to browser speech and visible text | S-16, M-21 | A step can be heard or read; failure never leaves a blank screen |
 | S-19 | S | Create a clean recipe share-card layout (print CSS first; PNG only if reliable Bengali rendering is available) | S-10 | Recipe title, original phrase, steps and range labels are legible; no false exact numbers |
-| J-05 | Both | P0 integration gate: clean install, fresh DB, mock capture, parse, resolve, calibrate, save, reopen and cook | M-20, S-18 | Entire journey completes on one laptop without manual code edits between steps |
+| J-05 | Both | P0 integration gate: clean install, fresh Supabase database, sign in, mock capture, parse, save, reopen (restart) and cook | M-20, M-18B, S-18 | Entire journey completes on one laptop without manual code edits between steps, and the minimum release journey in §1 is green |
 
 ### Day 5 — Sat 7 Nov: evidence + demo + public post
 
@@ -249,10 +281,10 @@ Every unfinished task must be moved to one of: `next day`, `cut`, or `blocked by
 3. **Rules before LLM.** The deterministic parser and unit maths are the source of truth. LLM extraction is not required for the demo if it threatens reliability; it can be added only after rules pass.
 4. **One clarification is better than a silent guess.** If the parser cannot distinguish tsp/tbsp or cup types, ask the user.
 5. **Evidence before polish.** Evaluation and demo footage outrank extra animations or P2 features.
-6. **If Day 3 slips:** cut servings scaling UI first, then advanced keyterm handling; preserve transcription/manual input, ranges, ambiguity and calibration.
+6. **If Day 3 slips:** cut servings scaling UI first, then advanced keyterm handling; preserve transcription/manual input, ranges, ambiguity and transcript editing. (Personal calibration is already postponed.)
 7. **If Day 4 slips:** cut PNG export and saved-recipe delete; preserve save/open, basic cook mode, ranges and transcript editing.
 8. **If Day 5 slips:** no optional features at all. Spend remaining time stabilising, measuring and recording the real working path.
-9. **Never cut:** one real Gnani API integration verified in the demo or clearly identified as a verified backend call, mock/manual fallback, privacy consent, honest ranges, test suite, contribution evidence and a truthful public demo.
+9. **Never cut:** one real Gnani API integration verified in the demo or clearly identified as a verified backend call, mock/manual fallback, privacy consent, honest ranges, Supabase sign-in with owner-scoped storage, test suite, contribution evidence and a truthful public demo.
 
 ## 8. Risks and immediate responses
 
@@ -268,9 +300,10 @@ Every unfinished task must be moved to one of: `next day`, `cut`, or `blocked by
 
 ## 9. Final release checklist
 
-- [ ] Product journey works on a fresh checkout in mock mode.
+- [ ] Product journey works on a fresh checkout: sign in (or mock mode where documented), transcript, parse, save, reopen, edit/version, delete.
 - [ ] At least one Gnani model/API was genuinely used and is named accurately in the project explanation.
-- [ ] Transcript editing, parse, clarification, range display and personal calibration work.
+- [ ] Transcript editing, parse, clarification and range display work.
+- [ ] Ownership isolation is demonstrated with two accounts: neither can list, open, edit or delete the other's recipes, and saved recipes survive an application restart.
 - [ ] Consent is collected before recording another person's voice; audio is not retained by default.
 - [ ] No real phone numbers, account numbers, Aadhaar, PAN or private recordings are in the repo/demo.
 - [ ] Automated tests pass offline; test command is documented.

@@ -23,12 +23,8 @@ from ..models import (
 router = APIRouter(tags=["system"])
 
 
-def _provider(
-    name: str, configured: bool, healthy: bool | None, note: str
-) -> LlmProviderStatus:
-    return LlmProviderStatus(
-        name=name, configured=configured, healthy=healthy, note=note
-    )
+def _provider(name: str, configured: bool, healthy: bool | None, note: str) -> LlmProviderStatus:
+    return LlmProviderStatus(name=name, configured=configured, healthy=healthy, note=note)
 
 
 def _llm_status(settings: Settings) -> LlmStatus:
@@ -37,7 +33,7 @@ def _llm_status(settings: Settings) -> LlmStatus:
             "gemini",
             configured=bool(settings.gemini_api_key),
             healthy=None,
-            note="selected primary extraction provider; live integration is a later task",
+            note="LLM extraction provider (M-10); reachability is not probed here",
         ),
         "ollama": _provider(
             "ollama",

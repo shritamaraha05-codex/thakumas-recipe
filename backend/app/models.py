@@ -13,7 +13,7 @@ from __future__ import annotations
 
 from enum import Enum
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 
 class Basis(str, Enum):
@@ -67,7 +67,15 @@ class QuantityRange(BaseModel):
 
 
 class Quantity(BaseModel):
-    """One ingredient/measure as spoken, plus code-derived range."""
+    """One ingredient/measure as spoken, plus code-derived range.
+
+    ``kind`` preserves *why* a quantity is (or is not) numeric:
+    ``exact`` (a single stated value), ``range`` (an explicit range),
+    ``vague`` (no number spoken), ``taste`` (to-taste instruction) or
+    ``unresolved`` (measurement spoken without a number). ``range`` is the
+    deterministic interval in grams/millilitres and stays ``None`` until the
+    units stage exists; the rules parser never fabricates it.
+    """
 
     id: str
     ingredient: str | None = None
@@ -75,20 +83,50 @@ class Quantity(BaseModel):
     qty: float | None = None
     qty_max: float | None = None
     unit: str | None = None
+    raw_unit: str | None = None
+    classifier: str | None = None
+    kind: str | None = None
     to_taste: bool = False
     raw_phrase: str
     confidence: float | None = Field(default=None, ge=0.0, le=1.0)
     source: Source
+    orig_start: int | None = None
+    orig_end: int | None = None
     range: QuantityRange | None = None
     clarification: Clarification | None = None
 
 
+class Duration(BaseModel):
+    """A spoken cooking duration.
+
+    The unit is what the cook used (``minute``/``hour``/``second``); it is never
+    converted to seconds here, so ``CookingStep.timer_seconds`` stays ``None``.
+    """
+
+    raw_phrase: str
+    value: float | None = None
+    value_max: float | None = None
+    unit: str | None = None
+    kind: str | None = None
+    orig_start: int | None = None
+    orig_end: int | None = None
+
+
 class CookingStep(BaseModel):
-    """An ordered step; ``text`` keeps her original words (golden rule 5)."""
+    """An ordered step; ``text`` keeps her original words (golden rule 5).
+
+    ``orig_start``/``orig_end`` span the untouched transcript, so the UI can
+    highlight exactly what was said. ``durations`` keeps spoken cooking times in
+    their original unit; ``timer_seconds`` is left ``None`` until a later task
+    is explicitly asked to convert.
+    """
 
     idx: int
     text: str
+    orig_start: int | None = None
+    orig_end: int | None = None
     timer_seconds: int | None = None
+    durations: list[Duration] = Field(default_factory=list)
     quantities: list[Quantity] = Field(default_factory=list)
 
 
@@ -126,13 +164,21 @@ class ParseRequest(BaseModel):
     """``POST /api/parse`` request body.
 
     ``hand_profile_id`` and ``servings`` are part of the frozen contract but are
-    not acted on in this batch (no hand calibration or serving scaling yet).
+    not acted on yet: personal measurement calibration and recipe scaling are
+    later tasks, so the parser neither calibrates nor scales.
     """
 
     text: str = Field(min_length=1)
     mode: ParseMode = ParseMode.auto
     hand_profile_id: int | None = None
     servings: float | None = Field(default=None, gt=0)
+
+    @field_validator("text")
+    @classmethod
+    def _reject_blank_text(cls, value: str) -> str:
+        if not value.strip():
+            raise ValueError("text must contain at least one non-whitespace character")
+        return value
 
 
 class ErrorCode(str, Enum):

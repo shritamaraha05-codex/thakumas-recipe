@@ -40,15 +40,18 @@ class Settings(BaseSettings):
     gnani_voice: str = "Shivani"
 
     # LLM provider chain. "rules" is the deterministic floor and must remain last.
-    # Production target is "gemini,rules"; Gemini integration is a later task.
+    # Auto mode walks this chain; an explicit mode="llm" uses Gemini (M-10).
     llm_chain: str = "rules"
     gemini_api_key: str = ""
-    gemini_model: str = ""
+    gemini_model: str = "gemini-3.5-flash-lite"
     ollama_base_url: str = "http://localhost:11434/v1"
     ollama_model: str = ""
     llm_replay_only: bool = False
 
-    # SQLite file path. Persistence is a later task (M-18); no DB is opened now.
+    # Deprecated placeholder. SQLite is no longer the store: persistence moves
+    # to Supabase PostgreSQL under M-18A (docs/02, docs/03). No database is
+    # opened by the app yet; this field stays only so the current health
+    # response is unchanged until M-18A replaces it.
     db_path: str = "thakuma.db"
 
     # Deterministic fixture served by POST /api/parse until the parser exists.

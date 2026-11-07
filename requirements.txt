@@ -8,3 +8,4 @@ pydantic>=2.7           # v2 request/response models (M-04)
 pydantic-settings>=2.2  # environment-based configuration (M-02)
 python-dotenv>=1.0      # lets pydantic-settings read a local .env
 httpx>=0.27             # required by FastAPI's TestClient; future HTTP client
+google-genai>=1.0       # Gemini Developer API SDK for the LLM provider (M-10); tested on 2.10.0

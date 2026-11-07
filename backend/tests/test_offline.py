@@ -19,8 +19,13 @@ def test_settings_are_credential_free(test_settings: Settings) -> None:
 
 def test_endpoints_work_without_credentials(client: TestClient) -> None:
     assert client.get("/api/health").status_code == 200
-    response = client.post("/api/parse", json={"text": "ek muthi chal", "mode": "llm"})
+    response = client.post("/api/parse", json={"text": "ek muthi chal", "mode": "rules"})
     assert response.status_code == 200
+    # An explicit LLM request selects Gemini; with no key it is refused with a
+    # controlled error, not silently downgraded, and still makes no network call.
+    llm = client.post("/api/parse", json={"text": "ek muthi chal", "mode": "llm"})
+    assert llm.status_code == 503
+    assert llm.json()["error"]["code"] == "LLM_UNAVAILABLE"
 
 
 def test_no_outbound_connection_is_made(

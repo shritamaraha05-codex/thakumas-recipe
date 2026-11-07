@@ -20,6 +20,12 @@ def test_empty_text_is_rejected(client: TestClient) -> None:
     assert response.json()["error"]["code"] == "INVALID_INPUT"
 
 
+def test_whitespace_only_text_is_rejected(client: TestClient) -> None:
+    response = client.post("/api/parse", json={"text": "   \n\t "})
+    assert response.status_code == 422
+    assert response.json()["error"]["code"] == "INVALID_INPUT"
+
+
 def test_unsupported_mode_is_rejected(client: TestClient) -> None:
     response = client.post("/api/parse", json={"text": "ek muthi chal", "mode": "magic"})
     assert response.status_code == 422

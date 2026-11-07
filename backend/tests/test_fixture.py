@@ -1,14 +1,25 @@
-"""The sample fixture must match the Pydantic contract (docs/04_API.md)."""
+"""The sample fixture must match the Pydantic contract (docs/04_API.md).
+
+Since M-09 the fixture is the *actual* response of the rules parser for one
+documented narration, not a hand-written mock. A test below re-runs that
+narration through the API and compares, so the sample cannot drift from reality.
+"""
 
 from __future__ import annotations
 
 import json
 
 import pytest
+from fastapi.testclient import TestClient
 from pydantic import ValidationError
 
 from backend.app.config import DEFAULT_MOCK_FIXTURE
 from backend.app.models import ParseRequest, ParseResult, QuantityRange
+
+# The narration the sample fixture was generated from (docs/04_API.md).
+SAMPLE_INPUT = (
+    "এক চামচ তেল দাও। তারপর এক মুঠো চাল আর এক চিমটি নুন দাও, স্বাদমতো নুন। দশ মিনিট ঢিমে আঁচে রান্না করো।"
+)
 
 QUANTITY_FIELDS = [
     "id",
@@ -32,9 +43,14 @@ def _raw() -> dict:
 
 def test_sample_fixture_validates_as_parse_result() -> None:
     result = ParseResult.model_validate(_raw())
-    assert result.meta.parser_mode.value == "hybrid"
-    assert result.meta.llm_provider == "gemini"
+    assert result.meta.parser_mode.value == "rules"
+    assert result.meta.llm_provider is None
     assert result.meta.mock is False
+
+
+def test_sample_fixture_matches_the_live_rules_response(client: TestClient) -> None:
+    body = client.post("/api/parse", json={"text": SAMPLE_INPUT, "mode": "rules"}).json()
+    assert body == _raw()
 
 
 def test_fixture_declares_mock_metadata_fields() -> None:
