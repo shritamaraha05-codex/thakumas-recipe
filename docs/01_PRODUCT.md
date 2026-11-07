@@ -16,6 +16,7 @@ Priority: **P0** demo-critical, **P1** makes it complete, **P2** stretch (drop f
 
 | ID | Feature | Pri | Area | Acceptance criteria |
 |---|---|---|---|---|
+| ACC-1 | Supabase Auth accounts: sign-up, sign-in, logout, session; Google login if enabled on the project | P0 | BE+FE | Frontend signs in via the Supabase client; every protected route requires a token verified for signature, `exp`, `iss` and `aud`; identity comes from the token's `sub`; no custom password storage |
 | CAP-1 | Record/upload long narration, chunked to <=25 s WAV, sequential STT | P0 | FE+BE | 3-min recording yields one merged transcript; no chunk >30 s; one active Gnani request at a time |
 | CAP-2 | Transcript review editor; corrections feed keyterm list | P0 | FE+BE | Edited words saved and sent as `keyterms` on next request |
 | CAP-3 | Interview mode: app asks follow-ups aloud to fill gaps | P1 | BE+FE | Missing quantity/time triggers a spoken question; answer merges into the step |
@@ -27,13 +28,13 @@ Priority: **P0** demo-critical, **P1** makes it complete, **P2** stretch (drop f
 | UND-4 | Synonym/regional tables, self-correction ("na na dui chamoch") | P1 | BE | Spec cases 12, 20, 21, 22 pass |
 | UND-5 | Nutrition and allergen ranges derived from quantity ranges | P2 | BE | Ranges propagate; labelled estimate |
 | QTY-1 | Sourced reference table (`reference.yaml`) | P0 | BE | Every row has `source`, `status`; unverified rows shown as "typical (unverified)" |
-| QTY-2 | Hand profiles + calibration wizard | P0 | BE+FE | 1 weighing narrows range (+-15%); >=2 uses observed spread |
-| QTY-3 | Servings scaling on intervals | P0 | BE+FE | Scaled ranges = base x factor, rounded sensibly |
-| QTY-4 | "Start low, taste, add more" for salt-like items | P0 | BE+FE | Salt/spice/chilli show staged guidance when scaled >1.5x |
+| QTY-2 | Hand profiles + calibration wizard — **POSTPONED** (2026-11-08) | P2 | BE+FE | 1 weighing narrows range (+-15%); >=2 uses observed spread |
+| QTY-3 | Servings scaling on intervals — **POSTPONED** (2026-11-08) | P2 | BE+FE | Scaled ranges = base x factor, rounded sensibly |
+| QTY-4 | "Start low, taste, add more" for salt-like items — **POSTPONED** (2026-11-08) | P2 | BE+FE | Salt/spice/chilli show staged guidance when scaled >1.5x |
 | QTY-5 | Unit converter; "which weighing tightens this recipe most?" | P1 | BE+FE | Suggestion ranks (unit, ingredient) by width x occurrences |
-| LIB-1 | SQLite library, versions, tags, attribution | P0 | BE+FE | CRUD + version; original transcript retained |
-| LIB-2 | Voice pantry search ("chal, dal, alu ache") | P1 | BE+FE | Recipes ranked by ingredient overlap |
-| LIB-3 | Collections ("Thakuma's recipes") | P1 | BE+FE | CRUD + filter |
+| LIB-1 | Cloud recipe library (Supabase PostgreSQL), versions, tags, attribution | P0 | BE+FE | CRUD + version; original transcript retained; owner-only access via Supabase Auth |
+| LIB-2 | Voice pantry search ("chal, dal, alu ache") — **POSTPONED** (2026-11-08) | P2 | BE+FE | Recipes ranked by ingredient overlap |
+| LIB-3 | Collections ("Thakuma's recipes") — **POSTPONED** (2026-11-08) | P2 | BE+FE | CRUD + filter |
 | LIB-4 | Family recipe tree | P2 | FE | Lineage view from attribution |
 | COK-1 | Hands-free cook mode: read steps, multiple timers, voice commands | P0 | FE+BE | next/back/repeat/stop by voice and keys; >=2 concurrent timers |
 | COK-2 | Realtime listening (no button) via Prisma WebSocket | P1 | BE+FE | Commands recognised within ~2 s while TTS is not playing |
@@ -45,14 +46,17 @@ Priority: **P0** demo-critical, **P1** makes it complete, **P2** stretch (drop f
 | SHR-3 | "Thakuma reads it to you" audio recipe | P1 | BE+FE | Timbre audio of the full recipe, cached |
 | SHR-4 | Cloned-voice reading (Gnani voice cloning) | P2 | BE | Only with `voice_clone` consent + verification phrase |
 | TRU-1 | Evaluation harness + dataset | P0 | EV | `eval/report.md` generated from data |
-| TRU-2 | In-app "How accurate is this?" page | P1 | FE+EV | Shows coverage/width from latest run |
+| TRU-2 | In-app "How accurate is this?" page — **POSTPONED** (2026-11-08) | P2 | FE+EV | Shows coverage/width from latest run |
 | TRU-3 | Consent and privacy | P0 | BE+FE | See `11_PRIVACY_CONSENT.md` |
 | PLT-1 | LLM provider chain, cache, replay | P0 | BE | Chain order configurable; replay works offline |
 | PLT-2 | Gnani gateway, budget log, mock mode | P0 | BE | `api_usage` rows written; `GNANI_MOCK=1` works |
 | PLT-3 | Evon-on-Kaggle experiment | P1 | BE | Decision recorded within the timebox |
 
 ## Non-goals
-Accounts/auth, mobile app, social network, nutrition accuracy claims, medical or allergen advice, dialects beyond Bengali/Hindi/English.
+Mobile app, social network, nutrition accuracy claims, medical or allergen advice, dialects beyond Bengali/Hindi/English. Accounts/auth are now in scope (Supabase Auth, ACC-1/LIB-1); custom password storage is a non-goal.
+
+## Postponed features (2026-11-08 planning correction)
+Personal measurement calibration and weighings, full person/profile/consent management, recipe scaling, pantry search, collections and the advanced evaluation dashboard are moved off the critical path to protect the sign-in → parse → save → library → persistence journey (see `docs/12_TASKS.md` §1). They are not cancelled; rows above keep their acceptance criteria for when they return.
 
 ## Success measures (targets, not claims)
-Post-calibration range coverage 80-90% on our own weighing set with width reported; parser item F1 on the case set; end-to-end demo works offline from fixtures; every P0 acceptance criterion demonstrated.
+Parser item F1 on the case set; end-to-end demo works offline from fixtures; every P0 acceptance criterion demonstrated; the minimum release journey (sign in, transcript, parse, save, reopen, isolation) passes on a fresh Supabase database. (The post-calibration range-coverage target is deferred with the calibration feature.)
