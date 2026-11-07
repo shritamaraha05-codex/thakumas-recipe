@@ -1,0 +1,9 @@
+[tool.ruff]
+line-length = 100
+
+# prototype_v0/ is a frozen reference (see docs/PROTOTYPE_AUDIT.md). Its lint
+# debt is out of scope for the new backend and must not be modified.
+extend-exclude = ["prototype_v0"]
+
+[tool.pytest.ini_options]
+testpaths = ["backend/tests", "prototype_v0/tests"]

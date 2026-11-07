@@ -13,8 +13,8 @@ Build "Thakuma's Recipe" as specified in `docs/`. Read `docs/00`–`docs/14` bef
 7. **The app must work without the LLM and without Gnani.** Rule parser + mock mode are the floor (`GNANI_MOCK=1`, `LLM_CHAIN=rules`).
 
 ## Stack and commands
-- Backend: Python 3.11+, FastAPI, pydantic v2, SQLite (stdlib `sqlite3`), `requests`/`httpx`, pytest, ruff.
-- Frontend: vanilla ES modules + CSS + SVG/Canvas. **No build step, no framework.**
+- Backend: Python 3.11+, FastAPI, pydantic v2, Supabase PostgreSQL (via `SUPABASE_DB_URL`) with Supabase Auth token verification, `requests`/`httpx`, pytest, ruff.
+- Frontend: React (Vite) with the Supabase Auth client; the frontend never writes to the database directly — all reads/writes go through FastAPI with the user's access token. No secrets or service-role keys in `VITE_` variables.
 - Run: `uvicorn backend.app.main:app --reload`; test: `pytest -q`; lint: `ruff check .`
 - Tests must never call Gnani or any LLM. Use fixtures and mocks.
 

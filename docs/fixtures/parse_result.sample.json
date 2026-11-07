@@ -1,35 +1,38 @@
 {
   "recipe": {
-    "title": "Sample (synthetic)",
-    "language": "bn-IN",
-    "base_servings": 4,
+    "title": "Untitled recipe",
+    "language": null,
+    "base_servings": null,
     "steps": [
       {
         "idx": 1,
-        "text": "ekta kodai e ek chamoch tel dao",
+        "text": "এক চামচ তেল দাও।",
+        "orig_start": 0,
+        "orig_end": 16,
         "timer_seconds": null,
+        "durations": [],
         "quantities": [
           {
             "id": "q1",
             "ingredient": "oil",
             "ingredient_class": "liquid",
-            "qty": 1,
+            "qty": 1.0,
             "qty_max": null,
             "unit": "spoon",
+            "raw_unit": "চামচ",
+            "classifier": null,
+            "kind": "exact",
             "to_taste": false,
-            "raw_phrase": "ek chamoch tel",
-            "confidence": 0.9,
-            "source": "both",
-            "range": {
-              "lo": 5,
-              "hi": 15,
-              "unit": "ml",
-              "basis": "typical"
-            },
+            "raw_phrase": "এক চামচ তেল",
+            "confidence": 1.0,
+            "source": "rules",
+            "orig_start": 0,
+            "orig_end": 11,
+            "range": null,
             "clarification": {
-              "id": "c1",
+              "id": "unit_spoon_1",
               "kind": "unit_spoon",
-              "question": "Chaa-er chamoch na bhaat-er chamoch?",
+              "question": "এক চামচ মানে কোনটি — ছোট চামচ (চা-চামচ) না বড় চামচ (ভাত-চামচ)?",
               "options": [
                 "tsp",
                 "tbsp"
@@ -40,58 +43,66 @@
       },
       {
         "idx": 2,
-        "text": "tarpor ek muthi chal ar ek chimti nun dao, jol ta jemon lage",
+        "text": "তারপর এক মুঠো চাল আর এক চিমটি নুন দাও, স্বাদমতো নুন।",
+        "orig_start": 17,
+        "orig_end": 69,
         "timer_seconds": null,
+        "durations": [],
         "quantities": [
           {
             "id": "q2",
             "ingredient": "rice",
             "ingredient_class": "grain",
-            "qty": 1,
+            "qty": 1.0,
             "qty_max": null,
             "unit": "muthi",
+            "raw_unit": "মুঠো",
+            "classifier": null,
+            "kind": "exact",
             "to_taste": false,
-            "raw_phrase": "ek muthi chal",
-            "confidence": 0.95,
-            "source": "both",
-            "range": {
-              "lo": 33,
-              "hi": 44,
-              "unit": "g",
-              "basis": "yours"
-            },
+            "raw_phrase": "এক মুঠো চাল",
+            "confidence": 1.0,
+            "source": "rules",
+            "orig_start": 23,
+            "orig_end": 34,
+            "range": null,
             "clarification": null
           },
           {
             "id": "q3",
             "ingredient": "salt",
             "ingredient_class": "salt",
-            "qty": 1,
+            "qty": 1.0,
             "qty_max": null,
             "unit": "chimti",
+            "raw_unit": "চিমটি",
+            "classifier": null,
+            "kind": "exact",
             "to_taste": false,
-            "raw_phrase": "ek chimti nun",
-            "confidence": 0.95,
+            "raw_phrase": "এক চিমটি নুন",
+            "confidence": 1.0,
             "source": "rules",
-            "range": {
-              "lo": 0.3,
-              "hi": 1,
-              "unit": "g",
-              "basis": "typical"
-            },
+            "orig_start": 38,
+            "orig_end": 50,
+            "range": null,
             "clarification": null
           },
           {
             "id": "q4",
-            "ingredient": "water",
-            "ingredient_class": "liquid",
+            "ingredient": "salt",
+            "ingredient_class": "salt",
             "qty": null,
             "qty_max": null,
             "unit": null,
+            "raw_unit": "স্বাদমতো",
+            "classifier": null,
+            "kind": "taste",
             "to_taste": true,
-            "raw_phrase": "jol ta jemon lage",
-            "confidence": 0.8,
+            "raw_phrase": "স্বাদমতো নুন",
+            "confidence": 1.0,
             "source": "rules",
+            "orig_start": 56,
+            "orig_end": 68,
             "range": null,
             "clarification": null
           }
@@ -99,15 +110,30 @@
       },
       {
         "idx": 3,
-        "text": "dosh minute dhimi anche ranna koro",
-        "timer_seconds": 600,
+        "text": "দশ মিনিট ঢিমে আঁচে রান্না করো।",
+        "orig_start": 70,
+        "orig_end": 100,
+        "timer_seconds": null,
+        "durations": [
+          {
+            "raw_phrase": "দশ মিনিট",
+            "value": 10.0,
+            "value_max": null,
+            "unit": "minute",
+            "kind": "exact",
+            "orig_start": 70,
+            "orig_end": 78
+          }
+        ],
         "quantities": []
       }
     ]
   },
   "meta": {
-    "parser_mode": "hybrid",
-    "llm_provider": "gemini",
-    "replayed": false
+    "parser_mode": "rules",
+    "llm_provider": null,
+    "replayed": false,
+    "mock": false,
+    "mock_source": null
   }
 }
