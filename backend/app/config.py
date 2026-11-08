@@ -48,11 +48,20 @@ class Settings(BaseSettings):
     ollama_model: str = ""
     llm_replay_only: bool = False
 
-    # Deprecated placeholder. SQLite is no longer the store: persistence moves
-    # to Supabase PostgreSQL under M-18A (docs/02, docs/03). No database is
-    # opened by the app yet; this field stays only so the current health
-    # response is unchanged until M-18A replaces it.
-    db_path: str = "thakuma.db"
+    # Supabase project. The publishable key is public (it identifies the project
+    # to the Data API/Auth), never a password or a service-role secret. The
+    # backend uses the user's access token for data access, so no database
+    # password or service-role key is configured here.
+    supabase_url: str = ""
+    supabase_publishable_key: str = ""
+    # Legacy name retained only as a fallback for existing local .env files.
+    supabase_anon_key: str = ""
+    supabase_jwt_audience: str = "authenticated"
+    supabase_jwks_cache_seconds: int = 300
+    supabase_request_timeout: float = 10.0
+
+    # Browser origins allowed to call this API (comma-separated).
+    frontend_origins: str = "http://localhost:5173"
 
     # Deterministic fixture served by POST /api/parse until the parser exists.
     mock_fixture_path: Path = DEFAULT_MOCK_FIXTURE
@@ -66,6 +75,27 @@ class Settings(BaseSettings):
             if name:
                 seen.setdefault(name, None)
         return list(seen)
+
+    @property
+    def supabase_key(self) -> str:
+        """The publishable key, with the legacy anon-key name as a fallback."""
+        return self.supabase_publishable_key or self.supabase_anon_key
+
+    @property
+    def supabase_configured(self) -> bool:
+        return bool(self.supabase_url and self.supabase_key)
+
+    @property
+    def supabase_issuer(self) -> str:
+        return f"{self.supabase_url.rstrip('/')}/auth/v1"
+
+    @property
+    def supabase_jwks_url(self) -> str:
+        return f"{self.supabase_issuer}/.well-known/jwks.json"
+
+    @property
+    def frontend_origin_list(self) -> list[str]:
+        return [origin.strip() for origin in self.frontend_origins.split(",") if origin.strip()]
 
 
 @lru_cache

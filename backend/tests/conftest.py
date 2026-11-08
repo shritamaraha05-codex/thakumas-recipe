@@ -25,6 +25,9 @@ def test_settings() -> Settings:
         llm_chain="rules",
         gemini_api_key="",
         gemini_model="",
+        supabase_url="",
+        supabase_publishable_key="",
+        supabase_anon_key="",
     )
 
 
