@@ -3,7 +3,7 @@
 JSON everywhere unless noted. Errors: `{"error":{"code":"...","message":"...","hint":"..."}}` with codes `INVALID_INPUT, AUDIO_TOO_LONG, NO_API_KEY, UPSTREAM_BUSY, UPSTREAM_ERROR, LLM_UNAVAILABLE, CONSENT_REQUIRED, NOT_FOUND, UNAUTHORIZED, FORBIDDEN`. HTTP mapping: `401 UNAUTHORIZED` = missing/invalid/expired access token; `403 FORBIDDEN` = authenticated but explicitly denied; `404 NOT_FOUND` = resource does not exist or is not owned by the caller (ownership is never leaked through 403); `422 INVALID_INPUT` = invalid request. A sample `ParseResult` lives in `docs/fixtures/parse_result.sample.json`; the frontend builds against it from day 1.
 
 ## System
-- `GET /api/health` -> `{ok, db:{status,path,note}, gnani:{configured, mock}, llm:{chain:[..], healthy:[..], providers:[{name,configured,healthy,note}]}}`. `ok` means the app process is up, **not** that external providers work. `healthy` lists only providers confirmed on this request (currently `rules`); external providers report `healthy:null` ("not probed") and are never marked healthy just because a key exists. (M-18A replaces the local-file `db.path` with a Supabase connectivity report; the response keeps this shape until then.)
+- `GET /api/health` -> `{ok, db:{status,configured,reachable,note}, gnani:{configured, mock}, llm:{chain:[..], healthy:[..], providers:[{name,configured,healthy,note}]}}`. `ok` means the app process is up, **not** that external providers work. `db.status` is `not_configured` (no Supabase URL/key), `unverified` (configured but no probe ran), `ok` (the Data API answered) or `unavailable` (the probe failed). `db.reachable` is `null` until a probe actually runs, so configuration is never reported as healthy. No URL, key or connection string is returned. `healthy` lists only providers confirmed on this request (currently `rules`); external providers report `healthy:null` ("not probed") and are never marked healthy just because a key exists.
 - `GET /api/llm/status` -> per provider `{name, ok, latency_ms, last_error}`
 
 ## Authentication (Supabase Auth)
@@ -12,14 +12,16 @@ All recipe-management endpoints require a valid Supabase access token. The parse
 
 - Supabase Auth owns registration, login, logout, session management, and (if enabled on the project) Google and email/password sign-in. The frontend uses the Supabase client for all of this; **this API has no custom password signup/login endpoints and we never store passwords.**
 - After sign-in the frontend sends the token on every protected request: `Authorization: Bearer <access_token>`.
-- The backend verifies the token before any repository work (task M-18B):
-  - **signature**: verified against the project's signing keys (`https://<project-ref>.supabase.co/auth/v1/.well-known/jwks.json` for asymmetric signing keys; a pre-signing-key project uses its legacy HS256 JWT secret instead — confirm which the project uses before implementing, and load keys from the JWKS URL, not from a hard-coded copy);
+- The backend verifies the token before any repository work (M-18B):
+  - **asymmetric signature**: verified against the project's JWKS (`https://<project-ref>.supabase.co/auth/v1/.well-known/jwks.json`), including the key id (`kid`) and algorithm; keys are cached, never hard-coded;
+  - **legacy HS256 projects**: verified by calling Supabase Auth's `GET /auth/v1/user` with the user token (and the publishable key as `apikey`). The project's JWT secret is never requested, read or stored;
   - **expiry**: `exp` is in the future;
   - **issuer**: `iss` equals the project's auth URL (`https://<project-ref>.supabase.co/auth/v1`);
   - **audience**: `aud` is `authenticated`.
+  - Missing, malformed, expired or invalid tokens return `401 UNAUTHORIZED`; an unreachable auth/JWKS endpoint returns `503 UPSTREAM_BUSY`.
 - The authenticated identity is the token's `sub` claim. **Never trust a user id supplied in the request body or query parameters** — a client-supplied `owner_user_id`/`user_id` is rejected or ignored, and `owner_user_id` for new recipes is always derived from the verified token.
 - Failures: missing, malformed or expired token -> `401 UNAUTHORIZED`; a valid token that does not own a resource -> `404 NOT_FOUND` on that resource (not 403, to avoid revealing another user's recipe ids).
-- `GET /api/me` -> `{id, display_name}` — the authenticated user's basic application profile (`profiles` row). `401 UNAUTHORIZED` without a valid token.
+- `GET /api/me` -> `{id, display_name, created_at}` — the authenticated user's basic application profile (`profiles` row; created on first use/sign-up if missing). `401 UNAUTHORIZED` without a valid token. No token, password or secret is ever returned.
 
 ## Capture and parse
 - `POST /api/narrations/transcribe` (multipart: `audio` WAV <=30 s, `language` default `indic-auto`, optional `previous_text`, `keyterms` JSON array) -> `{transcript, detected_language_code, chunk_index?}`. Server serialises calls to Gnani (one active request).
@@ -63,11 +65,16 @@ Example request: `{"text": "এক চামচ তেল দাও। তার
 
 All routes below require `Authorization: Bearer <access_token>` (see Authentication). The backend derives `owner_user_id` from the verified token's `sub`; the client must not send any ownership id. A missing/invalid token is `401 UNAUTHORIZED`; a recipe that does not exist or belongs to another user is `404 NOT_FOUND` for every read, update and delete, so recipe ids are never revealed.
 
-- `POST /api/recipes` `{title, original_transcript, draft, cook_person_id?, narrator_person_id?, tags[]}` -> `{id, version}`. `draft` is the complete `ParseResult` JSON; `original_transcript` is stored verbatim on version 1. `cook_person_id` / `narrator_person_id` are optional attribution for the cook/narrator *person* (a family member need not have an account); person management is postponed, so they are accepted and stored with the version but not yet resolved to person rows. `title` and `tags` may be empty (`tags` defaults to `[]`).
-- `GET /api/recipes?query=&tag=` -> list of **the authenticated user's recipes only** (title substring match for `query`, tag match for `tag`), newest first.
-- `GET /api/recipes/{id}` -> the saved recipe (newest version by default) if the authenticated user owns it, else `404 NOT_FOUND`. `hand_profile_id` and `servings` remain accepted for contract compatibility but are **not used**: personal calibration and recipe scaling are postponed, so nothing is calibrated, scaled and no `staged_guidance` is produced yet.
-- `PUT /api/recipes/{id}` `{title?, tags?, original_transcript, draft}` -> creates a **new** `recipe_versions` row (previous version retained); only the owner may update, else `404 NOT_FOUND`.
-- `DELETE /api/recipes/{id}` -> owner only, else `404 NOT_FOUND`. Deleting a recipe cascades to its versions.
+- `POST /api/recipes` `{title, original_transcript, draft, tags[]?, cook_person_id?, narrator_person_id?}` -> `201 {id, version}` with `version: 1`.
+  - `title` is required and must not be blank; `original_transcript` is required and stored **verbatim**; `draft` is the complete public `ParseResult` JSON and is stored as one JSONB value.
+  - `tags` defaults to `[]`. `cook_person_id` / `narrator_person_id` exist for forward compatibility but person management is postponed: any non-null value returns `422 INVALID_INPUT` explaining that linking is not implemented. They are never silently dropped.
+  - Unknown fields are rejected (`extra="forbid"`), including a client-supplied `owner_user_id`.
+- `GET /api/recipes?query=&tag=&limit=&offset=` -> `{items:[...], total}` for **the authenticated user's recipes only**. `query` is a case-insensitive title substring; `tag` matches one tag; results are newest-first with a stable id tie-break. `limit` is 1–100 (default 50), `offset` >= 0. Items contain only metadata: `{id, title, tags, version, created_at, updated_at}` — never the draft or transcript.
+- `GET /api/recipes/{id}` -> the latest version if the authenticated user owns it, else `404 NOT_FOUND` (also for malformed/nonexistent ids; malformed UUIDs get `422 INVALID_INPUT`). Shape: `{id, title, version, original_transcript, draft, tags, created_at, updated_at}`. The draft is returned exactly as saved; the parser is never re-run.
+- `PUT /api/recipes/{id}` `{title?, tags?, original_transcript, draft}` -> `{id, version}` with the **new** version number. This always creates a new immutable `recipe_versions` row; previous versions are never overwritten. Omitted `title`/`tags` keep the existing recipe metadata. Only the owner may update, else `404 NOT_FOUND`.
+- `DELETE /api/recipes/{id}` -> `{id, deleted: true}`. Owner only, else `404 NOT_FOUND`. Deleting a recipe cascades to all its versions.
+
+Versions are sequential per recipe (1, 2, 3, …); `unique(recipe_id, version_number)` and a locked recipe row in the `add_recipe_version` RPC prevent collisions. The latest version is the default view. `hand_profile_id`/`servings` are not part of the recipe endpoints (calibration and scaling remain postponed).
 
 ### Postponed recipe endpoints (not in this release)
 

@@ -12,32 +12,33 @@ FastAPI modular monolith (backend/app)
   parse/   normalize -> segment -> rules -> llm_extract -> merge/validate -> ambiguity
   llm/     provider chain (rules | gemini | ollama | evon_kaggle), cache/replay
   units/   reference table, hand profiles, interval maths, scaling
-  db/      owner-scoped Supabase PostgreSQL repo layer
+  db/      request-scoped Data API repository (the user's JWT, never service-role)
          |
-  Supabase Auth (JWKS) + Supabase PostgreSQL (RLS) + Gnani APIs (Prisma, Timbre) + optional LLM endpoints
+  Supabase Auth (JWKS; legacy /user fallback) + Supabase PostgreSQL Data API (RLS) + Gnani APIs (Prisma, Timbre) + optional LLM endpoints
 ```
 
 ## Decisions and reasons
 - **Modular monolith**: two people, one week. Each package has one job and one test folder.
 - **React (Vite) frontend with the Supabase Auth client**: sign-in/session state lives in the Supabase client; recipe screens render `ParseResult` fields only. The frontend holds only the publishable anon key and the user's own access token.
-- **Supabase Auth, not custom auth**: registration, login, logout, sessions and (if enabled) Google/email-password sign-in belong to Supabase. FastAPI only verifies the token it is handed: signature against the project's signing keys (JWKS), `exp`, `iss` and `aud=authenticated`, and reads the user id from `sub`. No custom password login/signup endpoints, no password storage.
-- **Supabase PostgreSQL, not a local SQLite file**: cloud-hosted, persistent across restarts, with Row Level Security. Because FastAPI connects with privileged server credentials (which bypass RLS), repository methods enforce ownership in application code on every read, update and delete. The service-role key never appears in frontend config or bundles.
+- **Supabase Auth, not custom auth**: registration, login, logout, sessions and (if enabled) Google/email-password sign-in belong to Supabase. FastAPI only verifies the token it is handed: signature against the project's signing keys (JWKS), `exp`, `iss` and `aud=authenticated`, and reads the user id from `sub`. Legacy HS256 projects are verified through Supabase Auth's `/user` endpoint; the project's JWT secret is never fetched or stored. No custom password login/signup endpoints, no password storage.
+- **Supabase PostgreSQL Data API, not SQLite and not a privileged DB connection**: cloud-hosted, persistent across restarts, with Row Level Security. Each request builds its own `postgrest` client carrying the project's publishable key and the user's verified access token. There is no shared mutable client (so concurrent users cannot overwrite each other's auth header) and no service-role key, so PostgreSQL evaluates `auth.uid()` for every query. Repository methods also pass the verified owner id and the SQL functions check it against `auth.uid()`; ownership is enforced in both application and database layers.
 - **Three separate identities** (see `docs/03_DATA_MODEL.md`): the account user, the cook/narrator person, and the measurement profile. They are never merged into one entity.
 - **Rules first, LLM second**: rules are the guaranteed floor; the LLM raises recall on unseen phrasing but is validated and optional.
 - **Mock everywhere**: `GNANI_MOCK=1` and `LLM_CHAIN=rules` give a fully offline app for tests and the demo. Authentication and storage still require real Supabase credentials.
 
-## Repo layout
+## Repo layout (implemented)
 ```
-backend/app/{main.py,config.py}
-backend/app/gnani/{stt.py,tts.py,realtime.py,budget.py,tts_text.py}
-backend/app/llm/{base.py,providers.py,chain.py,cache.py,prompts.py}
-backend/app/parse/{normalize.py,lexicon.py,rules.py,llm_extract.py,merge.py,ambiguity.py,schema.py}
-backend/app/units/{reference.yaml,reference.py,hands.py,ranges.py,scale.py}
-backend/app/db/{schema.sql,repo.py}
-backend/app/routers/{narrations.py,recipes.py,profiles.py,cook.py,library.py,health.py}
-backend/tests/{parse_cases.yaml,test_*.py}
-frontend/{index.html,css/,js/{app.js,api.js,state.js,views/,components/},assets/}
-eval/{cases/,harness.py,report.py}   kaggle/   scripts/   docs/   contributions/
+backend/app/{main.py,config.py,models.py,errors.py,dependencies.py}
+backend/app/auth/{__init__.py,dependencies.py,verification.py,schemas.py}
+backend/app/db/{__init__.py,client.py,repository.py,schemas.py,errors.py}
+backend/app/parse/{normalize.py,segment.py,lexicon.py,rules.py,llm.py,llm_schema.py,schema.py,serialize.py}
+backend/app/providers/{__init__.py,gemini.py}
+backend/app/routers/{health.py,parse.py,recipes.py}
+backend/tests/{conftest.py,fakes.py,test_*.py}
+backend/evaluation/                 # M-11 harness (unchanged)
+supabase/migrations/0001_initial_schema.sql
+frontend/{package.json,vite.config.js,index.html,.env.example,src/}
+docs/   scripts/   contributions/   prototype_v0/ (frozen reference)
 ```
 
 ## Key flows
@@ -55,13 +56,15 @@ eval/{cases/,harness.py,report.py}   kaggle/   scripts/   docs/   contributions/
 | OLLAMA_BASE_URL, OLLAMA_MODEL | default `http://localhost:11434/v1` |
 | EVON_BASE_URL, EVON_API_KEY | Kaggle tunnel URL + bearer token |
 | LLM_REPLAY_ONLY | `1` serves only cached LLM responses (label it in the UI) |
-| SUPABASE_URL | Project URL. Frontend (Supabase Auth client) and backend (token verification issuer/JWKS URL) |
-| SUPABASE_ANON_KEY | Publishable anon key. **Frontend only** (Vite: `VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY`) |
-| SUPABASE_DB_URL | PostgreSQL connection string. **Backend only** — never reaches the browser |
-| (no service-role key) | Deliberately absent. If the architecture ever needs one it stays backend-only and is never exposed via `VITE_` variables |
+| SUPABASE_URL | Project URL. Frontend (Supabase Auth client) and backend (issuer/JWKS URL) |
+| SUPABASE_PUBLISHABLE_KEY | Publishable project key. Safe in the browser (Vite: `VITE_SUPABASE_URL` / `VITE_SUPABASE_PUBLISHABLE_KEY`); not a password and not a JWT signing key |
+| SUPABASE_ANON_KEY | Legacy fallback name, read only when `SUPABASE_PUBLISHABLE_KEY` is empty |
+| SUPABASE_JWT_AUDIENCE | Expected `aud` claim (default `authenticated`) |
+| FRONTEND_ORIGINS | Comma-separated browser origins allowed by CORS (default `http://localhost:5173`) |
+| (no service-role key) | Deliberately absent. Ordinary recipe CRUD uses the user's JWT and must not bypass RLS |
 
 ## Error policy
-Every external call: timeout, one retry with backoff on 429/5xx, then fall back. Errors reach the UI as `{error:{code,message,hint}}`; never show raw upstream errors. Budgets: parse without LLM p95 < 1 s; with LLM < 15 s; TTS cached after first use.
+Every external call: timeout, one retry with backoff on 429/5xx, then fall back. Errors reach the UI as `{error:{code,message,hint}}`; never show raw upstream errors. Supabase mapping: a missing/invalid/expired token is `401 UNAUTHORIZED`; a recipe that is missing or not owned is `404 NOT_FOUND` (never 403, so ids are not revealed); a Data API timeout is `503 UPSTREAM_BUSY`; any other Data API failure is `502 UPSTREAM_ERROR`. Raw SQL, tokens and connection details never reach the client. Budgets: parse without LLM p95 < 1 s; with LLM < 15 s; TTS cached after first use.
 
 ## Testing
-pytest with fixtures; parser YAML cases; contract tests against `docs/fixtures/`; no network in tests.
+pytest with fixtures; parser YAML cases; contract tests against `docs/fixtures/`; no network in tests. Supabase auth is tested with locally generated RSA keys and a mocked JWKS/`/user` endpoint; repository/API tests use an in-memory RPC fake; the migration test checks SQL text only. `frontend` is built with `npm run build` (no test runner wired yet). Live Supabase and Gemini checks are manual and are not claimed by the automated suite.

@@ -12,7 +12,7 @@ An account user can save a recipe narrated by another family member; a narrator 
 
 ## Minimum schema for this release
 
-Cloud-hosted PostgreSQL (via Supabase). The initial SQL migration (task M-18A) creates exactly these three tables. The complete parsed recipe is stored as one JSONB document — there are **no** relational ingredient/step tables in this MVP.
+Cloud-hosted PostgreSQL (via Supabase). `supabase/migrations/0001_initial_schema.sql` creates exactly these three tables, their RLS policies, the sign-up profile trigger and the atomic recipe RPCs. The complete parsed recipe is stored as one JSONB document — there are **no** relational ingredient/step tables in this MVP.
 
 ```sql
 -- profiles: the application-facing part of an auth.users row.
@@ -57,39 +57,54 @@ Relationship rules enforced by the schema and the repository:
 
 ## Row Level Security
 
-RLS is enabled for every user-owned application table. A user can access only their own data:
+The migration (`supabase/migrations/0001_initial_schema.sql`) enables RLS on all three tables and grants table/function privileges to `authenticated` only. Anonymous users get no recipe data access.
 
 ```sql
-alter table profiles enable row level security;
-alter table recipes enable row level security;
-alter table recipe_versions enable row level security;
+alter table public.profiles enable row level security;
+alter table public.recipes enable row level security;
+alter table public.recipe_versions enable row level security;
 
--- Profiles are private to their owner, except intentionally exposed fields.
-create policy "profiles are self-visible" on profiles
-  for select using (auth.uid() = id);
-create policy "profiles are self-writable" on profiles
-  for all using (auth.uid() = id) with check (auth.uid() = id);
+-- Profiles: self only.
+create policy profiles_select_own on public.profiles
+  for select to authenticated using (auth.uid() = id);
+create policy profiles_insert_own on public.profiles
+  for insert to authenticated with check (auth.uid() = id);
+create policy profiles_update_own on public.profiles
+  for update to authenticated using (auth.uid() = id) with check (auth.uid() = id);
 
--- A user can read and write only their own recipes, and can never reassign
--- ownership to someone else: owner_user_id must match their own auth uid.
-create policy "recipes are owner-scoped" on recipes
-  for all using (auth.uid() = owner_user_id)
+-- Recipes: owner on every operation; WITH CHECK prevents reassignment.
+create policy recipes_select_own on public.recipes
+  for select to authenticated using (auth.uid() = owner_user_id);
+create policy recipes_insert_own on public.recipes
+  for insert to authenticated with check (auth.uid() = owner_user_id);
+create policy recipes_update_own on public.recipes
+  for update to authenticated using (auth.uid() = owner_user_id)
   with check (auth.uid() = owner_user_id);
+create policy recipes_delete_own on public.recipes
+  for delete to authenticated using (auth.uid() = owner_user_id);
 
--- Versions are reachable only through a recipe the user owns.
-create policy "recipe_versions follow the recipe owner" on recipe_versions
-  for all using (
-    exists (select 1 from recipes r where r.id = recipe_id and r.owner_user_id = auth.uid())
-  )
-  with check (
-    exists (select 1 from recipes r where r.id = recipe_id and r.owner_user_id = auth.uid())
-  );
+-- Versions: only through an owned recipe. No UPDATE/DELETE policy exists,
+-- so old versions are immutable; deleting the recipe cascades.
+create policy recipe_versions_select_owned on public.recipe_versions
+  for select to authenticated using (
+    exists (select 1 from public.recipes r
+            where r.id = recipe_id and r.owner_user_id = auth.uid()));
+create policy recipe_versions_insert_owned on public.recipe_versions
+  for insert to authenticated with check (
+    exists (select 1 from public.recipes r
+            where r.id = recipe_id and r.owner_user_id = auth.uid()));
 ```
 
-- A user cannot claim another user's `id` in a request body or query parameter and gain access: identity always comes from the verified token's `sub` claim (see `docs/04_API.md`). `owner_user_id` is derived server-side, never accepted from the client.
-- **Supabase service-role credentials bypass RLS.** The production path (FastAPI → `SUPABASE_DB_URL`) connects with privileged server credentials, so RLS on its own does **not** protect this data. Repository methods must therefore enforce ownership on every read, update and delete in application code, and every acceptance check for M-19/M-20 tests exactly that (two users cannot see or modify each other's recipes).
-- Privileged credentials never reach the frontend: no service-role key in `VITE_` variables, in the Vite config, or in any bundle. The browser only ever holds the publishable anon key plus the user's own access token.
-- The auth schema (`auth.users`) belongs to Supabase Auth. We do not create, modify or delete rows in it from application code.
+How the backend participates:
+
+- A user cannot claim another user's identity in a request body or query parameter: FastAPI verifies the token and derives `owner_user_id` from its `sub` claim (see `docs/04_API.md`). Request models reject an `owner_user_id` field (`extra="forbid"`).
+- FastAPI builds a **per-request** Data API client carrying the publishable key and the user's access token. There is no shared mutable client and no `SUPABASE_DB_URL`/service-role connection, so PostgreSQL RLS evaluates the real authenticated user on every statement.
+- The SQL RPCs (`create_recipe_with_version`, `add_recipe_version`, `get_recipe_detail`, `get_recipe_version`, `list_recipes`, `delete_recipe`, `get_or_create_profile`) are `SECURITY INVOKER`, use parameterised arguments, and call `assert_owner(p_owner_user_id)`, which requires `p_owner_user_id = auth.uid()`. User input is never interpolated into raw SQL.
+- `add_recipe_version` locks the recipe row (`FOR UPDATE`) before computing `MAX(version_number) + 1`; `unique(recipe_id, version_number)` is a second line of defence against concurrent writes.
+- Ordinary recipe CRUD never uses the service-role key.
+- The auth schema (`auth.users`) belongs to Supabase Auth. Application code does not create, modify or delete rows there; the sign-up trigger only inserts into `public.profiles`.
+
+**Do not claim RLS works because `ENABLE ROW LEVEL SECURITY` appears in the SQL.** The automated tests use fakes and static SQL checks. Apply the migration in the Supabase SQL Editor and run the README's manual two-user verification (A saves; B cannot list/open/update/delete; old versions survive an edit; deleting A's recipe removes its versions). That live result is the evidence.
 
 ## Deferred entities (postponed by the 2026-11-08 planning correction)
 

@@ -22,6 +22,9 @@ Those instructions are meaningful to the person who learned them. Our goal is to
 - [What is implemented today](#what-is-implemented-today)
 - [Technology](#technology)
 - [Run the backend locally](#run-the-backend-locally)
+- [Run the frontend locally](#run-the-frontend-locally)
+- [Supabase setup](#supabase-setup)
+- [Manual two-user verification](#manual-two-user-verification)
 - [API quick start](#api-quick-start)
 - [Project structure](#project-structure)
 - [What's next](#whats-next)
@@ -106,7 +109,7 @@ The parser identifies ingredients, quantities, durations and ordered cooking ste
 
 ### 4. Save and revisit
 
-The planned account-based library will let a signed-in user save recipes, find them later, open them on another visit and retain previous recipe versions. This persistence flow is part of the target product; it is not yet represented as a completed feature in the current backend status below.
+A signed-in user can save a parsed recipe into their own library, list and open their recipes, and edit one to create a new immutable version. Supabase Auth handles sign-in and Supabase PostgreSQL stores the recipes; ownership is enforced by the backend and by database row-level security. The minimal React frontend in `frontend/` wires this journey (auth, parse, save, library, version, delete). See [Run the frontend locally](#run-the-frontend-locally) and [Manual two-user verification](#manual-two-user-verification).
 
 ### 5. Cook
 
@@ -141,27 +144,30 @@ flowchart TD
 
 The rules parser is deterministic and offline. The Gemini parser is constrained to select evidence IDs generated from the local lexicon. The backend validates those IDs and constructs names, values and source spans from its own verified evidence rather than trusting model-generated wording or offsets.
 
-### Planned account and persistence architecture
+### Account and persistence architecture
 
-The selected direction for multi-user storage is **Supabase Auth + Supabase PostgreSQL**, with FastAPI remaining the application backend.
+Multi-user storage is **Supabase Auth + Supabase PostgreSQL**, with FastAPI remaining the application backend.
 
 ```mermaid
 flowchart TD
-    A[Frontend application] --> B[Supabase Auth]
+    A[React frontend] --> B[Supabase Auth]
     B --> C[User access token]
-    C --> D[FastAPI verifies token]
-    D --> E[Recipe and profile services]
-    E --> F[(Supabase PostgreSQL)]
+    C --> D[FastAPI verifies token via JWKS]
+    D --> E[Request-scoped Data API client with the user JWT]
+    E --> F[(Supabase PostgreSQL with RLS)]
     D --> G[Rules parser / Gemini provider]
 ```
 
-The intended ownership model separates three concepts:
+- The frontend uses the Supabase Auth client only for sign-in/sign-out and session/token handling. Every recipe read or write goes through FastAPI with `Authorization: Bearer <access_token>`; the frontend never talks to the database directly.
+- FastAPI verifies the token before any work (signature via JWKS for asymmetric projects, or Supabase Auth's `/user` endpoint for legacy HS256 projects, plus `exp`, `iss` and `aud`). Identity is the verified `sub`; a client-supplied user id is never trusted.
+- The backend builds a **per-request** Supabase Data API client carrying the user's token. There is no shared mutable client and no service-role key, so PostgreSQL row-level security evaluates the real authenticated user.
+- Ownership uses three separate concepts:
 
-- **Account user:** signs in and owns a personal recipe library.
-- **Cook or narrator:** the family member who prepared or narrated a recipe; they do not necessarily need an account.
-- **Measurement profile:** the person whose traditional measures may be calibrated in a future stage.
+  - **Account user:** signs in and owns a personal recipe library.
+  - **Cook or narrator:** the family member who prepared or narrated a recipe; they do not necessarily need an account (person management is postponed).
+  - **Measurement profile:** the person whose traditional measures may be calibrated in a future stage (postponed).
 
-Supabase authentication, database migrations, ownership policies and protected recipe routes are planned work. They should not be mistaken for currently implemented functionality.
+The schema is three tables (`profiles`, `recipes`, `recipe_versions`) created by `supabase/migrations/0001_initial_schema.sql`; see [Supabase setup](#supabase-setup) and [`docs/03_DATA_MODEL.md`](docs/03_DATA_MODEL.md).
 
 ---
 
@@ -179,17 +185,20 @@ The following status is based on the completed backend milestones reported by th
 | Parse API and response serialization | Implemented |
 | Gemini provider integration | Implemented; live manual smoke test still pending |
 | Structured-output evidence validation | Implemented |
-| Offline automated test suite | 322 tests passing at the M-10 checkpoint |
-| Supabase Auth and user accounts | Planned; not implemented yet |
-| Supabase PostgreSQL persistence | Planned; not implemented yet |
-| Save/list/open recipe endpoints | Planned; not implemented yet |
+| Supabase Auth and user accounts | Implemented (Supabase Auth; access tokens verified by FastAPI) |
+| Supabase PostgreSQL persistence | Implemented (migration + data API; live project not exercised by the test suite) |
+| Recipe save / list / open / version / delete endpoints | Implemented and tested offline |
+| `/api/me` authenticated profile endpoint | Implemented |
+| PostgreSQL row-level security migration | Implemented (`supabase/migrations/0001_initial_schema.sql`); real two-user behaviour must be verified manually |
+| Frontend auth + personal library | Implemented as a minimal React/Vite app (`frontend/`); visual/UX polish remains |
+| Offline automated test suite | 427 backend tests passing; `ruff check .` clean; `npm run build` for the frontend |
 | Recipe clarification/resolve endpoint | Not implemented yet |
 | Personal hand-measure calibration | Not implemented yet |
 | Gram/ml range estimation and serving scaling | Not implemented yet |
 | Gnani live speech-to-text / text-to-speech | Not claimed as verified here |
-| Full cook mode and saved-recipe library UI | Planned/in progress; verify current frontend branch |
+| Full cook mode | Not implemented yet |
 
-**Important:** “Gemini provider integration implemented” means the provider wrapper, structured response schema, evidence validation and offline tests exist. The live Gemini smoke test was not run at the M-10 checkpoint because a live API key was unavailable. Do not describe live model quality as verified until that test is completed.
+**Important:** “Gemini provider integration implemented” means the provider wrapper, structured response schema, evidence validation and offline tests exist. The live Gemini smoke test was not run because a live API key was unavailable, and the Supabase tests use injected fakes — they do not prove a live project works. Run the [manual two-user verification](#manual-two-user-verification) before claiming live persistence.
 
 ---
 
@@ -201,10 +210,10 @@ The following status is based on the completed backend milestones reported by th
 | Text processing | Python standard library | Normalization, segmentation and deterministic matching |
 | Recipe parsing | Rules parser + Gemini provider | Structured extraction from Bengali/Roman Bengali narration |
 | LLM integration | Google Gen AI SDK | Gemini structured-output request |
-| Authentication (planned) | Supabase Auth | Registration, login and session identity |
-| Database (planned) | Supabase PostgreSQL | User-owned recipes, versions and future profiles |
-| Frontend | Project frontend | Capture, review, recipe library and cook experience |
-| Testing | pytest, Ruff | Offline regression tests and code-quality checks |
+| Authentication | Supabase Auth (JWKS/PyJWT verification in FastAPI) | Registration, login, sessions and verified access tokens |
+| Database | Supabase PostgreSQL Data API (`postgrest`) | Owner-scoped recipes, versions and profiles, with RLS |
+| Frontend | React + Vite + `@supabase/supabase-js` | Auth screens, parse/save, personal library and versioning |
+| Testing | pytest, Ruff, `vite build` | Offline backend regression tests and a frontend production build |
 
 ### Parsing modes
 
@@ -235,6 +244,8 @@ The default model configured for Gemini is `gemini-3.5-flash-lite`. The model ca
 
 - Python installed on your machine.
 - Git, if you are cloning the repository.
+- Node.js 20+ for the React frontend (optional; only needed for the UI).
+- A Supabase project (project URL + publishable key) for accounts and storage. The backend still starts without one and serves `/api/parse` and `/api/health`; only the recipe routes need Supabase.
 - A Gemini API key only if you intend to test `mode="llm"` or configure Gemini first in `LLM_CHAIN`.
 
 ### 1. Clone the repository
@@ -297,7 +308,15 @@ GEMINI_API_KEY=your_gemini_api_key
 GEMINI_MODEL=gemini-3.5-flash-lite
 ```
 
-Never commit `.env`, API keys or other secrets.
+For accounts and recipe storage, configure the Supabase project (see [Supabase setup](#supabase-setup)):
+
+```env
+SUPABASE_URL=https://<project-ref>.supabase.co
+SUPABASE_PUBLISHABLE_KEY=<publishable-key>
+FRONTEND_ORIGINS=http://localhost:5173
+```
+
+`SUPABASE_PUBLISHABLE_KEY` is public project metadata, not a password and not a JWT signing key. No database password, connection string or service-role key is used by this backend. Never commit `.env`, API keys or other secrets.
 
 ### 5. Start the API
 
@@ -312,7 +331,70 @@ Useful endpoints:
 - Health: `http://127.0.0.1:8000/api/health`
 - Interactive API documentation: `http://127.0.0.1:8000/docs`
 
-The health endpoint reports application/database/provider status separately. An application process being up does not mean every external provider is available.
+The health endpoint reports application/database/provider status separately. An application process being up does not mean every external provider is available. The `db` block is `not_configured` without Supabase, `unverified` when configured but not probed, and `ok`/`unavailable` only after the running app's probe.
+
+---
+
+## Run the frontend locally
+
+```bash
+cd frontend
+npm install
+cp .env.example .env      # Windows PowerShell: Copy-Item .env.example .env
+```
+
+Set these values in `frontend/.env` (never commit it):
+
+```env
+VITE_SUPABASE_URL=https://<project-ref>.supabase.co
+VITE_SUPABASE_PUBLISHABLE_KEY=<publishable-key>
+VITE_API_BASE_URL=http://localhost:8000
+```
+
+Then:
+
+```bash
+npm run dev
+```
+
+Vite serves the app at `http://localhost:5173`. The backend must allow that origin (default `FRONTEND_ORIGINS=http://localhost:5173`). Build the production bundle with `npm run build` (output in `frontend/dist/`, which is ignored).
+
+The frontend uses Supabase **only** for Auth (sign-up, sign-in, Google when enabled, logout, session/token refresh). Every recipe read/write goes to FastAPI with `Authorization: Bearer <access_token>`; it never writes to the database directly.
+
+---
+
+## Supabase setup
+
+1. Create or select a project at <https://supabase.com>.
+2. Enable the auth providers you need (Email/Password, and optionally Google). For Google, configure the provider in Supabase and add the app URL/redirect URLs.
+3. Apply the migration: open **Dashboard → SQL Editor**, paste the whole of [`supabase/migrations/0001_initial_schema.sql`](supabase/migrations/0001_initial_schema.sql), and run it. This creates `profiles`, `recipes`, `recipe_versions`, the new-user profile trigger, RLS policies and the atomic RPCs. No Supabase CLI or Docker is required.
+4. Configure environments:
+   - backend `.env`: `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`, `FRONTEND_ORIGINS`
+   - `frontend/.env`: `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY`, `VITE_API_BASE_URL`
+   - Use the same project URL and publishable key in both.
+5. In Supabase Auth URL configuration, add `http://localhost:5173` (and your deployed origin) to the Site URL/Redirect URLs.
+6. Restart the backend and start the frontend.
+
+The publishable key is safe to ship to the browser. Never put a service-role key in a `VITE_` variable or any frontend bundle.
+
+**What the migration enforces:** every recipe has a mandatory `owner_user_id`; RLS requires `auth.uid() = owner_user_id` for select/insert/update/delete; versions are readable/insertable only through an owned recipe and have no update/delete policy; deleting a recipe cascades to its versions; `add_recipe_version` locks the recipe row before computing the next version number.
+
+---
+
+## Manual two-user verification
+
+This is the real Supabase check. The automated tests use injected fakes and do **not** prove live RLS behaviour. Record the actual date/project/result; do not claim a live pass that was not run.
+
+1. Start the backend and frontend and open `http://localhost:5173`.
+2. Register **User A** (email/password; confirm the email if the project requires it).
+3. Enter a Bengali narration, parse it with the offline rules mode, give it a title, and save it. It should appear in the library.
+4. Reload the page. The session should persist and the recipe should still be listed. Open it and verify the exact transcript and complete `ParseResult` JSON are returned.
+5. Edit it. Version 2 should be created and version 1 must remain unchanged (check in the SQL Editor: `select version_number, original_transcript from recipe_versions where recipe_id = '...' order by version_number;`).
+6. Log out, then register/sign in as **User B**.
+7. User B's library must not list User A's recipe, and direct `GET`/`PUT`/`DELETE` on A's recipe id must return `404 NOT_FOUND`.
+8. Sign back in as User A; the recipe must be intact. Delete it and confirm its versions are gone (`select count(*) from recipe_versions where recipe_id = '...';` returns 0).
+
+Use two test accounts and non-sensitive sample recipes. Do not put real personal data in the repository or demo.
 
 ---
 
@@ -364,9 +446,17 @@ Run Ruff:
 ruff check .
 ```
 
-The backend test suite is designed not to call external APIs. Gemini behavior is tested using injected fakes/mocks. Live Gemini checks must be run manually and reported separately from automated test results.
+Build the frontend:
 
-At the M-10 completion checkpoint, the reported result was **322 tests passing** and **Ruff clean**. Re-run the commands on the current branch for the latest result.
+```bash
+cd frontend
+npm install
+npm run build
+```
+
+The backend suite never calls Gemini or Supabase. Auth is tested with locally generated RSA keys and a mocked JWKS endpoint (plus a mocked legacy `/user` response); recipe tests use injected fakes. The migration test checks the SQL text (tables, cascades, RLS policies, atomic RPC) but does **not** prove live RLS. Live Gemini and live two-user Supabase checks must be run manually and reported separately.
+
+Current result at the M-18–M-20 checkpoint: **427 backend tests passing**, **Ruff clean**, and the frontend production build succeeds. Re-run the commands on the current branch for the latest result.
 
 ---
 
@@ -378,31 +468,29 @@ The following is the high-level backend and documentation layout; consult the re
 .
 ├── backend/
 │   ├── app/
-│   │   ├── main.py              # FastAPI application
+│   │   ├── main.py              # FastAPI application + CORS
 │   │   ├── config.py            # Environment-backed configuration
 │   │   ├── models.py            # Public API models
-│   │   ├── routers/             # API endpoints
+│   │   ├── auth/                # Supabase token verification + current-user deps
+│   │   ├── db/                  # Per-request Data API client, repository, schemas
+│   │   ├── routers/             # health, parse, recipes + /api/me
 │   │   ├── parse/               # Normalization, segmentation, lexicon and parsers
 │   │   └── providers/           # Replaceable LLM provider integrations
-│   └── tests/                   # Offline unit and API tests
-├── docs/
-│   ├── 01_PRODUCT.md
-│   ├── 02_ARCHITECTURE.md
-│   ├── 03_DATA_MODEL.md
-│   ├── 04_API.md
-│   ├── 05_PARSER_SPEC.md
-│   ├── 11_PRIVACY_CONSENT.md
-│   ├── 12_TASKS.md
-│   └── fixtures/
-├── frontend/                    # Frontend application
+│   └── tests/                   # Offline auth, repository, API, migration tests
+├── supabase/
+│   └── migrations/
+│       └── 0001_initial_schema.sql   # Tables, RLS policies, triggers, atomic RPCs
+├── frontend/
+│   ├── package.json             # React + Vite + @supabase/supabase-js
+│   ├── .env.example
+│   └── src/                     # Auth panel, recipe editor, library, versioning
+├── docs/                        # Product, architecture, data model, API, tasks
 ├── prototype_v0/                # Historical prototype; not the current architecture
 ├── contributions/               # Team contribution records
 ├── .env.example
 ├── requirements.txt
 └── README.md
 ```
-
-Some planned directories and features may not exist on the current branch yet. The parser/provider paths above reflect the reported backend implementation.
 
 ---
 
@@ -412,14 +500,12 @@ The immediate backend direction is to complete the product journey rather than c
 
 ### Next implementation priorities
 
-1. **Supabase foundation:** configure the project, PostgreSQL schema, migrations and row-level security.
-2. **Authentication:** use Supabase Auth for registration, login and sessions; verify access tokens in FastAPI.
-3. **User-owned recipes:** associate each saved recipe with the authenticated account.
-4. **Recipe persistence API:** implement save, list, open, version, update and delete operations.
-5. **Frontend integration:** connect authentication, recipe saving and the user's personal recipe library.
-6. **End-to-end verification:** sign in, parse, save, restart/reopen, retrieve and confirm another account cannot access the saved recipe.
+1. **Live Supabase verification:** run the [manual two-user verification](#manual-two-user-verification) on a real project and record the result. The automated suite uses fakes.
+2. **Frontend completion:** capture/record flow, clarification cards and cook mode (tasks S-16..S-18). The current React app covers auth, parse, save, library, version and delete.
+3. **Production hardening:** request limits, safe audit logging and monitoring around the Data API and Auth.
+4. **Postponed features:** personal calibration, recipe scaling, pantry search and collections only after the main journey is verified.
 
-The target is a reliable vertical slice: **sign in → capture → review → parse → save → reopen → cook**.
+The target remains a reliable vertical slice: **sign in → capture → review → parse → save → reopen → cook**.
 
 ### Features intentionally outside the first persistence milestone
 
@@ -436,18 +522,18 @@ These should be added only after the main journey is working reliably.
 
 ## Privacy and data ownership
 
-The planned multi-user architecture separates account identity from the family member who narrated or cooked a recipe.
+The multi-user architecture separates account identity from the family member who narrated or cooked a recipe.
 
-When Supabase is implemented:
+With Supabase implemented:
 
-- Every saved recipe must have an authenticated owner.
-- Users must only be able to access their own recipes and versions.
-- The backend must derive ownership from a verified access token, not a client-supplied user ID.
-- Database row-level security should enforce owner-scoped access.
-- Privileged database credentials must remain server-side.
-- Voice capture should require consent when recording another person, and audio retention must follow the project's privacy policy.
+- Every saved recipe has an authenticated owner (`owner_user_id` is `NOT NULL`).
+- Users can access only their own recipes and versions; the backend checks the owner and PostgreSQL RLS enforces `auth.uid()` independently.
+- Ownership comes from the verified access token's `sub`, never from a client-supplied user id.
+- The Data API client carries the user's own token per request. Ordinary recipe operations never use a service-role key, and no shared client can leak one user's token to another.
+- The publishable key is public project metadata, but a service-role key must never appear in `VITE_` variables or a frontend bundle.
+- Voice capture must require consent when recording another person, and audio retention must follow the project's privacy policy.
 
-Until authentication and persistence are implemented, do not treat the current API as a production multi-user recipe library.
+The automated tests prove the application logic and token verification with fakes; they do not prove live RLS. Run the [manual two-user verification](#manual-two-user-verification) before treating a deployed instance as a production multi-user library.
 
 ---
 

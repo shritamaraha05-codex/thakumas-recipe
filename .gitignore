@@ -19,3 +19,12 @@ venv/
 *.db
 *.sqlite
 *.sqlite3
+
+# Frontend (Vite/React)
+node_modules/
+frontend/dist/
+frontend/.vite/
+frontend/.env
+frontend/.env.*
+!frontend/.env.example
+*.local

@@ -192,6 +192,8 @@ class ErrorCode(str, Enum):
     LLM_UNAVAILABLE = "LLM_UNAVAILABLE"
     CONSENT_REQUIRED = "CONSENT_REQUIRED"
     NOT_FOUND = "NOT_FOUND"
+    UNAUTHORIZED = "UNAUTHORIZED"
+    FORBIDDEN = "FORBIDDEN"
 
 
 class ErrorDetail(BaseModel):
@@ -207,10 +209,18 @@ class ErrorResponse(BaseModel):
 
 
 class DbStatus(BaseModel):
-    """Actual database state; nothing is opened in this batch."""
+    """Supabase database state, reported honestly.
 
-    status: str = "not_initialized"
-    path: str | None = None
+    ``status`` is one of ``not_configured`` (no project URL/key), ``unverified``
+    (configured but no probe ran), ``ok`` (the probe reached the Data API) or
+    ``unavailable`` (the probe failed). ``reachable`` is ``None`` until a probe
+    actually runs, so configuration alone is never reported as healthy. No URL,
+    key or connection string is ever included.
+    """
+
+    status: str = "not_configured"
+    configured: bool = False
+    reachable: bool | None = None
     note: str | None = None
 
 
