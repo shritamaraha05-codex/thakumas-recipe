@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="bn" class="lang-bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#fbf3e5">
+<title>রান্না মোড · ঠাকুমার রান্না</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Tiro+Bangla:ital@0;1&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cream:#fbf3e5;--cream-deep:#f4e6ce;--paper:#fffaf1;--paper-2:#fffdf8;
+  --line:#e8d5b7;--line-strong:#d9bd94;--ink:#2d1b12;--muted:#806957;
+  --red:#b52d1c;--red-dark:#8e2118;--red-soft:#f8e3da;--leaf:#386b43;
+  --leaf-soft:#e7efdf;--gold:#bd8734;--shadow:0 14px 34px rgba(57,31,15,.09);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;min-height:100vh;color:var(--ink);font-family:'Hind Siliguri','Plus Jakarta Sans',sans-serif;background:var(--cream);}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;background:radial-gradient(ellipse at 10% 0%,rgba(202,132,57,.10),transparent 34%),radial-gradient(ellipse at 100% 100%,rgba(181,45,28,.055),transparent 30%),repeating-linear-gradient(0deg,rgba(115,79,43,.018) 0 1px,transparent 1px 4px);}
+button{font:inherit;cursor:pointer}button:focus-visible{outline:3px solid rgba(181,45,28,.28);outline-offset:3px}
+.topbar{height:68px;display:flex;align-items:center;justify-content:space-between;gap:18px;padding:0 clamp(18px,4vw,58px);background:rgba(255,250,241,.91);border-bottom:1px solid rgba(217,189,148,.55);backdrop-filter:blur(12px);position:sticky;top:0;z-index:30}
+.brand{display:flex;align-items:center;gap:10px;min-width:0}.brand-mark{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:var(--red);color:#fff4de;font-size:22px;box-shadow:0 3px 9px rgba(117,39,21,.19)}
+.brand-name{font-family:'Tiro Bangla',serif;font-size:23px;font-weight:700;color:var(--red);white-space:nowrap}.brand-sub{font-size:11px;color:var(--muted);background:var(--cream-deep);padding:4px 9px;border-radius:999px;white-space:nowrap}
+.top-right{display:flex;align-items:center;gap:12px}.mode-pill{display:flex;align-items:center;gap:8px;border:1px solid var(--line);background:#fff6e7;padding:7px 13px;border-radius:999px;color:var(--red-dark);font-size:13px;font-weight:600}.live-dot{width:7px;height:7px;background:#5d8c52;border-radius:50%;box-shadow:0 0 0 4px rgba(93,140,82,.12)}
+.lang-switch{display:flex;align-items:center;padding:3px;background:#f2e5d0;border:1px solid var(--line);border-radius:999px;gap:2px}.lang-switch button{border:0;background:transparent;color:var(--muted);padding:7px 13px;border-radius:999px;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:700}.lang-switch button.active{background:var(--red);color:white;box-shadow:0 2px 5px rgba(97,33,19,.18)}
+.exit-btn{border:1px solid var(--line);background:var(--paper);border-radius:50%;width:36px;height:36px;display:grid;place-items:center;color:var(--muted);font-size:20px}.exit-btn:hover{color:var(--red);border-color:#d9a89b}
+.wrap{width:min(1160px,calc(100% - 40px));margin:0 auto;padding:30px 0 54px}
+.recipe-head{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;margin-bottom:22px}.eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:12px;color:var(--red);background:#f8e8d6;border:1px solid #ecd4b2;border-radius:999px;padding:6px 12px;margin-bottom:9px}.eyebrow .mini{width:7px;height:7px;background:var(--leaf);border-radius:50%}
+h1{font-family:'Tiro Bangla',serif;margin:0;color:var(--ink);font-size:clamp(28px,4vw,42px);line-height:1.22;font-weight:700}.recipe-meta{display:flex;flex-wrap:wrap;gap:9px;margin-top:10px}.meta-chip{display:inline-flex;align-items:center;gap:7px;padding:6px 11px;border-radius:999px;background:rgba(255,250,241,.78);border:1px solid var(--line);font-size:13px;color:var(--muted)}.meta-chip svg{width:15px;height:15px;color:var(--red)}
+.first-timer-tag{display:flex;align-items:center;gap:8px;border:1px solid #d9e4d0;background:var(--leaf-soft);color:var(--leaf);padding:9px 13px;border-radius:12px;font-size:12px;white-space:nowrap}
+.workspace{display:grid;grid-template-columns:235px minmax(0,1fr);gap:18px;align-items:stretch}
+.steps-card,.cook-card,.voice-strip{background:rgba(255,251,243,.93);border:1px solid rgba(222,199,164,.85);border-radius:22px;box-shadow:var(--shadow)}
+.steps-card{padding:19px 16px}.section-label{font-family:'Tiro Bangla',serif;font-size:19px;font-weight:700;margin:0 0 17px}.step-list{display:flex;flex-direction:column;gap:5px;position:relative}.step-list:before{content:"";position:absolute;left:15px;top:18px;bottom:18px;width:1px;background:#e7d5ba}.step-nav{position:relative;display:flex;align-items:center;gap:11px;padding:9px 8px;border:0;background:transparent;border-radius:13px;text-align:left;color:var(--muted);font-size:13px;z-index:1}.step-nav:hover{background:#f7eddd}.step-nav.current{background:#f9e5db;color:var(--red-dark);font-weight:700}.step-no{width:30px;height:30px;flex:none;border-radius:50%;display:grid;place-items:center;background:#f2e7d6;border:1px solid #e8d5b7;color:#7b6048;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:700}.step-nav.current .step-no{background:var(--red);color:white;border-color:var(--red);box-shadow:0 3px 8px rgba(181,45,28,.2)}.step-nav.done .step-no{background:var(--leaf-soft);color:var(--leaf);border-color:#d7e4cd}.step-nav.done .step-name{color:var(--leaf)}
+.cook-card{overflow:hidden;display:flex;flex-direction:column}.cook-topline{padding:17px 23px 13px;border-bottom:1px solid #efe1cd;display:flex;align-items:center;justify-content:space-between;gap:14px}.step-count{font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:700;letter-spacing:.04em;color:var(--red)}.progress-meta{font-size:12px;color:var(--muted);display:flex;gap:9px;align-items:center}.progress{height:7px;background:#f0e2cc;border-radius:999px;overflow:hidden;flex:1;max-width:210px}.progress-fill{height:100%;width:16.66%;background:linear-gradient(90deg,var(--red),#d57a47);border-radius:999px;transition:width .35s ease}
+.active-step{padding:21px 23px 17px;display:grid;grid-template-columns:minmax(0,1fr) minmax(300px,.92fr);gap:22px;align-items:center}.instruction-kicker{font-size:12px;color:var(--leaf);font-weight:700;display:flex;align-items:center;gap:7px;margin-bottom:7px}.kicker-dot{width:7px;height:7px;border-radius:50%;background:var(--leaf)}h2.step-title{font-family:'Tiro Bangla',serif;font-size:clamp(25px,3vw,34px);line-height:1.25;margin:0 0 10px;color:var(--ink)}.step-description{font-size:17px;line-height:1.7;color:#493326;margin:0;max-width:620px}.step-hint{margin-top:14px;padding:10px 13px;border-left:3px solid var(--gold);background:#f8efdf;border-radius:0 11px 11px 0;color:#765d46;font-size:13px;line-height:1.55}.photo-frame{margin:0;position:relative;border-radius:17px;overflow:hidden;background:#ead7ba;aspect-ratio:16/9;box-shadow:0 8px 20px rgba(49,27,14,.12)}.photo-frame img{width:100%;height:100%;object-fit:cover;display:block}.photo-caption{position:absolute;left:12px;bottom:12px;border-radius:999px;background:rgba(39,25,15,.72);backdrop-filter:blur(8px);padding:5px 10px;color:#fff8ed;font-size:11px}
+.ingredients{padding:0 23px 18px}.ingredients-head{font-family:'Tiro Bangla',serif;font-size:17px;font-weight:700;color:var(--ink);margin:0 0 9px;display:flex;align-items:center;gap:8px}.ingredient-list{display:flex;flex-wrap:wrap;gap:8px}.ingredient{display:flex;align-items:center;gap:8px;padding:8px 11px;border:1px solid #eee0ca;background:#fbf2e4;border-radius:12px;min-width:0}.ingredient-symbol{width:26px;height:26px;display:grid;place-items:center;border-radius:9px;background:#f3dfc2;color:var(--red-dark);font-size:15px;font-weight:700}.ingredient-name{font-size:12px;color:#594331;line-height:1.35}.ingredient-name strong{display:block;color:var(--ink);font-size:13px;font-weight:700}
+.control-area{display:flex;align-items:center;justify-content:space-between;gap:15px;padding:15px 23px 19px;border-top:1px solid #efe1cd;background:linear-gradient(180deg,rgba(249,240,224,.4),rgba(249,240,224,.82))}.timer-box{display:flex;align-items:center;gap:13px;background:#f6ead7;border:1px solid #ead6b7;border-radius:15px;padding:10px 14px;min-width:235px}.timer-icon{width:34px;height:34px;border-radius:11px;background:#f8dfd4;color:var(--red);display:grid;place-items:center}.timer-label{font-size:11px;color:var(--muted);line-height:1.2}.timer-time{font-family:'Plus Jakarta Sans',sans-serif;font-variant-numeric:tabular-nums;font-weight:700;font-size:23px;color:var(--red-dark);line-height:1.2}.timer-actions{display:flex;align-items:center;gap:7px;margin-left:auto}.timer-action{border:0;background:transparent;color:var(--red-dark);font-size:11px;font-weight:700;padding:5px 7px;border-radius:8px}.timer-action:hover{background:#f2dfca}
+.main-actions{display:flex;align-items:center;gap:9px}.action-btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;border:1px solid var(--line);background:#fff9ef;color:#654b37;padding:10px 14px;border-radius:12px;font-size:13px;font-weight:600;transition:.18s ease;white-space:nowrap}.action-btn:hover{transform:translateY(-1px);border-color:#d7b78c}.action-btn.primary{background:var(--red);border-color:var(--red);color:white;box-shadow:0 4px 10px rgba(181,45,28,.17)}.action-btn.primary:hover{background:var(--red-dark)}.action-btn svg{width:16px;height:16px}
+.voice-strip{margin-top:16px;padding:13px 17px;display:flex;align-items:center;justify-content:space-between;gap:15px}.voice-left{display:flex;align-items:center;gap:11px;min-width:0}.mic-bubble{width:42px;height:42px;border-radius:50%;background:#f8e2d8;color:var(--red);display:grid;place-items:center;flex:none}.voice-title{font-weight:700;font-size:14px;line-height:1.3}.voice-sub{font-size:11px;color:var(--muted);margin-top:2px}.voice-commands{display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end}.voice-toggle{border:1px solid #dfc5a3;background:#fff9ef;color:var(--red-dark);border-radius:999px;padding:8px 12px;font-size:11px;font-weight:700;white-space:nowrap}.voice-toggle:hover{background:#f8e9d7}.voice-command{font-size:11px;color:#765c45;background:#f7eddd;border:1px solid #ecddc5;border-radius:999px;padding:6px 10px}
+.bottom-hint{text-align:center;color:#917a61;font-size:11px;margin:16px 0 0}
+/* First-time guide */
+.guide-backdrop{position:fixed;inset:0;z-index:60;background:rgba(43,27,17,.40);backdrop-filter:blur(5px);display:grid;place-items:center;padding:18px;transition:opacity .25s ease}.guide-backdrop.hidden{display:none}.guide{width:min(630px,100%);background:var(--paper-2);border:1px solid #e5cfad;border-radius:24px;box-shadow:0 24px 70px rgba(33,19,10,.24);overflow:hidden;animation:guideIn .28s ease}.guide-top{padding:22px 25px 18px;background:radial-gradient(circle at 100% 0%,rgba(221,170,101,.18),transparent 45%),linear-gradient(135deg,#fffaf0,#f8ebd8);border-bottom:1px solid #ecddc6}.guide-eyebrow{font-size:11px;font-weight:700;color:var(--leaf);letter-spacing:.04em;display:flex;align-items:center;gap:7px}.guide h2{font-family:'Tiro Bangla',serif;font-size:28px;line-height:1.3;margin:8px 0 5px;color:var(--red-dark)}.guide-intro{font-size:14px;line-height:1.6;color:#725942;margin:0;max-width:540px}.guide-body{padding:20px 25px}.guide-points{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.guide-point{padding:12px 11px;border:1px solid #ecddc6;background:#fffaf1;border-radius:14px;min-height:116px}.guide-point .point-icon{width:31px;height:31px;border-radius:10px;background:#f8e6d5;color:var(--red);display:grid;place-items:center;font-size:16px;margin-bottom:8px}.guide-point strong{display:block;font-size:13px;margin-bottom:3px}.guide-point span{font-size:11px;line-height:1.45;color:var(--muted);display:block}.guide-voice{margin-top:13px;background:#f1f4eb;border:1px solid #dbe5d0;border-radius:13px;padding:11px 13px;display:flex;align-items:center;gap:10px;color:#456743;font-size:12px}.guide-voice-icon{width:31px;height:31px;background:#e1ecd9;border-radius:50%;display:grid;place-items:center;flex:none}.guide-actions{display:flex;align-items:center;justify-content:flex-end;gap:9px;padding:0 25px 22px}.guide-actions .action-btn{padding:11px 17px}.guide-actions .primary{min-width:165px}.guide-footer{font-size:10px;color:#9a856d;padding:0 25px 18px;text-align:center}
+.toast{position:fixed;bottom:24px;left:50%;transform:translate(-50%,12px);opacity:0;pointer-events:none;z-index:100;background:#34231a;color:#fff8ed;padding:10px 16px;border-radius:999px;font-size:12px;box-shadow:0 8px 24px rgba(34,20,12,.24);transition:.22s ease;white-space:nowrap}.toast.show{opacity:1;transform:translate(-50%,0)}
+@keyframes guideIn{from{opacity:0;transform:translateY(9px) scale(.985)}to{opacity:1;transform:translateY(0) scale(1)}}
+@media(max-width:900px){.workspace{grid-template-columns:1fr}.steps-card{padding:12px 14px}.step-list{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}.step-list:before{display:none}.step-nav{flex-direction:column;justify-content:center;text-align:center;gap:5px;padding:7px 3px;font-size:10px}.step-no{width:27px;height:27px}.active-step{grid-template-columns:1fr 42%;gap:16px}.recipe-head{align-items:flex-start;flex-direction:column}.first-timer-tag{white-space:normal}}
+@media(max-width:650px){.topbar{height:60px;padding:0 13px;gap:8px}.brand-mark{width:31px;height:31px;font-size:19px}.brand-name{font-size:19px}.brand-sub,.mode-pill{display:none}.top-right{gap:7px}.lang-switch button{padding:6px 9px}.exit-btn{width:32px;height:32px}.wrap{width:min(100% - 24px,560px);padding:20px 0 36px}.recipe-head{gap:12px;margin-bottom:14px}.recipe-meta{gap:6px}.meta-chip{font-size:11px;padding:5px 8px}.workspace{gap:10px}.steps-card{border-radius:16px;padding:10px}.section-label{display:none}.step-list{grid-template-columns:repeat(5,minmax(0,1fr))}.step-nav{font-size:9px}.step-no{width:24px;height:24px;font-size:10px}.cook-card{border-radius:17px}.cook-topline{padding:13px 14px 10px}.progress-meta{font-size:10px}.progress{max-width:110px}.active-step{grid-template-columns:1fr;padding:16px 15px 13px;gap:12px}.step-description{font-size:15px;line-height:1.65}.photo-frame{aspect-ratio:16/8.7}.ingredients{padding:0 15px 14px}.ingredient{padding:7px 9px;gap:6px}.ingredient-name{font-size:10px}.ingredient-name strong{font-size:11px}.ingredient-symbol{width:23px;height:23px}.control-area{padding:12px 13px 14px;display:flex;flex-direction:column;align-items:stretch;gap:10px}.timer-box{min-width:0;width:100%}.timer-actions{margin-left:auto}.main-actions{display:grid;grid-template-columns:.8fr 1fr 1fr}.action-btn{padding:10px 7px;font-size:11px;gap:4px}.voice-strip{padding:11px 12px;border-radius:15px;align-items:flex-start;flex-direction:column}.voice-commands{justify-content:flex-start}.guide-top{padding:18px 18px 15px}.guide h2{font-size:24px}.guide-intro{font-size:13px}.guide-body{padding:15px 18px}.guide-points{grid-template-columns:1fr;gap:7px}.guide-point{min-height:0;display:grid;grid-template-columns:30px 1fr;column-gap:9px;align-items:center;padding:9px 10px}.guide-point .point-icon{grid-row:span 2;margin:0}.guide-point strong{margin:0}.guide-point span{font-size:10px}.guide-actions{padding:0 18px 15px;flex-direction:column-reverse;align-items:stretch}.guide-actions .action-btn{width:100%}.guide-footer{padding:0 18px 15px}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}}
+</style>
+<style id="thakuma-shared-navigation">
+/* Shared Thakuma's Recipe navigation — matches the profile page */
+.site-header{position:fixed;top:0;left:0;right:0;z-index:100;background:transparent;border:0;backdrop-filter:none;pointer-events:none}
+.site-header .header-inner{width:min(1180px,calc(100% - 32px));min-height:64px;margin:10px auto 0;padding:9px 18px;display:flex;align-items:center;justify-content:space-between;gap:22px;border:1px solid rgba(179,35,27,.14);border-radius:50px;background:rgba(255,248,234,.86);box-shadow:0 14px 40px -14px rgba(120,40,20,.24);backdrop-filter:blur(14px);pointer-events:auto}
+.site-header .brand{display:inline-flex;align-items:center;gap:10px;min-width:max-content;text-decoration:none;color:inherit}
+.site-header .brand-mark{flex:0 0 auto;width:48px;height:48px;display:block;border-radius:50%;object-fit:contain;background:rgba(255,248,234,.9);filter:drop-shadow(0 5px 9px rgba(80,30,12,.18));}
+.site-header .brand-copy{display:block;min-width:0}
+.site-header .brand-name{display:block;color:#b3231b;font-family:'Tiro Bangla',serif;font-size:19px;font-weight:400;line-height:1.1;white-space:nowrap}
+html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font-family:'Playfair Display',serif;font-style:italic}
+.site-header .brand-caption{display:block;margin-top:3px;color:#7a5a45;font-family:'Hind Siliguri',sans-serif;font-size:9px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;white-space:nowrap}
+.site-header .main-nav{display:flex;align-items:center;gap:25px;margin-left:auto}
+.site-header .nav-link{position:relative;display:inline-flex;align-items:center;padding:10px 0;color:#7a5a45;font-family:'Plus Jakarta Sans','Hind Siliguri',sans-serif;font-size:13px;font-weight:600;text-decoration:none;white-space:nowrap;transition:color .2s ease}
+.site-header .nav-link:hover,.site-header .nav-link.active{color:#3a1e12}
+.site-header .nav-link:after{content:'';position:absolute;left:0;right:0;bottom:3px;height:2px;width:0;background:#b3231b;border-radius:2px;transition:width .25s ease}
+.site-header .nav-link:hover:after,.site-header .nav-link.active:after{width:100%}
+.site-header .header-actions{display:flex;align-items:center;gap:10px;flex:0 0 auto}
+.site-header .language-switch{display:inline-flex;align-items:center;gap:3px;padding:3px;border:0;border-radius:999px;background:#f1dfbd}
+.site-header .language-switch button{min-width:43px;padding:6px 11px;border:0;border-radius:999px;color:#3a1e12;background:transparent;font-family:'Plus Jakarta Sans','Hind Siliguri',sans-serif;font-size:12px;font-weight:700;line-height:1.3;cursor:pointer;transition:background .2s ease,color .2s ease,box-shadow .2s ease}
+.site-header .language-switch button[aria-pressed="true"],.site-header .language-switch button.active,.site-header .language-switch button.selected,.site-header .language-switch button.on{color:#fff;background:#b3231b;box-shadow:0 3px 9px rgba(142,23,16,.22)}
+.site-header .avatar-mini{width:34px;height:34px;display:grid;place-items:center;border:0;border-radius:50%;background:#1f4a37;color:#fff8ea;font-family:'Hind Siliguri',sans-serif;font-size:12px;font-weight:600;line-height:1;cursor:pointer}
+.site-header .header-icon{width:34px;height:34px;display:grid;place-items:center;border:1px solid rgba(179,35,27,.13);border-radius:50%;background:rgba(255,248,234,.82);color:#7a5a45;cursor:pointer;transition:background .2s ease,color .2s ease,border-color .2s ease}
+.site-header .header-icon:hover{background:#f1dfbd;color:#b3231b;border-color:rgba(179,35,27,.28)}
+.site-header .header-icon svg{width:17px;height:17px;display:block}
+.site-header .mobile-nav{display:none}
+/* Profile-page spoon cursor. No particles or particle canvas. */
+#spoon{position:fixed;left:0;top:0;z-index:120;width:46px;height:46px;margin:-6px 0 0 -6px;pointer-events:none;filter:drop-shadow(0 4px 4px rgba(80,20,10,.35));transform-origin:6px 6px;will-change:transform}
+@media(pointer:fine){body,body a,body button,body input,body select{cursor:none!important}}
+@media(pointer:coarse){#spoon{display:none!important}}
+@media(prefers-reduced-motion:reduce){#spoon{display:none!important}body,body a,body button,body input,body select{cursor:auto!important}}
+@media(max-width:820px){.site-header .header-inner{width:min(100% - 32px,760px)}.site-header .main-nav{gap:17px}.site-header .nav-link{font-size:11px}}
+@media(max-width:620px){
+ .site-header .header-inner{width:calc(100% - 24px);min-height:58px;margin-top:7px;padding:7px 12px;gap:8px}
+ .site-header .brand{gap:8px}
+ .site-header .brand-mark{width:39px;height:39px}
+ .site-header .brand-name{font-size:16px}
+ .site-header .brand-caption{font-size:7px;letter-spacing:.1em}
+ .site-header .main-nav{display:none}
+ .site-header .header-actions{gap:7px}
+ .site-header .language-switch button{min-width:36px;padding:6px 7px;font-size:10px}
+ .site-header .avatar-mini,.site-header .header-icon{width:30px;height:30px;font-size:10px}
+ .site-header .mobile-nav{display:flex;align-items:center;justify-content:space-around;gap:8px;width:calc(100% - 54px);max-width:430px;margin:6px auto 0;padding:8px 12px;border:1px solid rgba(179,35,27,.12);border-radius:30px;background:rgba(255,248,234,.9);box-shadow:0 8px 22px rgba(120,40,20,.12);backdrop-filter:blur(12px);pointer-events:auto}
+ .site-header .mobile-nav .nav-link{padding:0;color:#7a5a45;font-family:'Hind Siliguri',sans-serif;font-size:10px;font-weight:700}
+ .site-header .mobile-nav .nav-link:after{display:none}
+ .site-header .mobile-nav .nav-link.active{color:#b3231b}
+}
+</style><style id="shared-header-content-offset">main.wrap{padding-top:126px!important}@media(max-width:620px){main.wrap{padding-top:140px!important}}</style></head>
+<body>
+<svg id="spoon" viewBox="0 0 46 46" aria-hidden="true"><g transform="rotate(-40 6 6)"><path d="M6 4 C0 4 0 16 6 18 C12 16 12 4 6 4Z" fill="#e0a526" stroke="#8e5a10" stroke-width="1.2"/><rect x="4.8" y="17" width="2.4" height="26" rx="1.2" fill="#b07a1c"/></g></svg>
+<header class="site-header">
+  <div class="header-inner">
+    <a class="brand" href="#/" aria-label="Thakuma’s Recipe home">
+      <img class="brand-mark" src="/assets/images/thakuma_brand_mark.webp" alt="" aria-hidden="true">
+      <span class="brand-copy"><span class="brand-name i18n" data-bn="ঠাকুমার রান্না" data-en="Thakuma’s Recipe">ঠাকুমার রান্না</span><span class="brand-caption i18n" data-bn="ঘরের স্বাদ" data-en="A taste of home">ঘরের স্বাদ</span></span>
+    </a>
+    <div class="main-nav" role="navigation" aria-label="Main navigation"><a class="nav-link active" href="#/"><span class="i18n" data-bn="রেসিপি" data-en="Recipes">রেসিপি</span></a><a class="nav-link" href="#/hands"><span class="i18n" data-bn="হাতের মাপ" data-en="Hands">হাতের মাপ</span></a><a class="nav-link" href="#/accuracy"><span class="i18n" data-bn="নির্ভুলতা" data-en="Accuracy">নির্ভুলতা</span></a></div>
+    <div class="header-actions">
+      <div class="language-switch" id="lang" role="group" aria-label="Choose language"><button type="button" id="lang-bn" data-l="bn" data-language="bn" aria-pressed="true" class="active selected" onclick="setLanguage('bn')">বাংলা</button><button type="button" id="lang-en" data-l="en" data-language="en" aria-pressed="false" onclick="setLanguage('en')">EN</button></div>
+      <div class="avatar-mini" aria-label="Profile">ঠা</div>
+      <button id="new-recipe-top" type="button" hidden aria-hidden="true" tabindex="-1"></button>
+    </div>
+  </div>
+  <div class="mobile-nav" role="navigation" aria-label="Mobile navigation"><a class="nav-link active" href="#/"><span class="i18n" data-bn="রেসিপি" data-en="Recipes">রেসিপি</span></a><a class="nav-link" href="#/hands"><span class="i18n" data-bn="হাতের মাপ" data-en="Hands">হাতের মাপ</span></a><a class="nav-link" href="#/accuracy"><span class="i18n" data-bn="নির্ভুলতা" data-en="Accuracy">নির্ভুলতা</span></a></div>
+</header>
+
+<main class="wrap">
+  <section class="recipe-head">
+    <div>
+      <div class="eyebrow"><span class="mini"></span><span class="i18n" data-bn="ঠাকুমার রান্নাঘর থেকে" data-en="From Thakuma’s kitchen">ঠাকুমার রান্নাঘর থেকে</span></div>
+      <h1><span class="i18n" data-bn="খিচুড়ি রান্না" data-en="Cooking Khichuri">খিচুড়ি রান্না</span></h1>
+      <div class="recipe-meta">
+        <span class="meta-chip"><span>♧</span><span class="i18n" data-bn="৪ জনের জন্য" data-en="Serves 4">৪ জনের জন্য</span></span>
+        <span class="meta-chip"><span>◷</span><span class="i18n" data-bn="মোট সময় প্রায় ৪০ মিনিট" data-en="About 40 minutes total">মোট সময় প্রায় ৪০ মিনিট</span></span>
+        <span class="meta-chip"><span>✿</span><span class="i18n" data-bn="সহজ" data-en="Easy">সহজ</span></span>
+      </div>
+    </div>
+    <div class="first-timer-tag"><span>✦</span><span class="i18n" data-bn="প্রথমবার? ধাপে ধাপে এগোন" data-en="First time? Follow one step at a time">প্রথমবার? ধাপে ধাপে এগোন</span></div>
+  </section>
+
+  <section class="workspace" aria-label="Cooking workspace">
+    <aside class="steps-card">
+      <h2 class="section-label i18n" data-bn="রান্নার ধাপ" data-en="Cooking steps">রান্নার ধাপ</h2>
+      <div class="step-list" id="step-list">
+        <button class="step-nav current" data-step="0" type="button" onclick="goToStep(0)"><span class="step-no">১</span><span class="step-name i18n" data-bn="ফোড়ন দিন" data-en="Temper spices">ফোড়ন দিন</span></button>
+        <button class="step-nav" data-step="1" type="button" onclick="goToStep(1)"><span class="step-no">২</span><span class="step-name i18n" data-bn="ডাল ও চাল ধুয়ে নিন" data-en="Rinse rice & lentils">ডাল ও চাল ধুয়ে নিন</span></button>
+        <button class="step-nav" data-step="2" type="button" onclick="goToStep(2)"><span class="step-no">৩</span><span class="step-name i18n" data-bn="সবজি মেশান" data-en="Add vegetables">সবজি মেশান</span></button>
+        <button class="step-nav" data-step="3" type="button" onclick="goToStep(3)"><span class="step-no">৪</span><span class="step-name i18n" data-bn="মশলা কষিয়ে নিন" data-en="Cook the spices">মশলা কষিয়ে নিন</span></button>
+        <button class="step-nav" data-step="4" type="button" onclick="goToStep(4)"><span class="step-no">৫</span><span class="step-name i18n" data-bn="জল দিয়ে রান্না করুন" data-en="Add water & simmer">জল দিয়ে রান্না করুন</span></button>
+        <button class="step-nav" data-step="5" type="button" onclick="goToStep(5)"><span class="step-no">৬</span><span class="step-name i18n" data-bn="পরিবেশন করুন" data-en="Serve">পরিবেশন করুন</span></button>
+      </div>
+    </aside>
+
+    <section class="cook-card" aria-live="polite">
+      <div class="cook-topline">
+        <div class="step-count" id="step-count">ধাপ ১ / ৬</div>
+        <div class="progress-meta"><span class="i18n" data-bn="রান্নার অগ্রগতি" data-en="Cooking progress">রান্নার অগ্রগতি</span><div class="progress"><div class="progress-fill" id="progress-fill"></div></div><strong id="progress-percent">১৭%</strong></div>
+      </div>
+      <div class="active-step">
+        <div class="instruction">
+          <div class="instruction-kicker"><span class="kicker-dot"></span><span class="i18n" data-bn="এখন যা করবেন" data-en="What to do now">এখন যা করবেন</span></div>
+          <h2 class="step-title" id="step-title">ফোড়ন দিন</h2>
+          <p class="step-description" id="step-description">কড়াইতে সরষের তেল গরম করুন। তেল হালকা গরম হলে পাঁচফোড়ন, শুকনো লঙ্কা আর তেজপাতা দিন। ২০–৩০ সেকেন্ড নেড়ে নিন, যতক্ষণ সুন্দর গন্ধ বের হয়।</p>
+          <div class="step-hint" id="step-hint"><span class="i18n" data-bn="ঠাকুমার টিপস: মশলা পুড়তে দেবেন না—ফোড়নের গন্ধ উঠলেই পরের ধাপে যান।" data-en="Thakuma’s tip: Don’t let the spices burn—move on as soon as they become fragrant.">ঠাকুমার টিপস: মশলা পুড়তে দেবেন না—ফোড়নের গন্ধ উঠলেই পরের ধাপে যান।</span></div>
+        </div>
+        <figure class="photo-frame" id="photo-frame"><img src="/assets/images/Sizzling Phoron in a Black Kadai.png" alt="Hot iron kadai with bubbling oil, panch phoron, dried red chillies and bay leaf"><figcaption class="photo-caption i18n" data-bn="ফোড়নের সঠিক মুহূর্ত" data-en="The tempering stage">ফোড়নের সঠিক মুহূর্ত</figcaption></figure>
+      </div>
+      <div class="ingredients">
+        <h3 class="ingredients-head"><span>✦</span><span class="i18n" data-bn="এই ধাপে লাগবে" data-en="You’ll need for this step">এই ধাপে লাগবে</span></h3>
+        <div class="ingredient-list" id="ingredient-list">
+          <div class="ingredient"><span class="ingredient-symbol">◒</span><span class="ingredient-name"><strong class="i18n" data-bn="সরষের তেল" data-en="Mustard oil">সরষের তেল</strong><span class="i18n" data-bn="২ টেবিল চামচ" data-en="2 tbsp">২ টেবিল চামচ</span></span></div>
+          <div class="ingredient"><span class="ingredient-symbol">✳</span><span class="ingredient-name"><strong class="i18n" data-bn="পাঁচফোড়ন" data-en="Panch phoron">পাঁচফোড়ন</strong><span class="i18n" data-bn="১ চা চামচ" data-en="1 tsp">১ চা চামচ</span></span></div>
+          <div class="ingredient"><span class="ingredient-symbol">♨</span><span class="ingredient-name"><strong class="i18n" data-bn="শুকনো লঙ্কা" data-en="Dried red chilli">শুকনো লঙ্কা</strong><span class="i18n" data-bn="২টি" data-en="2 pieces">২টি</span></span></div>
+          <div class="ingredient"><span class="ingredient-symbol">❧</span><span class="ingredient-name"><strong class="i18n" data-bn="তেজপাতা" data-en="Bay leaf">তেজপাতা</strong><span class="i18n" data-bn="১টি" data-en="1 leaf">১টি</span></span></div>
+        </div>
+      </div>
+      <div class="control-area">
+        <div class="timer-box">
+          <div class="timer-icon">◷</div>
+          <div><div class="timer-label i18n" data-bn="এই ধাপের টাইমার" data-en="Step timer">এই ধাপের টাইমার</div><div class="timer-time" id="timer-display">00:30</div></div>
+          <div class="timer-actions"><button class="timer-action" id="timer-toggle" type="button" onclick="toggleTimer()">শুরু</button><button class="timer-action i18n" data-bn="রিসেট" data-en="Reset" type="button" onclick="resetTimer()">রিসেট</button></div>
+        </div>
+        <div class="main-actions">
+          <button class="action-btn" type="button" onclick="previousStep()"><span>←</span><span class="i18n" data-bn="আগের ধাপ" data-en="Previous">আগের ধাপ</span></button>
+          <button class="action-btn" type="button" onclick="repeatStep()"><span>↻</span><span class="i18n" data-bn="আবার শুনুন" data-en="Repeat step">আবার শুনুন</span></button>
+          <button class="action-btn primary" type="button" onclick="nextStep()"><span class="i18n" data-bn="পরের ধাপ" data-en="Next step">পরের ধাপ</span><span>→</span></button>
+        </div>
+      </div>
+    </section>
+  </section>
+
+  <section class="voice-strip">
+    <div class="voice-left"><div class="mic-bubble" id="mic-bubble">♬</div><div><div class="voice-title i18n" id="voice-title" data-bn="কথায় বলুন, ঠাকুমার মতো রান্না করুন" data-en="Speak naturally and cook hands-free">কথায় বলুন, ঠাকুমার মতো রান্না করুন</div><div class="voice-sub" id="voice-sub"><span class="i18n" data-bn="ভয়েস কন্ট্রোল বন্ধ · চাইলে চালু করতে পারেন" data-en="Voice control is off · You can enable it anytime">ভয়েস কন্ট্রোল বন্ধ · চাইলে চালু করতে পারেন</span></div></div></div>
+    <div class="voice-commands"><button class="voice-toggle" id="voice-toggle" type="button" onclick="toggleVoiceControls()">ভয়েস চালু করুন</button><span class="voice-command i18n" data-bn="“পরের ধাপ”" data-en="“Next step”">“পরের ধাপ”</span><span class="voice-command i18n" data-bn="“আবার বলো”" data-en="“Repeat that”">“আবার বলো”</span><span class="voice-command i18n" data-bn="“থামো”" data-en="“Pause”">“থামো”</span></div>
+  </section>
+  <p class="bottom-hint i18n" data-bn="রান্নার সময় ফোনটি নিরাপদে, চোখের সামনে রাখুন। স্ক্রিনে হাত না দিয়েও ধাপ বদলাতে পারবেন।" data-en="Keep your phone safely within view while cooking. You can move between steps without touching the screen.">রান্নার সময় ফোনটি নিরাপদে, চোখের সামনে রাখুন। স্ক্রিনে হাত না দিয়েও ধাপ বদলাতে পারবেন।</p>
+</main>
+
+<!-- First-time onboarding: visible on a user's first visit -->
+<div class="guide-backdrop" id="first-guide" role="dialog" aria-modal="true" aria-labelledby="guide-title">
+  <section class="guide">
+    <div class="guide-top">
+      <div class="guide-eyebrow"><span>✦</span><span class="i18n" data-bn="আপনার প্রথম রান্না মোড" data-en="Your first Cook Mode session">আপনার প্রথম রান্না মোড</span></div>
+      <h2 id="guide-title" class="i18n" data-bn="চলুন, একসঙ্গে রান্না শুরু করি!" data-en="Let’s cook together, one step at a time!">চলুন, একসঙ্গে রান্না শুরু করি!</h2>
+      <p class="guide-intro i18n" data-bn="এই মোডে ঠাকুমার রেসিপি ধাপে ধাপে দেখানো হবে। আপনি চাইলে কণ্ঠে নির্দেশ দিতে পারবেন, আবার স্ক্রিনের বোতাম দিয়েও সব নিয়ন্ত্রণ করতে পারবেন।" data-en="Cook Mode guides you through Thakuma’s recipe one step at a time. You can use voice commands or control everything with the on-screen buttons.">এই মোডে ঠাকুমার রেসিপি ধাপে ধাপে দেখানো হবে। আপনি চাইলে কণ্ঠে নির্দেশ দিতে পারবেন, আবার স্ক্রিনের বোতাম দিয়েও সব নিয়ন্ত্রণ করতে পারবেন।</p>
+    </div>
+    <div class="guide-body">
+      <div class="guide-points">
+        <div class="guide-point"><div class="point-icon">◉</div><strong class="i18n" data-bn="ফোনটি সামনে রাখুন" data-en="Place your phone nearby">ফোনটি সামনে রাখুন</strong><span class="i18n" data-bn="রান্নার জায়গা থেকে যেন ধাপগুলো দেখা যায়।" data-en="Keep the steps visible from your cooking area.">রান্নার জায়গা থেকে যেন ধাপগুলো দেখা যায়।</span></div>
+        <div class="guide-point"><div class="point-icon">♬</div><strong class="i18n" data-bn="নির্দেশ শুনুন" data-en="Listen to each step">নির্দেশ শুনুন</strong><span class="i18n" data-bn="‘আবার বলো’ বললে নির্দেশটি আবার শোনাবে।" data-en="Say “Repeat that” to hear the instruction again.">‘আবার বলো’ বললে নির্দেশটি আবার শোনাবে।</span></div>
+        <div class="guide-point"><div class="point-icon">➜</div><strong class="i18n" data-bn="ধাপে ধাপে এগোন" data-en="Move at your own pace">ধাপে ধাপে এগোন</strong><span class="i18n" data-bn="‘পরের ধাপ’ বলুন বা বোতাম চাপুন।" data-en="Say “Next step” or tap the button.">‘পরের ধাপ’ বলুন বা বোতাম চাপুন।</span></div>
+      </div>
+      <div class="guide-voice"><div class="guide-voice-icon">♩</div><div><strong class="i18n" data-bn="মাইক্রোফোন আপনার অনুমতি ছাড়া চালু হবে না।" data-en="Your microphone won’t turn on without permission.">মাইক্রোফোন আপনার অনুমতি ছাড়া চালু হবে না।</strong><div class="i18n" data-bn="ভয়েস কন্ট্রোল ঐচ্ছিক—না দিলেও টাচ কন্ট্রোল কাজ করবে।" data-en="Voice control is optional; touch controls work either way.">ভয়েস কন্ট্রোল ঐচ্ছিক—না দিলেও টাচ কন্ট্রোল কাজ করবে।</div></div></div>
+    </div>
+    <div class="guide-actions"><button class="action-btn" type="button" onclick="startCook(false)"><span class="i18n" data-bn="টাচ দিয়ে চালাবো" data-en="Use touch controls">টাচ দিয়ে চালাবো</span></button><button class="action-btn primary" type="button" onclick="startCook(true)"><span class="i18n" data-bn="রান্না শুরু করি" data-en="Start cooking">রান্না শুরু করি</span><span>→</span></button></div>
+    <div class="guide-footer i18n" data-bn="আপনি পরে যেকোনো সময় ভয়েস কন্ট্রোল চালু করতে পারবেন।" data-en="You can enable voice control later at any time.">আপনি পরে যেকোনো সময় ভয়েস কন্ট্রোল চালু করতে পারবেন।</div>
+  </section>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+
+<script>
+  (() => {
+    const spoon = document.getElementById('spoon');
+    const finePointer = window.matchMedia && window.matchMedia('(pointer: fine)').matches;
+    const reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!spoon || !finePointer || reducedMotion) return;
+    let targetX = -100, targetY = -100, spoonX = -100, spoonY = -100;
+    let targetRotation = 0, rotation = 0, targetScale = 1, scale = 1, frame = 0;
+    function animate() {
+      spoonX += (targetX - spoonX) * .28;
+      spoonY += (targetY - spoonY) * .28;
+      rotation += (targetRotation - rotation) * .22;
+      scale += (targetScale - scale) * .2;
+      spoon.style.transform = `translate3d(${spoonX}px, ${spoonY}px, 0) rotate(${rotation}deg) scale(${scale})`;
+      frame = requestAnimationFrame(animate);
+    }
+    window.addEventListener('pointermove', (event) => {
+      targetX = event.clientX; targetY = event.clientY;
+      targetRotation = Math.max(-25, Math.min(25, (event.movementX || 0) * 1.2));
+    }, { passive: true });
+    window.addEventListener('pointerdown', () => { targetScale = .8; window.setTimeout(() => { targetScale = 1; }, 110); }, { passive: true });
+    window.addEventListener('blur', () => { targetX = targetY = -100; });
+    document.addEventListener('pointerover', (event) => { if (event.target.closest('a,button,input,select')) targetScale = 1.3; });
+    document.addEventListener('pointerout', (event) => { if (event.target.closest('a,button,input,select')) targetScale = 1; });
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) { cancelAnimationFrame(frame); frame = 0; }
+      else if (!frame) animate();
+    });
+    animate();
+  })();
+</script>
+
+<script type="module">
+  import { requireAuth } from './js/session.js';
+  import { api } from './js/api.js';
+  import { getPreferredLanguage, setPreferredLanguage, initNavigation } from './js/navigation.js';
+
+  let currentToken = null;
+  let currentLang = getPreferredLanguage();
+  let currentStep = 0;
+  let timerInterval = null;
+  let timeLeft = 0;
+  let timerRunning = false;
+  let synth = window.speechSynthesis;
+
+  let steps = [
+    {
+      title: { bn: 'ফোড়ন দিন', en: 'Temper the spices' },
+      desc: {
+        bn: 'কড়াইতে সরষের তেল গরম করুন। তেল হালকা গরম হলে পাঁচফোড়ন, শুকনো লঙ্কা আর তেজপাতা দিন। ২০–৩০ সেকেন্ড নেড়ে নিন, যতক্ষণ সুন্দর গন্ধ বের হয়।',
+        en: 'Warm mustard oil in a kadai. Add panch phoron, dried red chillies and a bay leaf. Stir for 20–30 seconds, just until the spices become fragrant.'
+      },
+      hint: {
+        bn: 'ঠাকুমার টিপস: মশলা পুড়তে দেবেন না—ফোড়নের গন্ধ উঠলেই পরের ধাপে যান।',
+        en: 'Thakuma’s tip: Don’t let the spices burn—move on as soon as they become fragrant.'
+      },
+      duration: 30,
+      ingredients: [
+        ['সরষের তেল', 'Mustard oil', '১ চামচ', '1 spoon', '◓'],
+        ['পাঁচফোড়ন', 'Panch phoron', '১ চিমটি', '1 pinch', '✻']
+      ],
+      photo: true
+    }
+  ];
+
+  function toDigits(n) {
+    return currentLang === 'bn' ? String(n).replace(/\d/g, d => '০১২৩৪৫৬৭৮৯'[d]) : String(n);
+  }
+
+  function applyLanguage(lang) {
+    currentLang = lang === 'en' ? 'en' : 'bn';
+    setPreferredLanguage(currentLang);
+    document.documentElement.lang = currentLang;
+    document.documentElement.classList.toggle('lang-bn', currentLang === 'bn');
+    document.documentElement.classList.toggle('lang-en', currentLang === 'en');
+    document.body.classList.toggle('lang-bn', currentLang === 'bn');
+    document.body.classList.toggle('lang-en', currentLang === 'en');
+
+    document.querySelectorAll('.i18n').forEach(el => {
+      const v = el.dataset[currentLang];
+      if (v !== undefined) el.textContent = v;
+    });
+
+    const btnBn = document.getElementById('lang-bn');
+    const btnEn = document.getElementById('lang-en');
+    if (btnBn) btnBn.classList.toggle('selected', currentLang === 'bn');
+    if (btnEn) btnEn.classList.toggle('selected', currentLang === 'en');
+
+    renderStepsList();
+    renderCurrentStep();
+  }
+
+  function notify(msg) {
+    const toast = document.getElementById('toast');
+    if (!toast) return;
+    toast.textContent = msg;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 3500);
+  }
+
+  function renderStepsList() {
+    const listEl = document.getElementById('step-list');
+    if (!listEl) return;
+    listEl.innerHTML = '';
+
+    steps.forEach((s, i) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = `step-nav ${i === currentStep ? 'current' : ''}`;
+      btn.dataset.step = String(i);
+
+      const noSpan = document.createElement('span');
+      noSpan.className = 'step-no';
+      noSpan.textContent = toDigits(i + 1);
+
+      const nameSpan = document.createElement('span');
+      nameSpan.className = 'step-name';
+      nameSpan.textContent = s.title[currentLang] || s.title.bn;
+
+      btn.appendChild(noSpan);
+      btn.appendChild(nameSpan);
+
+      btn.addEventListener('click', () => goToStep(i));
+      listEl.appendChild(btn);
+    });
+  }
+
+  function renderCurrentStep() {
+    if (!steps[currentStep]) return;
+    const s = steps[currentStep];
+
+    // Update progress pill
+    const countPill = document.getElementById('step-count-pill');
+    if (countPill) {
+      countPill.textContent = currentLang === 'en'
+        ? `Step ${currentStep + 1} of ${steps.length}`
+        : `ধাপ ${toDigits(currentStep + 1)} / ${toDigits(steps.length)}`;
+    }
+
+    const progBar = document.getElementById('progress-bar');
+    if (progBar) {
+      const pct = Math.round(((currentStep + 1) / steps.length) * 100);
+      progBar.style.width = `${pct}%`;
+    }
+
+    // Step title & description
+    const titleEl = document.getElementById('step-title');
+    if (titleEl) titleEl.textContent = s.title[currentLang] || s.title.bn;
+
+    const descEl = document.getElementById('step-desc');
+    if (descEl) descEl.textContent = s.desc[currentLang] || s.desc.bn;
+
+    const hintEl = document.getElementById('tip-text');
+    if (hintEl) hintEl.textContent = s.hint[currentLang] || s.hint.bn;
+
+    // Ingredients
+    const ingContainer = document.getElementById('ing-list');
+    if (ingContainer) {
+      ingContainer.innerHTML = '';
+      if (!s.ingredients || s.ingredients.length === 0) {
+        ingContainer.innerHTML = `<span style="font-size: 12px; color: #826b57;">${currentLang === 'en' ? 'No specific measure needed for this step.' : 'এই ধাপের জন্য আলাদা কোনো মাপ নেই।'}</span>`;
+      } else {
+        s.ingredients.forEach(item => {
+          const pill = document.createElement('span');
+          pill.className = 'ing-pill';
+          const name = currentLang === 'en' ? (item[1] || item[0]) : item[0];
+          const amt = currentLang === 'en' ? (item[3] || item[2]) : item[2];
+          const sym = item[4] || '◌';
+          const symSpan = document.createElement('span');
+          symSpan.textContent = sym;
+          const nameStrong = document.createElement('strong');
+          nameStrong.textContent = name;
+          const amtSmall = document.createElement('small');
+          amtSmall.textContent = amt;
+          pill.appendChild(symSpan);
+          pill.appendChild(nameStrong);
+          pill.appendChild(amtSmall);
+          ingContainer.appendChild(pill);
+        });
+      }
+    }
+
+    // Timer
+    resetTimer(s.duration || 0);
+
+    // Sidebar active item
+    document.querySelectorAll('.step-nav').forEach((btn, idx) => {
+      btn.classList.toggle('current', idx === currentStep);
+    });
+
+    // Control buttons state
+    const prevBtn = document.getElementById('prev-step-btn');
+    const nextBtn = document.getElementById('next-step-btn');
+    if (prevBtn) prevBtn.disabled = currentStep === 0;
+    if (nextBtn) {
+      nextBtn.textContent = currentStep === steps.length - 1
+        ? (currentLang === 'en' ? 'Finish cooking ✓' : 'রান্না সম্পন্ন ✓')
+        : (currentLang === 'en' ? 'Next step →' : 'পরের ধাপ →');
+    }
+  }
+
+  function goToStep(idx) {
+    if (idx < 0 || idx >= steps.length) return;
+    currentStep = idx;
+    renderCurrentStep();
+  }
+
+  function nextStep() {
+    if (currentStep < steps.length - 1) {
+      goToStep(currentStep + 1);
+    } else {
+      notify(currentLang === 'en' ? 'All steps completed! Delicious cooking!' : 'সব ধাপ সম্পন্ন হয়েছে! চমৎকার রান্না!');
+    }
+  }
+
+  function prevStep() {
+    if (currentStep > 0) {
+      goToStep(currentStep - 1);
+    }
+  }
+
+  function repeatStep() {
+    const s = steps[currentStep];
+    const textToSpeak = s.desc[currentLang] || s.desc.bn;
+
+    if (synth && 'speechSynthesis' in window) {
+      synth.cancel();
+      const utterance = new SpeechSynthesisUtterance(textToSpeak);
+      utterance.lang = currentLang === 'bn' ? 'bn-IN' : 'en-US';
+      synth.speak(utterance);
+      notify(currentLang === 'en' ? 'Repeating step…' : 'ধাপটি পড়ে শোনানো হচ্ছে…');
+    } else {
+      notify(textToSpeak);
+    }
+  }
+
+  // Timer logic
+  function resetTimer(seconds) {
+    clearInterval(timerInterval);
+    timerRunning = false;
+    timeLeft = seconds;
+    updateTimerDisplay();
+
+    const tBtn = document.getElementById('timer-toggle-btn');
+    if (tBtn) {
+      tBtn.textContent = currentLang === 'en' ? 'Start timer' : 'টাইমার শুরু';
+      tBtn.style.display = seconds > 0 ? '' : 'none';
+    }
+    const tWrap = document.getElementById('timer-wrap');
+    if (tWrap) tWrap.style.display = seconds > 0 ? 'flex' : 'none';
+  }
+
+  function updateTimerDisplay() {
+    const timerDisplay = document.getElementById('timer-countdown');
+    if (!timerDisplay) return;
+    const m = Math.floor(timeLeft / 60);
+    const s = timeLeft % 60;
+    const str = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+    timerDisplay.textContent = toDigits(str);
+  }
+
+  function toggleTimer() {
+    const tBtn = document.getElementById('timer-toggle-btn');
+    if (!timerRunning) {
+      if (timeLeft <= 0) return;
+      timerRunning = true;
+      if (tBtn) tBtn.textContent = currentLang === 'en' ? 'Pause' : 'থামান';
+      timerInterval = setInterval(() => {
+        timeLeft--;
+        updateTimerDisplay();
+        if (timeLeft <= 0) {
+          clearInterval(timerInterval);
+          timerRunning = false;
+          if (tBtn) tBtn.textContent = currentLang === 'en' ? 'Done!' : 'সম্পন্ন!';
+          notify(currentLang === 'en' ? 'Timer finished for this step!' : 'এই ধাপের সময় শেষ!');
+        }
+      }, 1000);
+    } else {
+      clearInterval(timerInterval);
+      timerRunning = false;
+      if (tBtn) tBtn.textContent = currentLang === 'en' ? 'Resume' : 'চালু করুন';
+    }
+  }
+
+  async function loadRecipeForCooking() {
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get('id');
+
+    if (!id) {
+      // Use existing demo steps
+      renderStepsList();
+      renderCurrentStep();
+      return;
+    }
+
+    try {
+      const recipe = await api.getRecipe(currentToken, id);
+      if (recipe) {
+        // Set page header title
+        const h1 = document.querySelector('.recipe-head h1 span');
+        if (h1) h1.textContent = recipe.title;
+
+        // Parse steps from draft
+        const draftSteps = recipe.draft?.recipe?.steps || [];
+        if (draftSteps.length > 0) {
+          steps = draftSteps.map((ds, i) => {
+            const ings = (ds.quantities || []).map(q => {
+              const name = q.ingredient || q.raw_phrase;
+              let amt = q.raw_phrase;
+              if (q.range) amt = `${q.range.lo}–${q.range.hi} ${q.range.unit}`;
+              else if (q.qty !== null && q.qty !== undefined) amt = `${q.qty} ${q.unit || ''}`;
+              return [name, name, amt, amt, '◌'];
+            });
+
+            const durSec = ds.durations?.[0]?.value ? Math.round(ds.durations[0].value * 60) : 0;
+
+            return {
+              title: {
+                bn: ds.text.slice(0, 32) + (ds.text.length > 32 ? '…' : ''),
+                en: ds.text.slice(0, 32) + (ds.text.length > 32 ? '…' : '')
+              },
+              desc: { bn: ds.text, en: ds.text },
+              hint: {
+                bn: 'ঠাকুমার পরামর্শ: মনোযোগ দিয়ে ধাপে ধাপে সম্পন্ন করুন।',
+                en: 'Thakuma’s guidance: Proceed step by step with care.'
+              },
+              duration: durSec,
+              ingredients: ings,
+              photo: i === 0
+            };
+          });
+        }
+      }
+    } catch (err) {
+      console.warn('[cook-mode] Could not load recipe by id, using standard steps:', err);
+    }
+
+    renderStepsList();
+    renderCurrentStep();
+  }
+
+  async function init() {
+    const authState = await requireAuth({ redirectTo: '/login.html' });
+    currentToken = authState.token;
+    initNavigation({ activePage: 'cook' });
+
+    // Language buttons
+    document.querySelectorAll('#lang-bn, #lang-en').forEach(b => {
+      b.addEventListener('click', () => {
+        applyLanguage(b.dataset.l || (b.id === 'lang-en' ? 'en' : 'bn'));
+      });
+    });
+
+    // Control buttons
+    document.getElementById('prev-step-btn')?.addEventListener('click', prevStep);
+    document.getElementById('next-step-btn')?.addEventListener('click', nextStep);
+    document.getElementById('repeat-step-btn')?.addEventListener('click', repeatStep);
+    document.getElementById('timer-toggle-btn')?.addEventListener('click', toggleTimer);
+
+    // Back to recipe detail link
+    const backBtn = document.querySelector('a[href*="detail"], a.back-link');
+    if (backBtn) {
+      const id = new URLSearchParams(window.location.search).get('id');
+      if (id) backBtn.href = `/recipe-detail.html?id=${encodeURIComponent(id)}`;
+    }
+
+    applyLanguage(currentLang);
+    await loadRecipeForCooking();
+  }
+
+  // Expose global step triggers for inline click handlers
+  window.goToStep = goToStep;
+  window.nextStep = nextStep;
+  window.prevStep = prevStep;
+  window.repeatStep = repeatStep;
+
+  init();
+</script>
+</body>
+</html>

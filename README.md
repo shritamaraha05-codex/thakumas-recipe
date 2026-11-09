@@ -109,7 +109,7 @@ The parser identifies ingredients, quantities, durations and ordered cooking ste
 
 ### 4. Save and revisit
 
-A signed-in user can save a parsed recipe into their own library, list and open their recipes, and edit one to create a new immutable version. Supabase Auth handles sign-in and Supabase PostgreSQL stores the recipes; ownership is enforced by the backend and by database row-level security. The minimal React frontend in `frontend/` wires this journey (auth, parse, save, library, version, delete). See [Run the frontend locally](#run-the-frontend-locally) and [Manual two-user verification](#manual-two-user-verification).
+A signed-in user can save a parsed recipe into their own library, list and open their recipes, and edit one to create a new immutable version. Supabase Auth handles sign-in and Supabase PostgreSQL stores the recipes; ownership is enforced by the backend and by database row-level security. The vanilla HTML/CSS/JavaScript frontend in `frontend/` wires this journey (auth, parse, save, library, version, delete). See [Run the frontend locally](#run-the-frontend-locally) and [Manual two-user verification](#manual-two-user-verification).
 
 ### 5. Cook
 
@@ -150,7 +150,7 @@ Multi-user storage is **Supabase Auth + Supabase PostgreSQL**, with FastAPI rema
 
 ```mermaid
 flowchart TD
-    A[React frontend] --> B[Supabase Auth]
+    A[Frontend: HTML/CSS/JS via Vite] --> B[Supabase Auth]
     B --> C[User access token]
     C --> D[FastAPI verifies token via JWKS]
     D --> E[Request-scoped Data API client with the user JWT]
@@ -190,7 +190,7 @@ The following status is based on the completed backend milestones reported by th
 | Recipe save / list / open / version / delete endpoints | Implemented and tested offline |
 | `/api/me` authenticated profile endpoint | Implemented |
 | PostgreSQL row-level security migration | Implemented (`supabase/migrations/0001_initial_schema.sql`); real two-user behaviour must be verified manually |
-| Frontend auth + personal library | Implemented as a minimal React/Vite app (`frontend/`); visual/UX polish remains |
+| Frontend auth + personal library | Implemented as a vanilla HTML/CSS/JS app built with Vite (`frontend/`); visual/UX polish remains |
 | Offline automated test suite | 427 backend tests passing; `ruff check .` clean; `npm run build` for the frontend |
 | Recipe clarification/resolve endpoint | Not implemented yet |
 | Personal hand-measure calibration | Not implemented yet |
@@ -212,7 +212,7 @@ The following status is based on the completed backend milestones reported by th
 | LLM integration | Google Gen AI SDK | Gemini structured-output request |
 | Authentication | Supabase Auth (JWKS/PyJWT verification in FastAPI) | Registration, login, sessions and verified access tokens |
 | Database | Supabase PostgreSQL Data API (`postgrest`) | Owner-scoped recipes, versions and profiles, with RLS |
-| Frontend | React + Vite + `@supabase/supabase-js` | Auth screens, parse/save, personal library and versioning |
+| Frontend | Vanilla HTML/CSS/JS + Vite + `@supabase/supabase-js` | Auth screens, parse/save, personal library and versioning |
 | Testing | pytest, Ruff, `vite build` | Offline backend regression tests and a frontend production build |
 
 ### Parsing modes
@@ -244,7 +244,7 @@ The default model configured for Gemini is `gemini-3.5-flash-lite`. The model ca
 
 - Python installed on your machine.
 - Git, if you are cloning the repository.
-- Node.js 20+ for the React frontend (optional; only needed for the UI).
+- Node.js 20+ for the vanilla HTML/CSS/JavaScript frontend built with Vite (optional; only needed for the UI).
 - A Supabase project (project URL + publishable key) for accounts and storage. The backend still starts without one and serves `/api/parse` and `/api/health`; only the recipe routes need Supabase.
 - A Gemini API key only if you intend to test `mode="llm"` or configure Gemini first in `LLM_CHAIN`.
 
@@ -279,21 +279,26 @@ source .venv/bin/activate
 python -m pip install -r requirements.txt
 ```
 
-### 4. Configure environment variables
+### 4. Configure backend environment variables
 
-Copy `.env.example` to `.env` and fill in only the values needed for the mode you intend to use.
+The backend reads its own file, `backend/.env`, resolved relative to the source
+code so it loads the same way regardless of the working directory. Copy the
+template and fill in only the values needed for the mode you intend to use.
 
 **Windows PowerShell:**
 
 ```powershell
-Copy-Item .env.example .env
+Copy-Item backend\.env.example backend\.env
 ```
 
 **macOS / Linux:**
 
 ```bash
-cp .env.example .env
+cp backend/.env.example backend/.env
 ```
+
+See [`docs/LOCAL_DEVELOPMENT.md`](docs/LOCAL_DEVELOPMENT.md) for a description of
+every variable.
 
 For an offline rules-only setup, configure the provider chain to use rules, for example:
 
@@ -313,7 +318,7 @@ For accounts and recipe storage, configure the Supabase project (see [Supabase s
 ```env
 SUPABASE_URL=https://<project-ref>.supabase.co
 SUPABASE_PUBLISHABLE_KEY=<publishable-key>
-FRONTEND_ORIGINS=http://localhost:5173
+FRONTEND_ORIGINS=http://localhost:5173,http://127.0.0.1:5173
 ```
 
 `SUPABASE_PUBLISHABLE_KEY` is public project metadata, not a password and not a JWT signing key. No database password, connection string or service-role key is used by this backend. Never commit `.env`, API keys or other secrets.
@@ -337,6 +342,9 @@ The health endpoint reports application/database/provider status separately. An 
 
 ## Run the frontend locally
 
+The frontend is plain HTML/CSS/JavaScript served and built by Vite. It reads its
+own environment file, `frontend/.env`.
+
 ```bash
 cd frontend
 npm install
@@ -348,18 +356,25 @@ Set these values in `frontend/.env` (never commit it):
 ```env
 VITE_SUPABASE_URL=https://<project-ref>.supabase.co
 VITE_SUPABASE_PUBLISHABLE_KEY=<publishable-key>
-VITE_API_BASE_URL=http://localhost:8000
+VITE_API_BASE_URL=http://127.0.0.1:8000
 ```
 
 Then:
 
 ```bash
-npm run dev
+npm run dev -- --host 127.0.0.1 --port 5173
 ```
 
-Vite serves the app at `http://localhost:5173`. The backend must allow that origin (default `FRONTEND_ORIGINS=http://localhost:5173`). Build the production bundle with `npm run build` (output in `frontend/dist/`, which is ignored).
+Vite serves the app at `http://127.0.0.1:5173`. The backend must allow that origin
+(the default `FRONTEND_ORIGINS` covers both `http://localhost:5173` and
+`http://127.0.0.1:5173`). Build the production bundle with `npm run build`
+(output in `frontend/dist/`, which is ignored).
 
-The frontend uses Supabase **only** for Auth (sign-up, sign-in, Google when enabled, logout, session/token refresh). Every recipe read/write goes to FastAPI with `Authorization: Bearer <access_token>`; it never writes to the database directly.
+Vite embeds `VITE_` values at build time, so changing them requires a new build,
+and a production host must receive them before building. Never put a backend
+secret or a Supabase service-role key in a `VITE_` variable.
+
+The frontend uses Supabase **only** for Auth (sign-up, sign-in, Google when enabled, logout, session/token refresh). Every recipe read/write goes to FastAPI with `Authorization: Bearer <access_token>`; it never writes to the database directly. For a full walkthrough, see [`docs/LOCAL_DEVELOPMENT.md`](docs/LOCAL_DEVELOPMENT.md).
 
 ---
 
@@ -369,7 +384,7 @@ The frontend uses Supabase **only** for Auth (sign-up, sign-in, Google when enab
 2. Enable the auth providers you need (Email/Password, and optionally Google). For Google, configure the provider in Supabase and add the app URL/redirect URLs.
 3. Apply the migration: open **Dashboard → SQL Editor**, paste the whole of [`supabase/migrations/0001_initial_schema.sql`](supabase/migrations/0001_initial_schema.sql), and run it. This creates `profiles`, `recipes`, `recipe_versions`, the new-user profile trigger, RLS policies and the atomic RPCs. No Supabase CLI or Docker is required.
 4. Configure environments:
-   - backend `.env`: `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`, `FRONTEND_ORIGINS`
+   - `backend/.env`: `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`, `FRONTEND_ORIGINS`
    - `frontend/.env`: `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY`, `VITE_API_BASE_URL`
    - Use the same project URL and publishable key in both.
 5. In Supabase Auth URL configuration, add `http://localhost:5173` (and your deployed origin) to the Site URL/Redirect URLs.
@@ -385,7 +400,7 @@ The publishable key is safe to ship to the browser. Never put a service-role key
 
 This is the real Supabase check. The automated tests use injected fakes and do **not** prove live RLS behaviour. Record the actual date/project/result; do not claim a live pass that was not run.
 
-1. Start the backend and frontend and open `http://localhost:5173`.
+1. Start the backend and frontend and open `http://127.0.0.1:5173`.
 2. Register **User A** (email/password; confirm the email if the project requires it).
 3. Enter a Bengali narration, parse it with the offline rules mode, give it a title, and save it. It should appear in the library.
 4. Reload the page. The session should persist and the recipe should still be listed. Open it and verify the exact transcript and complete `ParseResult` JSON are returned.
@@ -476,14 +491,17 @@ The following is the high-level backend and documentation layout; consult the re
 │   │   ├── routers/             # health, parse, recipes + /api/me
 │   │   ├── parse/               # Normalization, segmentation, lexicon and parsers
 │   │   └── providers/           # Replaceable LLM provider integrations
+│   ├── .env.example             # Backend env template (copy to backend/.env)
 │   └── tests/                   # Offline auth, repository, API, migration tests
 ├── supabase/
 │   └── migrations/
 │       └── 0001_initial_schema.sql   # Tables, RLS policies, triggers, atomic RPCs
 ├── frontend/
-│   ├── package.json             # React + Vite + @supabase/supabase-js
+│   ├── package.json             # Vite + @supabase/supabase-js, multi-page build
+│   ├── vite.config.js           # Multi-page entry points
 │   ├── .env.example
-│   └── src/                     # Auth panel, recipe editor, library, versioning
+│   ├── *.html                   # login, library, record, recipe-detail, cook-mode, profile
+│   └── js/                      # config, supabase, api, auth, session, navigation
 ├── docs/                        # Product, architecture, data model, API, tasks
 ├── prototype_v0/                # Historical prototype; not the current architecture
 ├── contributions/               # Team contribution records
@@ -501,7 +519,7 @@ The immediate backend direction is to complete the product journey rather than c
 ### Next implementation priorities
 
 1. **Live Supabase verification:** run the [manual two-user verification](#manual-two-user-verification) on a real project and record the result. The automated suite uses fakes.
-2. **Frontend completion:** capture/record flow, clarification cards and cook mode (tasks S-16..S-18). The current React app covers auth, parse, save, library, version and delete.
+2. **Frontend completion:** capture/record flow, clarification cards and cook mode (tasks S-16..S-18). The current frontend covers auth, parse, save, library, version and delete.
 3. **Production hardening:** request limits, safe audit logging and monitoring around the Data API and Auth.
 4. **Postponed features:** personal calibration, recipe scaling, pantry search and collections only after the main journey is verified.
 

@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#fbf1df" />
+  <title>ঠাকুমার রান্না · Welcome to your family kitchen</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Tiro+Bangla:ital@0;1&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --cream: #fbf1df;
+      --cream-deep: #f5e7cd;
+      --paper: #fffaf0;
+      --paper-bright: #fffdf7;
+      --line: #ead8b9;
+      --ink: #321b12;
+      --muted: #795b49;
+      --red: #982017;
+      --red-deep: #7f180f;
+      --red-soft: #b12c20;
+      --gold: #d79e2e;
+      --shadow: 0 18px 50px rgba(69, 36, 16, .18), 0 3px 10px rgba(69, 36, 16, .08);
+    }
+
+    * { box-sizing: border-box; }
+    html { min-height: 100%; background: #eee2cc; }
+    body {
+      margin: 0;
+      min-height: 100svh;
+      display: grid;
+      place-items: center;
+      padding: 18px 12px;
+      color: var(--ink);
+      background:
+        radial-gradient(ellipse at 12% 8%, rgba(255,255,255,.72), transparent 34%),
+        radial-gradient(ellipse at 88% 85%, rgba(211,157,79,.14), transparent 36%),
+        #eee2cc;
+      font-family: 'Plus Jakarta Sans', 'Hind Siliguri', sans-serif;
+    }
+
+    button, input { font: inherit; }
+    button { -webkit-tap-highlight-color: transparent; }
+
+    .auth-card {
+      position: relative;
+      isolation: isolate;
+      display: flex;
+      flex-direction: column;
+      width: min(448px, 100%);
+      height: min(730px, calc(100svh - 36px));
+      min-height: 650px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,.72);
+      border-radius: 17px;
+      background:
+        radial-gradient(circle at 20% 35%, rgba(194,139,70,.045) 0 1px, transparent 1.5px) 0 0 / 7px 7px,
+        linear-gradient(145deg, #fffaf0 0%, #fbf1df 58%, #f8ecd7 100%);
+      box-shadow: var(--shadow);
+    }
+
+    .hero {
+      position: relative;
+      flex: 0 0 272px;
+      height: 272px;
+      overflow: visible;
+      background: #78512e;
+    }
+    .hero-photo {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: 50% 44%;
+      display: block;
+      user-select: none;
+      -webkit-user-drag: none;
+    }
+    .hero::after {
+      content: "";
+      position: absolute;
+      z-index: 1;
+      inset: 0;
+      pointer-events: none;
+      background: linear-gradient(
+        180deg,
+        rgba(39, 19, 8, .08) 0%,
+        rgba(39, 19, 8, 0) 38%,
+        rgba(251, 241, 223, .22) 61%,
+        rgba(251, 241, 223, .92) 90%,
+        var(--cream) 100%
+      );
+    }
+    .hero::before {
+      content: "";
+      position: absolute;
+      z-index: 2;
+      left: 0; right: 0; bottom: -1px;
+      height: 34px;
+      pointer-events: none;
+      background: linear-gradient(180deg, transparent, rgba(251,241,223,.5));
+    }
+
+    .brand-lockup {
+      position: absolute;
+      z-index: 3;
+      left: 18px;
+      right: 18px;
+      bottom: -58px;
+      text-align: center;
+    }
+    .brand-flourish {
+      display: block;
+      width: 40px;
+      height: 27px;
+      margin: 0 auto -2px;
+      color: var(--red);
+      filter: drop-shadow(0 1px 0 rgba(255,255,255,.65));
+    }
+    .brand-title {
+      margin: 0;
+      color: var(--red);
+      font: 700 clamp(40px, 10vw, 49px)/1.22 'Tiro Bangla', 'Hind Siliguri', serif;
+      letter-spacing: -.045em;
+      text-shadow: 0 1px 0 rgba(255,255,255,.62);
+    }
+
+    .content {
+      position: relative;
+      z-index: 2;
+      flex: 1 1 auto;
+      min-height: 0;
+      padding: 68px 42px 32px;
+      text-align: center;
+    }
+    .tagline {
+      margin: 0;
+      color: #8f241a;
+      font: 700 15px/1.5 'Plus Jakarta Sans', sans-serif;
+      letter-spacing: -.02em;
+    }
+    .bengali-line {
+      margin: 25px 0 27px;
+      color: #4a3023;
+      font: 500 19px/1.75 'Tiro Bangla', 'Hind Siliguri', serif;
+    }
+
+    .actions { display: grid; gap: 13px; width: min(100%, 330px); margin: 0 auto; }
+    .auth-action {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 11px;
+      width: 100%;
+      min-height: 47px;
+      padding: 10px 18px;
+      border-radius: 999px;
+      cursor: pointer;
+      font: 600 14px/1.25 'Plus Jakarta Sans', 'Hind Siliguri', sans-serif;
+      transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
+    }
+    .auth-action:active { transform: translateY(1px) scale(.99); }
+    .auth-action:focus-visible, .text-button:focus-visible, .field input:focus-visible {
+      outline: 3px solid rgba(215,158,46,.55);
+      outline-offset: 3px;
+    }
+    .auth-action.email {
+      color: #fffaf0;
+      border: 1px solid #851a12;
+      background: linear-gradient(180deg, #a3261c, #8d1c14);
+      box-shadow: 0 5px 12px rgba(133,26,18,.19), inset 0 1px 0 rgba(255,255,255,.18);
+    }
+    .auth-action.email:hover { background: linear-gradient(180deg, #af2b20, #8f1b13); box-shadow: 0 7px 16px rgba(133,26,18,.23); }
+    .auth-action.google {
+      color: #30251e;
+      border: 1px solid #ead9bd;
+      background: rgba(255,252,245,.92);
+      box-shadow: 0 3px 8px rgba(75,45,20,.10), inset 0 1px 0 rgba(255,255,255,.9);
+    }
+    .auth-action.google:hover { background: #fffdf8; box-shadow: 0 5px 12px rgba(75,45,20,.13); }
+    .action-icon { width: 19px; height: 19px; flex: 0 0 auto; }
+    .google-mark { width: 19px; height: 19px; flex: 0 0 auto; }
+
+    .account-prompt {
+      margin: 28px 0 0;
+      color: #765e4e;
+      font: 500 12px/1.6 'Plus Jakarta Sans', sans-serif;
+    }
+    .text-button {
+      display: inline;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: var(--red);
+      font: inherit; font-weight: 700;
+      cursor: pointer;
+    }
+    .text-button:hover { color: var(--red-deep); text-decoration: underline; text-underline-offset: 3px; }
+
+    /* Email form is revealed from the quiet landing state, keeping the first view close to the reference. */
+    .form-view { display: none; text-align: left; width: min(100%, 350px); margin: -2px auto 0; animation: rise .35s ease both; }
+    .form-view.is-visible { display: block; }
+    .landing-view.is-hidden { display: none; }
+    @keyframes rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .form-heading { margin: 0; text-align: center; color: var(--red); font: 600 25px/1.35 'Tiro Bangla', 'Hind Siliguri', serif; }
+    .form-caption { margin: 4px 0 17px; text-align: center; color: var(--muted); font: 12px/1.5 'Plus Jakarta Sans', sans-serif; }
+    .back-row { display: flex; justify-content: center; margin: 0 0 12px; }
+    .back-button { border: 0; background: none; color: var(--muted); cursor: pointer; font-size: 12px; }
+    .back-button:hover { color: var(--red); }
+    .form-fields { display: grid; gap: 10px; }
+    .field { display: grid; gap: 5px; }
+    .field[hidden] { display: none !important; }
+    .field label { color: var(--ink); font: 600 12px/1.4 'Hind Siliguri', sans-serif; }
+    .field input {
+      width: 100%;
+      height: 42px;
+      padding: 0 13px;
+      border: 1px solid #e4d2b4;
+      border-radius: 9px;
+      color: var(--ink);
+      background: rgba(255,253,247,.82);
+      font: 13px 'Plus Jakarta Sans', 'Hind Siliguri', sans-serif;
+      box-shadow: inset 0 1px 2px rgba(66,39,17,.035);
+    }
+    .field input::placeholder { color: #a28a76; }
+    .password-wrap { position: relative; }
+    .password-wrap input { padding-right: 46px; }
+    .password-toggle {
+      position: absolute; top: 0; right: 0; width: 42px; height: 42px;
+      border: 0; background: transparent; color: #8c7561; cursor: pointer;
+    }
+    .forgot-row { display: flex; justify-content: flex-end; margin-top: -2px; }
+    .forgot-row .text-button { font-size: 11px; }
+    .remember-row { display: flex; align-items: center; gap: 8px; margin: 2px 0 0; color: #765e4e; font: 11px 'Hind Siliguri', sans-serif; }
+    .remember-row input { accent-color: var(--red); }
+    .submit-button {
+      width: 100%; min-height: 44px; margin-top: 3px;
+      border: 1px solid var(--red-deep); border-radius: 999px;
+      color: #fffaf0; background: linear-gradient(180deg, #a3261c, #8d1c14);
+      font: 600 13px 'Hind Siliguri', sans-serif; cursor: pointer;
+      box-shadow: 0 5px 12px rgba(133,26,18,.15);
+    }
+    .form-switch { margin: 12px 0 0; text-align: center; color: #765e4e; font: 11px/1.6 'Plus Jakarta Sans', sans-serif; }
+    .form-extras { display: flex; justify-content: center; gap: 14px; margin-top: 12px; }
+    .form-extras button { border: 0; background: none; color: #8b715d; font: 11px 'Hind Siliguri', sans-serif; cursor: pointer; }
+    .form-extras button:hover { color: var(--red); }
+
+    .card-bottom-flower {
+      position: absolute; z-index: 0; bottom: 8px; left: 50%; transform: translateX(-50%);
+      width: 90px; height: 14px; opacity: .24; pointer-events: none;
+      background: radial-gradient(ellipse at 50% 100%, #ba7b37 0 2px, transparent 3px),
+                  radial-gradient(ellipse at 35% 50%, #ba7b37 0 2px, transparent 3px),
+                  radial-gradient(ellipse at 65% 50%, #ba7b37 0 2px, transparent 3px);
+    }
+    .toast {
+      position: absolute; z-index: 10; left: 18px; right: 18px; bottom: 20px;
+      display: none; padding: 11px 15px; border-radius: 10px;
+      color: #fffaf0; background: #342219; box-shadow: 0 8px 24px rgba(37,20,10,.24);
+      text-align: center; font: 12px/1.45 'Hind Siliguri', sans-serif;
+    }
+    .toast.is-visible { display: block; animation: rise .2s ease both; }
+
+    @media (max-width: 480px) {
+      body { display: block; padding: 0; background: var(--cream); }
+      .auth-card { width: 100%; height: 100svh; min-height: 650px; border: 0; border-radius: 0; box-shadow: none; }
+      .hero { flex-basis: 37svh; height: 37svh; min-height: 245px; max-height: 285px; }
+      .content { padding: 68px 34px 30px; }
+      .brand-lockup { bottom: -57px; }
+      .bengali-line { margin-top: 24px; margin-bottom: 26px; font-size: 18px; }
+    }
+    @media (max-height: 700px) and (min-width: 481px) {
+      body { padding-top: 8px; padding-bottom: 8px; }
+      .auth-card { height: auto; min-height: calc(100svh - 16px); }
+      .hero { flex-basis: 245px; height: 245px; }
+      .content { padding-top: 65px; padding-bottom: 26px; }
+      .bengali-line { margin-top: 18px; margin-bottom: 20px; }
+      .account-prompt { margin-top: 20px; }
+    }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; } }
+
+
+    /* Landing-page paper treatment: warm, quiet, lightly textured rather than a flat panel. */
+    html { background: #f8f0e2; }
+    body {
+      background:
+        radial-gradient(ellipse at 10% 12%, rgba(255,255,255,.88) 0, transparent 35%),
+        radial-gradient(ellipse at 92% 84%, rgba(218,166,87,.12) 0, transparent 38%),
+        linear-gradient(135deg, #fbf6eb 0%, #f7eddd 52%, #f3e6d1 100%);
+    }
+    .auth-card {
+      border: 1px solid rgba(220, 198, 160, .82);
+      background-color: #fffaf0;
+      background-image:
+        radial-gradient(circle at 12% 18%, rgba(153,104,48,.045) 0 .8px, transparent 1.35px),
+        radial-gradient(circle at 78% 67%, rgba(153,104,48,.032) 0 .7px, transparent 1.25px),
+        repeating-linear-gradient(0deg, rgba(117,82,46,.012) 0 1px, transparent 1px 5px),
+        linear-gradient(155deg, #fffdf8 0%, #fffaf0 48%, #f9f0e1 100%);
+      background-size: 9px 9px, 13px 13px, 100% 6px, 100% 100%;
+      box-shadow:
+        0 22px 58px rgba(78, 47, 23, .15),
+        0 4px 12px rgba(78, 47, 23, .06),
+        inset 0 1px 0 rgba(255,255,255,.95);
+    }
+    .content {
+      background-color: #fffaf0;
+      background-image:
+        radial-gradient(ellipse at 2% 88%, rgba(210,160,86,.075), transparent 31%),
+        radial-gradient(ellipse at 98% 12%, rgba(174,49,32,.025), transparent 27%),
+        repeating-linear-gradient(0deg, rgba(117,82,46,.012) 0 1px, transparent 1px 6px),
+        linear-gradient(180deg, rgba(255,253,248,.98), rgba(250,241,224,.98));
+      background-size: 100% 100%, 100% 100%, 100% 7px, 100% 100%;
+    }
+    .hero::after {
+      background: linear-gradient(
+        180deg,
+        rgba(39, 19, 8, .07) 0%,
+        rgba(39, 19, 8, 0) 40%,
+        rgba(255, 250, 240, .18) 62%,
+        rgba(255, 250, 240, .91) 90%,
+        #fffaf0 100%
+      );
+    }
+    .hero::before {
+      background: linear-gradient(180deg, transparent, rgba(255,250,240,.56));
+    }
+    .field input {
+      background: rgba(255,253,248,.9);
+      border-color: #e8d9bd;
+    }
+    .auth-action.google {
+      background: rgba(255,253,248,.94);
+      border-color: #e8d9bd;
+    }
+    @media (max-width: 480px) {
+      body { background: #fbf4e8; }
+      .auth-card { background-color: #fffaf0; }
+    }
+
+  
+    /* Shared Thakuma navigation — same system as the Profile page. */
+    .site-header{position:fixed;top:0;left:0;right:0;z-index:50;background:transparent;border:0;backdrop-filter:none;pointer-events:none}
+    .header-inner{width:min(1180px,calc(100% - 32px));min-height:64px;margin:10px auto 0;padding:9px 18px;display:flex;align-items:center;justify-content:space-between;gap:22px;border:1px solid rgba(179,35,27,.14);border-radius:50px;background:rgba(255,248,234,.84);box-shadow:var(--shadow);backdrop-filter:blur(14px);pointer-events:auto}
+    .brand{display:inline-flex;align-items:center;gap:10px;min-width:max-content;text-decoration:none}
+    .brand-mark{flex:0 0 auto;width:48px;height:48px;display:block;border-radius:50%;object-fit:contain;background:rgba(255,248,234,.9);filter:drop-shadow(0 5px 9px rgba(80,30,12,.18))}
+    .brand-name{display:block;color:var(--red);font-family:'Tiro Bangla','Hind Siliguri',serif;font-size:19px;font-weight:400;line-height:1.1;white-space:nowrap}
+    .brand-caption{display:block;margin-top:3px;color:var(--muted);font-family:'Hind Siliguri',sans-serif;font-size:9px;font-weight:600;letter-spacing:.12em;text-transform:uppercase}
+    .main-nav{display:flex;align-items:center;gap:25px;margin-left:auto}
+    .nav-link{position:relative;padding:10px 0;color:var(--muted);font-family:'Hind Siliguri',sans-serif;font-size:13px;font-weight:600;text-decoration:none;transition:color .2s ease}
+    .nav-link:hover,.nav-link.active{color:var(--ink)}
+    .nav-link::after{content:'';position:absolute;left:0;right:0;bottom:3px;height:2px;width:0;background:var(--red);transition:width .25s ease}
+    .nav-link:hover::after,.nav-link.active::after{width:100%}
+    .header-actions{display:flex;align-items:center;gap:10px}
+    .language-switch{display:inline-flex;align-items:center;gap:3px;padding:3px;border:0;border-radius:999px;background:#f1dfbd}
+    .language-switch button{min-width:43px;padding:6px 11px;border:0;border-radius:999px;color:var(--ink);background:transparent;font-family:'Hind Siliguri',sans-serif;font-size:12px;font-weight:700;transition:background .2s ease,color .2s ease,box-shadow .2s ease}
+    .language-switch button[aria-pressed="true"]{color:#fff;background:var(--red);box-shadow:0 3px 9px rgba(142,23,16,.22)}
+    .avatar-mini{width:34px;height:34px;display:grid;place-items:center;border-radius:50%;background:#1f4a37;color:#fff8ea;font-family:'Tiro Bangla',serif;font-size:12px;font-weight:600}
+    .mobile-nav{display:none}
+    #spoon{position:fixed;left:0;top:0;z-index:100;width:46px;height:46px;margin:-6px 0 0 -6px;pointer-events:none;filter:drop-shadow(0 4px 4px rgba(80,20,10,.35));transform-origin:6px 6px;will-change:transform}
+    @media(pointer:fine){body,body a,body button,body input{cursor:none}}
+    @media(pointer:coarse){#spoon{display:none}}
+    @media(prefers-reduced-motion:reduce){#spoon{display:none!important}body,body a,body button,body input{cursor:auto!important}}
+
+    /* The auth view grows with its content: the document, not the card, scrolls. */
+    body{display:block;min-height:100svh;padding:0;overflow-x:hidden;overflow-y:auto;place-items:initial}
+    .auth-card{height:auto;min-height:0;max-height:none;width:min(448px,calc(100% - 28px));margin:112px auto 48px;overflow:hidden;scroll-margin-top:104px}
+    .hero{flex:0 0 252px;height:252px}
+    .content{flex:0 0 auto;min-height:0;padding:68px 38px 38px}
+    .form-view{scroll-margin-top:112px;padding-bottom:4px}
+    .form-fields{padding-bottom:3px}
+    .toast{position:fixed;left:50%;right:auto;bottom:20px;width:min(420px,calc(100% - 32px));transform:translateX(-50%);z-index:120}
+    .toast.is-visible{animation:rise .2s ease both}
+    html.lang-en body{font-family:'Plus Jakarta Sans','Hind Siliguri',sans-serif}
+    @media(max-width:820px){.header-inner{width:min(100% - 28px,760px);gap:14px}.main-nav{gap:17px}.nav-link{font-size:11px}}
+    @media(max-width:620px){
+      .header-inner{width:calc(100% - 24px);min-height:58px;margin-top:7px;padding:7px 12px;gap:8px}
+      .brand{gap:8px}.brand-mark{width:39px;height:39px}.brand-name{font-size:16px}.brand-caption{font-size:7px;letter-spacing:.1em}
+      .main-nav{display:none}.header-actions{gap:7px}.language-switch button{min-width:36px;padding:6px 7px;font-size:10px}.avatar-mini{width:30px;height:30px;font-size:10px}
+      .mobile-nav{display:flex;align-items:center;justify-content:space-around;gap:8px;width:calc(100% - 54px);max-width:430px;margin:6px auto 0;padding:8px 12px;border:1px solid rgba(179,35,27,.12);border-radius:30px;background:rgba(255,248,234,.9);box-shadow:0 8px 22px rgba(120,40,20,.12);backdrop-filter:blur(12px);pointer-events:auto}
+      .mobile-nav a{color:var(--muted);font-family:'Hind Siliguri',sans-serif;font-size:10px;font-weight:700;text-decoration:none}.mobile-nav a:hover{color:var(--red)}
+      .auth-card{width:100%;margin:132px auto 24px;min-height:0;height:auto;border:0;border-radius:0;box-shadow:none;overflow:hidden}
+      .hero{flex:0 0 235px;height:235px;min-height:220px;max-height:none}
+      .content{padding:66px 26px 34px}
+      .brand-lockup{bottom:-53px}.brand-title{font-size:clamp(37px,10vw,46px)}
+      .bengali-line{margin-top:20px;margin-bottom:23px;font-size:17px}
+      .form-view{width:min(100%,370px)}
+    }
+    @media(max-width:380px){.brand-caption{display:none}.header-inner{padding-inline:10px}.brand-mark{width:36px;height:36px}.brand-name{font-size:15px}.language-switch button{min-width:32px;padding:6px 6px}.content{padding-inline:21px}}
+    @media(max-height:700px) and (min-width:621px){.auth-card{margin-top:100px}.hero{flex-basis:220px;height:220px}.content{padding-top:62px}}
+
+</style>
+</head>
+<body class="lang-bn">
+<svg id="spoon" viewBox="0 0 46 46" aria-hidden="true"><g transform="rotate(-40 6 6)"><path d="M6 4 C0 4 0 16 6 18 C12 16 12 4 6 4Z" fill="#e0a526" stroke="#8e5a10" stroke-width="1.2"/><rect x="4.8" y="17" width="2.4" height="26" rx="1.2" fill="#b07a1c"/></g></svg>
+<header class="site-header">
+  <div class="header-inner">
+    <a class="brand" href="#/" aria-label="Thakuma's Recipe home">
+      <img class="brand-mark" src="/assets/images/thakuma_brand_mark.webp" alt="" aria-hidden="true" />
+      <span>
+        <span class="brand-name" data-i18n="brand">ঠাকুমার রান্না</span>
+        <span class="brand-caption" data-i18n="brandCaption">ঘরের স্বাদ</span>
+      </span>
+    </a>
+    <nav class="main-nav" aria-label="Main navigation">
+      <a class="nav-link" href="#/" data-i18n="navRecipes">রেসিপি</a>
+      <a class="nav-link" href="#/hands" data-i18n="navHands">হাতের মাপ</a>
+      <a class="nav-link" href="#/accuracy" data-i18n="navAccuracy">নির্ভুলতা</a>
+    </nav>
+    <div class="header-actions">
+      <div class="language-switch" role="group" aria-label="Choose language">
+        <button type="button" data-language="bn" aria-pressed="true">বাংলা</button>
+        <button type="button" data-language="en" aria-pressed="false">EN</button>
+      </div>
+      <div class="avatar-mini" aria-label="Account">ঠা</div>
+    </div>
+  </div>
+  <nav class="mobile-nav" aria-label="Mobile navigation">
+    <a href="#/" data-i18n="navRecipes">রেসিপি</a>
+    <a href="#/hands" data-i18n="navHands">হাতের মাপ</a>
+    <a href="#/accuracy" data-i18n="navAccuracy">নির্ভুলতা</a>
+  </nav>
+</header>
+  <main class="auth-card" aria-label="Thakuma's Recipe sign in">
+    <section class="hero" aria-label="A warm traditional Bengali kitchen">
+      <img class="hero-photo" src="/assets/images/thakuma_login_kitchen_hero.png" alt="Sunlit Bengali kitchen with a green ceramic jar, mustard flowers and brass vessels" />
+      <div class="brand-lockup">
+        <svg class="brand-flourish" viewBox="0 0 48 32" aria-hidden="true">
+          <path d="M24 28c-5-7-5-13 0-19 5 6 5 12 0 19Z" fill="#a5261b"/>
+          <path d="M18 28c-8-3-12-8-12-14 8 1 13 6 12 14Zm12 0c8-3 12-8 12-14-8 1-13 6-12 14Z" fill="#a5261b"/>
+          <path d="M24 8V2M8 29h32" fill="none" stroke="#a5261b" stroke-width="1.4" stroke-linecap="round"/>
+        </svg>
+        <h1 class="brand-title">ঠাকুমার রান্না</h1>
+      </div>
+    </section>
+
+    <section class="content">
+      <div class="landing-view" id="landing-view">
+        <p class="tagline" id="tagline">Your family. Your recipes. Your memories.</p>
+        <p class="bengali-line" id="bengali-line">প্রজন্মের পর প্রজন্ম ধরে<br />রান্নার গল্প এখন আপনার হাতে।</p>
+        <div class="actions">
+          <button class="auth-action email" type="button" id="continue-email">
+            <svg class="action-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3.2" y="5.2" width="17.6" height="13.6" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="m4.5 7 7.5 6 7.5-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span id="email-button-label">Continue with Email</span>
+          </button>
+          <button class="auth-action google" type="button" id="continue-google">
+            <svg class="google-mark" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5Z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.9c-.58 2.96-2.25 5.48-4.73 7.18l7.63 5.92c4.46-4.12 7.18-10.2 7.18-17.57Z"/><path fill="#FBBC05" d="M10.54 28.59A14.4 14.4 0 0 1 9.75 24c0-1.6.28-3.14.78-4.59l-7.98-6.19A23.9 23.9 0 0 0 0 24c0 3.87.93 7.54 2.56 10.78l7.98-6.19Z"/><path fill="#34A853" d="M24 48c6.47 0 11.91-2.13 15.87-5.88l-7.63-5.92c-2.12 1.42-4.83 2.26-8.24 2.26-6.26 0-11.57-4.22-13.46-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48Z"/></svg>
+            <span id="google-button-label">Continue with Google</span>
+          </button>
+        </div>
+        <p class="account-prompt"><span id="account-prompt-copy">Already have an account?</span> <button class="text-button" type="button" id="open-login">Login</button></p>
+      </div>
+
+      <div class="form-view" id="form-view" aria-live="polite">
+        <div class="back-row"><button class="back-button" id="back-to-welcome" type="button">← Back</button></div>
+        <h2 class="form-heading" id="form-heading">নতুন খাতা শুরু করুন</h2>
+        <p class="form-caption" id="form-caption">Create your family's private recipe archive</p>
+        <form class="form-fields" id="auth-form" novalidate>
+          <div class="field" id="field-name" hidden>
+            <label for="user-name" id="label-user-name">আপনার নাম (Your name)</label>
+            <input id="user-name" name="name" autocomplete="name" placeholder="যেমন: অনন্যা সেন" />
+          </div>
+          <div class="field" id="field-kitchen" hidden>
+            <label for="kitchen-name" id="label-kitchen-name">পারিবারিক রান্নাঘরের নাম (Family kitchen)</label>
+            <input id="kitchen-name" name="kitchen" autocomplete="organization" placeholder="যেমন: রায় বাড়ির হেঁশেল" />
+          </div>
+          <div class="field">
+            <label for="auth-identifier" id="label-auth-identifier">মোবাইল নম্বর বা ইমেইল (Mobile / Email)</label>
+            <input id="auth-identifier" name="identifier" type="text" autocomplete="username" required placeholder="email@example.com / +91 98..." />
+          </div>
+          <div class="field">
+            <label for="auth-password" id="label-auth-password">পাসওয়ার্ড (Password)</label>
+            <div class="password-wrap">
+              <input id="auth-password" name="password" type="password" autocomplete="current-password" required minlength="6" placeholder="At least 6 characters" />
+              <button class="password-toggle" id="toggle-password" type="button" aria-label="Show password" aria-pressed="false">◉</button>
+            </div>
+          </div>
+          <div class="forgot-row" id="forgot-row"><button class="text-button" type="button" id="forgot-password">পাসওয়ার্ড ভুলে গেছেন?</button></div>
+          <label class="remember-row"><input id="remember-me" type="checkbox" checked /> <span id="remember-label">এই ডিভাইসে আমার খাতা মনে রাখুন</span></label>
+          <button class="submit-button" id="submit-button" type="submit">খাতা তৈরি করুন (Create account)</button>
+        </form>
+        <p class="form-switch" id="form-switch">Already have an account? <button class="text-button" id="switch-to-login" type="button">Login</button></p>
+        <div class="form-extras">
+          <button id="guest-demo" type="button">অতিথি হিসেবে দেখুন · Explore demo</button>
+        </div>
+      </div>
+    </section>
+    <div class="card-bottom-flower" aria-hidden="true"></div>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  </main>
+
+
+  <script>
+    (() => {
+      const spoon = document.getElementById('spoon');
+      const finePointer = window.matchMedia && window.matchMedia('(pointer: fine)').matches;
+      const reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (!spoon || !finePointer || reducedMotion) return;
+      let targetX = -100, targetY = -100, spoonX = -100, spoonY = -100;
+      let targetRotation = 0, rotation = 0, targetScale = 1, scale = 1, frame = 0;
+      function animate() {
+        spoonX += (targetX - spoonX) * .28;
+        spoonY += (targetY - spoonY) * .28;
+        rotation += (targetRotation - rotation) * .22;
+        scale += (targetScale - scale) * .2;
+        spoon.style.transform = `translate3d(${spoonX}px, ${spoonY}px, 0) rotate(${rotation}deg) scale(${scale})`;
+        frame = requestAnimationFrame(animate);
+      }
+      window.addEventListener('pointermove', (event) => {
+        targetX = event.clientX; targetY = event.clientY;
+        targetRotation = Math.max(-25, Math.min(25, (event.movementX || 0) * 1.2));
+      }, { passive: true });
+      window.addEventListener('pointerdown', () => { targetScale = .8; window.setTimeout(() => { targetScale = 1; }, 110); }, { passive: true });
+      window.addEventListener('blur', () => { targetX = targetY = -100; });
+      document.addEventListener('pointerover', (event) => { if (event.target.closest('a,button,input')) targetScale = 1.3; });
+      document.addEventListener('pointerout', (event) => { if (event.target.closest('a,button,input')) targetScale = 1; });
+      document.addEventListener('visibilitychange', () => {
+        if (document.hidden) { cancelAnimationFrame(frame); frame = 0; }
+        else if (!frame) animate();
+      });
+      animate();
+    })();
+  </script>
+
+  <script type="module">
+    import { signUp, signIn, signInWithGoogle } from './js/auth.js';
+    import { redirectIfAuthenticated } from './js/session.js';
+    import { supabaseConfigured } from './js/supabase.js';
+    import { setPreferredLanguage, getPreferredLanguage, initNavigation } from './js/navigation.js';
+
+    // Redirect already authenticated users
+    redirectIfAuthenticated({ redirectTo: '/library.html' });
+
+    let currentAuthMode = 'signup';
+    let currentLanguage = getPreferredLanguage();
+    let toastTimer;
+
+    const landingView = document.getElementById('landing-view');
+    const formView = document.getElementById('form-view');
+    const fieldName = document.getElementById('field-name');
+    const fieldKitchen = document.getElementById('field-kitchen');
+    const formHeading = document.getElementById('form-heading');
+    const formCaption = document.getElementById('form-caption');
+    const submitButton = document.getElementById('submit-button');
+    const formSwitch = document.getElementById('form-switch');
+    const forgotRow = document.getElementById('forgot-row');
+    const passwordInput = document.getElementById('auth-password');
+    const identifierInput = document.getElementById('auth-identifier');
+    const userNameInput = document.getElementById('user-name');
+    const kitchenNameInput = document.getElementById('kitchen-name');
+
+    const languageCopy = {
+      bn: {
+        brand: 'ঠাকুমার রান্না', brandCaption: 'ঘরের স্বাদ', navRecipes: 'রেসিপি', navHands: 'হাতের মাপ', navAccuracy: 'নির্ভুলতা',
+        tagline: 'আপনার পরিবার। আপনার রেসিপি। আপনার স্মৃতি।',
+        bengaliLine: 'প্রজন্মের পর প্রজন্ম ধরে<br />রান্নার গল্প এখন আপনার হাতে।',
+        emailButton: 'ইমেল দিয়ে এগিয়ে যান', googleButton: 'Google দিয়ে এগিয়ে যান', accountPrompt: 'আগে থেকেই অ্যাকাউন্ট আছে?', login: 'লগইন করুন',
+        back: '← ফিরে যান', nameLabel: 'আপনার নাম', kitchenLabel: 'পারিবারিক রান্নাঘরের নাম', identifierLabel: 'ইমেইল অ্যাড্রেস', passwordLabel: 'পাসওয়ার্ড',
+        namePlaceholder: 'যেমন: অনন্যা সেন', kitchenPlaceholder: 'যেমন: রায় বাড়ির হেঁশেল', identifierPlaceholder: 'ইমেইল লিখুন (name@example.com)', passwordPlaceholder: 'কমপক্ষে ৬টি অক্ষর',
+        forgot: 'পাসওয়ার্ড ভুলে গেছেন?', remember: 'এই ডিভাইসে আমার খাতা মনে রাখুন', guest: 'অতিথি হিসেবে দেখুন · ডেমো',
+        formSwitchSignup: 'ঠাকুমার রান্নায় নতুন?', formSwitchCreate: 'নতুন অ্যাকাউন্ট খুলুন', formSwitchLogin: 'লগইন করুন',
+        googleNotice: 'Google দিয়ে সাইন ইন করতে Supabase প্রকল্পে OAuth কনফিগারেশন প্রয়োজন।', demoNotice: 'নমুনা রান্নাঘরে নিয়ে যাওয়া হচ্ছে…',
+        resetNotice: 'পাসওয়ার্ড রিসেটের লিংক আপনার ইমেইলে পাঠানোর ব্যবস্থা করা হচ্ছে।',
+        missingIdentifier: 'দয়া করে একটি সঠিক ইমেইল ঠিকানা লিখুন।', shortPassword: 'কমপক্ষে ৬ অক্ষরের পাসওয়ার্ড লিখুন।',
+        signingIn: 'লগইন করা হচ্ছে…', signingUp: 'খাতা তৈরি করা হচ্ছে…',
+        signupSuccess: 'খাতা সফলভাবে তৈরি হয়েছে! প্রবেশ করা হচ্ছে…',
+        signupConfirm: 'অ্যাকাউন্ট তৈরি হয়েছে। আপনার ইমেইল যাচাই করে লগইন করুন।',
+        unconfiguredNotice: 'Supabase কনফিগার করা নেই। অতিথি মোডে লাইব্রেরিতে নিয়ে যাওয়া হচ্ছে…'
+      },
+      en: {
+        brand: "Thakuma's Recipe", brandCaption: 'A taste of home', navRecipes: 'Recipes', navHands: 'Her Hand', navAccuracy: 'Accuracy',
+        tagline: 'Your family. Your recipes. Your memories.',
+        bengaliLine: 'Generations of family recipes,<br />kept close and passed on with love.',
+        emailButton: 'Continue with Email', googleButton: 'Continue with Google', accountPrompt: 'Already have an account?', login: 'Log in',
+        back: '← Back', nameLabel: 'Your name', kitchenLabel: 'Family kitchen name', identifierLabel: 'Email address', passwordLabel: 'Password',
+        namePlaceholder: 'e.g. Ananya Sen', kitchenPlaceholder: 'e.g. The Sen family kitchen', identifierPlaceholder: 'Enter email (name@example.com)', passwordPlaceholder: 'At least 6 characters',
+        forgot: 'Forgot password?', remember: 'Remember my kitchen on this device', guest: 'Explore as a guest · Demo',
+        formSwitchSignup: "New to Thakuma's kitchen?", formSwitchCreate: 'Create an account', formSwitchLogin: 'Log in',
+        googleNotice: 'Google sign-in requires Google OAuth to be enabled in Supabase.', demoNotice: 'Entering guest preview mode…',
+        resetNotice: 'Password reset instructions will be sent to your email.',
+        missingIdentifier: 'Please enter a valid email address.', shortPassword: 'Please enter a password with at least 6 characters.',
+        signingIn: 'Signing in…', signingUp: 'Creating account…',
+        signupSuccess: 'Account created! Redirecting to recipe library…',
+        signupConfirm: 'Account created. Please check your email to confirm, then sign in.',
+        unconfiguredNotice: 'Supabase is not configured. Taking you to library in local mode…'
+      }
+    };
+
+    function applyLanguage(language) {
+      currentLanguage = language === 'en' ? 'en' : 'bn';
+      setPreferredLanguage(currentLanguage);
+      const copy = languageCopy[currentLanguage];
+      document.documentElement.lang = currentLanguage;
+      document.documentElement.classList.toggle('lang-en', currentLanguage === 'en');
+      document.body.classList.toggle('lang-en', currentLanguage === 'en');
+      document.body.classList.toggle('lang-bn', currentLanguage === 'bn');
+      document.title = currentLanguage === 'en' ? "Welcome · Thakuma's Recipe" : 'ঠাকুমার রান্না · আপনার পরিবারের রান্নাঘর';
+
+      document.querySelectorAll('[data-i18n]').forEach((node) => {
+        const key = node.dataset.i18n;
+        if (copy[key] !== undefined) node.innerHTML = copy[key];
+      });
+
+      const setText = (id, key) => { const node = document.getElementById(id); if (node) node.textContent = copy[key]; };
+      setText('tagline', 'tagline'); setText('email-button-label', 'emailButton'); setText('google-button-label', 'googleButton');
+      setText('account-prompt-copy', 'accountPrompt'); setText('open-login', 'login'); setText('back-to-welcome', 'back');
+      setText('label-user-name', 'nameLabel'); setText('label-kitchen-name', 'kitchenLabel');
+      setText('label-auth-identifier', 'identifierLabel'); setText('label-auth-password', 'passwordLabel');
+      setText('remember-label', 'remember'); setText('forgot-password', 'forgot'); setText('guest-demo', 'guest');
+      const line = document.getElementById('bengali-line'); if (line) line.innerHTML = copy.bengaliLine;
+
+      userNameInput.placeholder = copy.namePlaceholder;
+      kitchenNameInput.placeholder = copy.kitchenPlaceholder;
+      identifierInput.placeholder = copy.identifierPlaceholder;
+      passwordInput.placeholder = copy.passwordPlaceholder;
+
+      document.querySelectorAll('[data-language]').forEach((button) =>
+        button.setAttribute('aria-pressed', String(button.dataset.language === currentLanguage))
+      );
+
+      setAuthMode(currentAuthMode);
+    }
+
+    document.querySelectorAll('[data-language]').forEach((button) =>
+      button.addEventListener('click', () => applyLanguage(button.dataset.language))
+    );
+
+    function setAuthMode(mode) {
+      currentAuthMode = mode;
+      const isSignup = mode === 'signup';
+      fieldName.hidden = !isSignup;
+      fieldKitchen.hidden = !isSignup;
+      forgotRow.hidden = isSignup;
+      passwordInput.autocomplete = isSignup ? 'new-password' : 'current-password';
+      const en = currentLanguage === 'en';
+      formHeading.textContent = isSignup ? (en ? 'Start your family recipe book' : 'নতুন খাতা শুরু করুন') : (en ? 'Welcome back' : 'আবার স্বাগতম');
+      formCaption.textContent = isSignup
+        ? (en ? "Create your family's private recipe archive" : 'আপনার পরিবারের রেসিপি ও স্মৃতি এক জায়গায় রাখুন')
+        : (en ? 'Sign in to return to your family kitchen' : 'আপনার পরিবারের রান্নাঘরে ফিরে আসুন');
+      submitButton.textContent = isSignup ? (en ? 'Create account' : 'খাতা তৈরি করুন') : (en ? 'Log in' : 'খাতা খুলুন');
+      formSwitch.innerHTML = isSignup
+        ? (en ? 'Already have an account? <button class="text-button" id="switch-to-login" type="button">Log in</button>' : 'আগে থেকেই অ্যাকাউন্ট আছে? <button class="text-button" id="switch-to-login" type="button">লগইন করুন</button>')
+        : (en ? 'New to Thakuma\'s kitchen? <button class="text-button" id="switch-to-signup" type="button">Create an account</button>' : 'ঠাকুমার রান্নায় নতুন? <button class="text-button" id="switch-to-signup" type="button">নতুন অ্যাকাউন্ট খুলুন</button>');
+      bindModeSwitch();
+    }
+
+    function bindModeSwitch() {
+      const loginSwitch = document.getElementById('switch-to-login');
+      const signupSwitch = document.getElementById('switch-to-signup');
+      if (loginSwitch) loginSwitch.addEventListener('click', () => setAuthMode('login'));
+      if (signupSwitch) signupSwitch.addEventListener('click', () => setAuthMode('signup'));
+    }
+
+    function showForm(mode) {
+      setAuthMode(mode);
+      landingView.classList.add('is-hidden');
+      formView.classList.add('is-visible');
+      window.requestAnimationFrame(() => {
+        formView.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'nearest' });
+        identifierInput.focus({ preventScroll: true });
+      });
+    }
+
+    function showWelcome() {
+      formView.classList.remove('is-visible');
+      landingView.classList.remove('is-hidden');
+      window.requestAnimationFrame(() => document.querySelector('.auth-card').scrollIntoView({ behavior: 'smooth', block: 'start' }));
+    }
+
+    function showAuthToast(message, isError = false) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.style.background = isError ? '#7f180f' : '#342219';
+      toast.classList.add('is-visible');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove('is-visible'), 4000);
+    }
+
+    document.getElementById('continue-email').addEventListener('click', () => showForm('signup'));
+    document.getElementById('open-login').addEventListener('click', () => showForm('login'));
+    document.getElementById('back-to-welcome').addEventListener('click', showWelcome);
+
+    document.getElementById('continue-google').addEventListener('click', async () => {
+      if (!supabaseConfigured) {
+        showAuthToast(languageCopy[currentLanguage].googleNotice);
+        return;
+      }
+      try {
+        await signInWithGoogle();
+      } catch (err) {
+        showAuthToast(err.message || languageCopy[currentLanguage].googleNotice, true);
+      }
+    });
+
+    document.getElementById('toggle-password').addEventListener('click', (event) => {
+      const button = event.currentTarget;
+      const showing = passwordInput.type === 'text';
+      passwordInput.type = showing ? 'password' : 'text';
+      button.textContent = showing ? '◉' : '◎';
+      button.setAttribute('aria-label', showing ? 'Show password' : 'Hide password');
+      button.setAttribute('aria-pressed', String(!showing));
+    });
+
+    document.getElementById('forgot-password').addEventListener('click', () => {
+      showAuthToast(languageCopy[currentLanguage].resetNotice);
+    });
+
+    document.getElementById('guest-demo').addEventListener('click', () => {
+      showAuthToast(languageCopy[currentLanguage].demoNotice);
+      setTimeout(() => {
+        window.location.href = '/library.html';
+      }, 700);
+    });
+
+    document.getElementById('auth-form').addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const identifier = identifierInput.value.trim();
+      const password = passwordInput.value;
+
+      if (!identifier) {
+        identifierInput.focus();
+        showAuthToast(languageCopy[currentLanguage].missingIdentifier, true);
+        return;
+      }
+      if (password.length < 6) {
+        passwordInput.focus();
+        showAuthToast(languageCopy[currentLanguage].shortPassword, true);
+        return;
+      }
+
+      if (!supabaseConfigured) {
+        showAuthToast(languageCopy[currentLanguage].unconfiguredNotice);
+        setTimeout(() => {
+          window.location.href = '/library.html';
+        }, 1200);
+        return;
+      }
+
+      submitButton.disabled = true;
+      const originalBtnText = submitButton.textContent;
+
+      if (currentAuthMode === 'signup') {
+        submitButton.textContent = languageCopy[currentLanguage].signingUp;
+        try {
+          const userName = userNameInput.value.trim();
+          const kitchenName = kitchenNameInput.value.trim();
+          const { data, error } = await signUp({
+            email: identifier,
+            password,
+            data: { display_name: userName, kitchen_name: kitchenName }
+          });
+
+          if (error) throw error;
+
+          if (data.session) {
+            showAuthToast(languageCopy[currentLanguage].signupSuccess);
+            setTimeout(() => {
+              window.location.href = '/library.html';
+            }, 800);
+          } else {
+            showAuthToast(languageCopy[currentLanguage].signupConfirm);
+            setAuthMode('login');
+          }
+        } catch (err) {
+          showAuthToast(err.message || 'Signup failed', true);
+        } finally {
+          submitButton.disabled = false;
+          submitButton.textContent = originalBtnText;
+        }
+      } else {
+        submitButton.textContent = languageCopy[currentLanguage].signingIn;
+        try {
+          const { data, error } = await signIn({
+            email: identifier,
+            password
+          });
+
+          if (error) throw error;
+
+          showAuthToast(currentLanguage === 'en' ? 'Welcome back! Loading recipes…' : 'স্বাগতম! রেসিপি লোড হচ্ছে…');
+          setTimeout(() => {
+            window.location.href = '/library.html';
+          }, 600);
+        } catch (err) {
+          showAuthToast(err.message || 'Login failed. Check your email and password.', true);
+        } finally {
+          submitButton.disabled = false;
+          submitButton.textContent = originalBtnText;
+        }
+      }
+    });
+
+    initNavigation({ activePage: 'login' });
+    setAuthMode('signup');
+    applyLanguage(currentLanguage);
+  </script>
+</body>
+</html>

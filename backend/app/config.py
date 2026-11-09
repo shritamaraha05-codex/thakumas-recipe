@@ -17,6 +17,12 @@ from pathlib import Path
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
+# The backend's own .env lives next to this package (``backend/.env``). It is
+# resolved from this source file, not the current working directory, so the
+# settings load identically whether Uvicorn is started from the repository root
+# or anywhere else. Real environment variables still override file values.
+BACKEND_DIR = Path(__file__).resolve().parents[1]
+BACKEND_ENV_FILE = BACKEND_DIR / ".env"
 DEFAULT_MOCK_FIXTURE = REPO_ROOT / "docs" / "fixtures" / "parse_result.sample.json"
 
 
@@ -24,7 +30,7 @@ class Settings(BaseSettings):
     """All runtime configuration, resolved from the environment."""
 
     model_config = SettingsConfigDict(
-        env_file=".env",
+        env_file=BACKEND_ENV_FILE,
         env_file_encoding="utf-8",
         extra="ignore",
     )
@@ -60,8 +66,10 @@ class Settings(BaseSettings):
     supabase_jwks_cache_seconds: int = 300
     supabase_request_timeout: float = 10.0
 
-    # Browser origins allowed to call this API (comma-separated).
-    frontend_origins: str = "http://localhost:5173"
+    # Browser origins allowed to call this API (comma-separated). The default
+    # covers the Vite dev server under both host spellings; production origins
+    # must be set through FRONTEND_ORIGINS.
+    frontend_origins: str = "http://localhost:5173,http://127.0.0.1:5173"
 
     # Deterministic fixture served by POST /api/parse until the parser exists.
     mock_fixture_path: Path = DEFAULT_MOCK_FIXTURE
