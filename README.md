@@ -189,9 +189,10 @@ The following status is based on the completed backend milestones reported by th
 | Supabase PostgreSQL persistence | Implemented (migration + data API; live project not exercised by the test suite) |
 | Recipe save / list / open / version / delete endpoints | Implemented and tested offline |
 | `/api/me` authenticated profile endpoint | Implemented |
+| Recipe media upload/list/signed URL/delete (ImageKit) | Implemented and tested offline; live ImageKit is not exercised by the test suite |
 | PostgreSQL row-level security migration | Implemented (`supabase/migrations/0001_initial_schema.sql`); real two-user behaviour must be verified manually |
 | Frontend auth + personal library | Implemented as a vanilla HTML/CSS/JS app built with Vite (`frontend/`); visual/UX polish remains |
-| Offline automated test suite | 427 backend tests passing; `ruff check .` clean; `npm run build` for the frontend |
+| Offline automated test suite | 498 backend tests passing; `ruff check backend/` clean; `npm run build` for the frontend |
 | Recipe clarification/resolve endpoint | Not implemented yet |
 | Personal hand-measure calibration | Not implemented yet |
 | Gram/ml range estimation and serving scaling | Not implemented yet |
@@ -211,7 +212,8 @@ The following status is based on the completed backend milestones reported by th
 | Recipe parsing | Rules parser + Gemini provider | Structured extraction from Bengali/Roman Bengali narration |
 | LLM integration | Google Gen AI SDK | Gemini structured-output request |
 | Authentication | Supabase Auth (JWKS/PyJWT verification in FastAPI) | Registration, login, sessions and verified access tokens |
-| Database | Supabase PostgreSQL Data API (`postgrest`) | Owner-scoped recipes, versions and profiles, with RLS |
+| Database | Supabase PostgreSQL Data API (`postgrest`) | Owner-scoped recipes, versions, profiles and media metadata, with RLS |
+| Media storage | ImageKit (`imagekitio`) | Private recipe images/audio; server-side uploads and signed delivery URLs |
 | Frontend | Vanilla HTML/CSS/JS + Vite + `@supabase/supabase-js` | Auth screens, parse/save, personal library and versioning |
 | Testing | pytest, Ruff, `vite build` | Offline backend regression tests and a frontend production build |
 
@@ -246,6 +248,7 @@ The default model configured for Gemini is `gemini-3.5-flash-lite`. The model ca
 - Git, if you are cloning the repository.
 - Node.js 20+ for the vanilla HTML/CSS/JavaScript frontend built with Vite (optional; only needed for the UI).
 - A Supabase project (project URL + publishable key) for accounts and storage. The backend still starts without one and serves `/api/parse` and `/api/health`; only the recipe routes need Supabase.
+- An ImageKit account (private key + URL endpoint) only if you want to test recipe image/audio uploads. The backend starts and serves every other endpoint without it; the media routes return `503` until configured.
 - A Gemini API key only if you intend to test `mode="llm"` or configure Gemini first in `LLM_CHAIN`.
 
 ### 1. Clone the repository
@@ -323,6 +326,19 @@ FRONTEND_ORIGINS=http://localhost:5173,http://127.0.0.1:5173
 
 `SUPABASE_PUBLISHABLE_KEY` is public project metadata, not a password and not a JWT signing key. No database password, connection string or service-role key is used by this backend. Never commit `.env`, API keys or other secrets.
 
+For recipe image/audio uploads, also configure ImageKit in `backend/.env` (the
+private key is server-side only; never put it in a `VITE_` variable):
+
+```env
+IMAGEKIT_PRIVATE_KEY=<private-key>
+IMAGEKIT_URL_ENDPOINT=https://ik.imagekit.io/<your-id>
+IMAGEKIT_SIGNED_URL_TTL_SECONDS=900
+IMAGEKIT_MAX_IMAGE_UPLOAD_MB=8
+IMAGEKIT_MAX_AUDIO_UPLOAD_MB=25
+```
+
+Then apply `supabase/migrations/0003_recipe_media.sql` (see [Supabase setup](#supabase-setup)). Full walkthrough, including Render configuration: [`docs/LOCAL_DEVELOPMENT.md`](docs/LOCAL_DEVELOPMENT.md#12-imagekit-media-storage-optional).
+
 ### 5. Start the API
 
 ```bash
@@ -382,7 +398,7 @@ The frontend uses Supabase **only** for Auth (sign-up, sign-in, Google when enab
 
 1. Create or select a project at <https://supabase.com>.
 2. Enable the auth providers you need (Email/Password, and optionally Google). For Google, configure the provider in Supabase and add the app URL/redirect URLs.
-3. Apply the migration: open **Dashboard → SQL Editor**, paste the whole of [`supabase/migrations/0001_initial_schema.sql`](supabase/migrations/0001_initial_schema.sql), and run it. This creates `profiles`, `recipes`, `recipe_versions`, the new-user profile trigger, RLS policies and the atomic RPCs. No Supabase CLI or Docker is required.
+3. Apply the migrations: open **Dashboard → SQL Editor**, paste the whole of [`supabase/migrations/0001_initial_schema.sql`](supabase/migrations/0001_initial_schema.sql) and run it. This creates `profiles`, `recipes`, `recipe_versions`, the new-user profile trigger, RLS policies and the atomic RPCs. If you want recipe media, then run [`supabase/migrations/0003_recipe_media.sql`](supabase/migrations/0003_recipe_media.sql) the same way. Do not re-run `0001`, and do not assume `0003` has already been applied. No Supabase CLI or Docker is required.
 4. Configure environments:
    - `backend/.env`: `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`, `FRONTEND_ORIGINS`
    - `frontend/.env`: `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY`, `VITE_API_BASE_URL`
@@ -445,6 +461,19 @@ The parse endpoint returns a `recipe` and `meta` object. A recipe contains order
 
 For the full current response contract, see [`docs/04_API.md`](docs/04_API.md) and the verified fixture at [`docs/fixtures/parse_result.sample.json`](docs/fixtures/parse_result.sample.json).
 
+### Recipe media (ImageKit)
+
+All media routes require a Supabase access token and an owned recipe:
+
+| Method | Endpoint | Purpose |
+|---|---|---|
+| `POST` | `/api/recipes/{recipe_id}/media` | Upload a private image or audio file (multipart `file`, `media_type`) |
+| `GET` | `/api/recipes/{recipe_id}/media` | List owned media with temporary signed delivery URLs |
+| `GET` | `/api/recipes/{recipe_id}/media/{media_id}/url` | Get a fresh signed URL for one item |
+| `DELETE` | `/api/recipes/{recipe_id}/media/{media_id}` | Delete the ImageKit file, then its metadata row |
+
+The backend names folders and files (`/users/{sub}/recipes/{recipe_id}/{audio|images}/`), marks files private, and never accepts ImageKit ids, paths or URLs from the client. Images are JPEG/PNG/WEBP (8 MB default); audio is WebM/Ogg/MP4/MPEG/WAV (25 MB default). See [`docs/04_API.md`](docs/04_API.md) for the contract and [`docs/LOCAL_DEVELOPMENT.md`](docs/LOCAL_DEVELOPMENT.md#12-imagekit-media-storage-optional) for setup and curl examples. Live ImageKit and live Supabase media integration have **not** been tested by the project; the automated suite uses fakes only.
+
 ---
 
 ## Tests and code quality
@@ -471,7 +500,7 @@ npm run build
 
 The backend suite never calls Gemini or Supabase. Auth is tested with locally generated RSA keys and a mocked JWKS endpoint (plus a mocked legacy `/user` response); recipe tests use injected fakes. The migration test checks the SQL text (tables, cascades, RLS policies, atomic RPC) but does **not** prove live RLS. Live Gemini and live two-user Supabase checks must be run manually and reported separately.
 
-Current result at the M-18–M-20 checkpoint: **427 backend tests passing**, **Ruff clean**, and the frontend production build succeeds. Re-run the commands on the current branch for the latest result.
+Current result on the current branch (including recipe media): **498 backend tests passing**, **`ruff check backend/` clean**, and the frontend production build succeeds. The media tests use an in-memory ImageKit fake; live ImageKit and live Supabase media integration have not been tested. Re-run the commands on the current branch for the latest result.
 
 ---
 
@@ -488,14 +517,16 @@ The following is the high-level backend and documentation layout; consult the re
 │   │   ├── models.py            # Public API models
 │   │   ├── auth/                # Supabase token verification + current-user deps
 │   │   ├── db/                  # Per-request Data API client, repository, schemas
-│   │   ├── routers/             # health, parse, recipes + /api/me
+│   │   ├── routers/             # health, parse, recipes + /api/me, media
+│   │   ├── media/               # ImageKit storage, validation and media orchestration
 │   │   ├── parse/               # Normalization, segmentation, lexicon and parsers
 │   │   └── providers/           # Replaceable LLM provider integrations
 │   ├── .env.example             # Backend env template (copy to backend/.env)
 │   └── tests/                   # Offline auth, repository, API, migration tests
 ├── supabase/
 │   └── migrations/
-│       └── 0001_initial_schema.sql   # Tables, RLS policies, triggers, atomic RPCs
+│       ├── 0001_initial_schema.sql   # Tables, RLS policies, triggers, atomic RPCs
+│       └── 0003_recipe_media.sql     # Private media metadata + owner-scoped RLS
 ├── frontend/
 │   ├── package.json             # Vite + @supabase/supabase-js, multi-page build
 │   ├── vite.config.js           # Multi-page entry points

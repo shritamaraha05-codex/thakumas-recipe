@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from .client import RpcClient
+from .client import MediaClient, RpcClient
 from .errors import DatabaseFailure, InvalidPersonLink, RecipeNotFound
 from .schemas import (
     ProfileResponse,
@@ -122,6 +122,68 @@ class RecipeRepository:
         )
         if deleted is not True:
             raise RecipeNotFound(recipe_id)
+
+
+class RecipeMediaRepository:
+    """Owner-scoped access to ``public.recipe_media`` (see 0003_recipe_media.sql).
+
+    Every query runs through the caller's authenticated Data API client, so RLS
+    restricts rows to recipes the verified user owns. The repository never sends
+    ``owner_user_id``: ownership is enforced by the database policy.
+    """
+
+    def __init__(self, client: MediaClient) -> None:
+        self._client = client
+
+    async def recipe_exists(self, recipe_id: str) -> bool:
+        """True only if the recipe is visible to the authenticated user."""
+        rows = await self._client.select(
+            "recipes", columns="id", filters={"id": recipe_id}, limit=1
+        )
+        return bool(rows)
+
+    async def current_version_id(self, recipe_id: str) -> str | None:
+        """The UUID of the newest version, or ``None`` when no version exists.
+
+        The RPCs expose only the numeric ``version_number``; the media table
+        needs the version UUID, so it is read from ``recipe_versions`` directly
+        under the user's own token (RLS applies).
+        """
+        rows = await self._client.select(
+            "recipe_versions",
+            columns="id",
+            filters={"recipe_id": recipe_id},
+            orders=[("version_number", True)],
+            limit=1,
+        )
+        return str(rows[0]["id"]) if rows else None
+
+    async def insert_media(self, row: dict[str, Any]) -> dict[str, Any]:
+        rows = await self._client.insert("recipe_media", row)
+        return _mapping(rows)
+
+    async def list_media(self, recipe_id: str) -> list[dict[str, Any]]:
+        return await self._client.select(
+            "recipe_media",
+            columns="*",
+            filters={"recipe_id": recipe_id},
+            orders=[("created_at", True), ("id", True)],
+        )
+
+    async def get_media(self, recipe_id: str, media_id: str) -> dict[str, Any] | None:
+        rows = await self._client.select(
+            "recipe_media",
+            columns="*",
+            filters={"id": media_id, "recipe_id": recipe_id},
+            limit=1,
+        )
+        return rows[0] if rows else None
+
+    async def delete_media(self, recipe_id: str, media_id: str) -> bool:
+        rows = await self._client.delete(
+            "recipe_media", filters={"id": media_id, "recipe_id": recipe_id}
+        )
+        return bool(rows)
 
 
 def _mapping(value: Any) -> dict[str, Any]:

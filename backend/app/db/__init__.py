@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
-from .client import PostgrestRpcClient, RpcClient, build_user_client
+from .client import MediaClient, PostgrestRpcClient, RpcClient, build_user_client
 from .errors import DatabaseFailure, DatabaseUnavailable, InvalidPersonLink, RecipeNotFound
-from .repository import RecipeRepository
+from .repository import RecipeMediaRepository, RecipeRepository
 from .schemas import (
     DeleteResponse,
     ProfileResponse,
@@ -22,12 +22,14 @@ __all__ = [
     "DatabaseUnavailable",
     "DeleteResponse",
     "InvalidPersonLink",
+    "MediaClient",
     "PostgrestRpcClient",
     "ProfileResponse",
     "RecipeCreateRequest",
     "RecipeCreated",
     "RecipeDetail",
     "RecipeListResponse",
+    "RecipeMediaRepository",
     "RecipeNotFound",
     "RecipeRepository",
     "RecipeSummary",

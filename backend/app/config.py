@@ -71,6 +71,15 @@ class Settings(BaseSettings):
     # must be set through FRONTEND_ORIGINS.
     frontend_origins: str = "http://localhost:5173,http://127.0.0.1:5173"
 
+    # ImageKit media storage (optional). The private key is server-side only and
+    # is never sent to the browser. Missing credentials keep the rest of the app
+    # running; the media endpoints return a configuration error until set.
+    imagekit_private_key: str = ""
+    imagekit_url_endpoint: str = ""
+    imagekit_signed_url_ttl_seconds: int = 900
+    imagekit_max_image_upload_mb: int = 8
+    imagekit_max_audio_upload_mb: int = 25
+
     # Deterministic fixture served by POST /api/parse until the parser exists.
     mock_fixture_path: Path = DEFAULT_MOCK_FIXTURE
 
@@ -104,6 +113,11 @@ class Settings(BaseSettings):
     @property
     def frontend_origin_list(self) -> list[str]:
         return [origin.strip() for origin in self.frontend_origins.split(",") if origin.strip()]
+
+    @property
+    def imagekit_configured(self) -> bool:
+        """True only when both values needed for server-side ImageKit uploads exist."""
+        return bool(self.imagekit_private_key and self.imagekit_url_endpoint)
 
 
 @lru_cache

@@ -8,6 +8,7 @@ repository code without a Supabase project.
 from __future__ import annotations
 
 import copy
+from collections.abc import Sequence
 from datetime import datetime, timedelta, timezone
 from typing import Any
 from uuid import uuid4
@@ -21,8 +22,10 @@ from backend.app.auth import (
     get_auth_context,
 )
 from backend.app.config import Settings
-from backend.app.db import RecipeRepository
+from backend.app.db import DatabaseFailure, RecipeMediaRepository, RecipeRepository
 from backend.app.main import create_app
+from backend.app.media import MediaStorage, UploadedAsset
+from backend.app.routers.media import get_media_repository
 from backend.app.routers.recipes import get_repository
 
 
@@ -64,6 +67,11 @@ def make_user(
     )
 
 
+def _sort_value(value: Any) -> Any:
+    """Typing helper: the fake only orders by same-typed, non-null columns."""
+    return value
+
+
 class FakeStore:
     """Shared in-memory data for two simulated users."""
 
@@ -71,6 +79,9 @@ class FakeStore:
         self.profiles: dict[str, dict[str, Any]] = {}
         self.recipes: dict[str, dict[str, Any]] = {}
         self.versions: dict[str, list[dict[str, Any]]] = {}
+        self.media: dict[str, dict[str, Any]] = {}
+        self.media_insert_error: Exception | None = None
+        self.media_delete_error: Exception | None = None
         self._clock = 0
 
     def now(self) -> str:
@@ -240,19 +251,168 @@ class FakeRpcClient:
         return True
 
 
+class FakeMediaClient:
+    """In-memory ``recipe_media`` table that enforces RLS-like ownership."""
+
+    def __init__(self, store: FakeStore, auth_uid: str) -> None:
+        self.store = store
+        self.auth_uid = auth_uid
+        self.closed = False
+
+    async def aclose(self) -> None:
+        self.closed = True
+
+    def _owned_recipe_ids(self) -> set[str]:
+        return {
+            recipe["id"]
+            for recipe in self.store.recipes.values()
+            if recipe["owner_user_id"] == self.auth_uid
+        }
+
+    async def select(
+        self,
+        table: str,
+        *,
+        columns: str = "*",
+        filters: dict[str, Any] | None = None,
+        orders: Sequence[tuple[str, bool]] | None = None,
+        limit: int | None = None,
+    ) -> list[dict[str, Any]]:
+        owned = self._owned_recipe_ids()
+        if table == "recipes":
+            rows = [r for r in self.store.recipes.values() if r["id"] in owned]
+        elif table == "recipe_versions":
+            rows = [
+                version
+                for recipe_id, versions in self.store.versions.items()
+                if recipe_id in owned
+                for version in versions
+            ]
+        elif table == "recipe_media":
+            rows = [m for m in self.store.media.values() if m["recipe_id"] in owned]
+        else:
+            raise AssertionError(f"unexpected table {table!r}")
+
+        for column, value in (filters or {}).items():
+            rows = [row for row in rows if row.get(column) == value]
+        for column, descending in reversed(orders or ()):
+            rows.sort(key=lambda row: _sort_value(row.get(column)), reverse=descending)
+        if limit is not None:
+            rows = rows[:limit]
+        return copy.deepcopy(rows)
+
+    async def insert(self, table: str, row: dict[str, Any]) -> list[dict[str, Any]]:
+        if table != "recipe_media":
+            raise AssertionError(f"unexpected table {table!r}")
+        if self.store.media_insert_error is not None:
+            raise self.store.media_insert_error
+        if row["recipe_id"] not in self._owned_recipe_ids():
+            raise AssertionError("insert into a recipe not owned by the caller")
+        if any(
+            media["imagekit_file_id"] == row["imagekit_file_id"]
+            for media in self.store.media.values()
+        ):
+            raise DatabaseFailure("duplicate imagekit file id")
+        media_id = row.get("id") or str(uuid4())
+        record = {**copy.deepcopy(row), "id": media_id, "created_at": self.store.now()}
+        self.store.media[media_id] = record
+        return [copy.deepcopy(record)]
+
+    async def delete(self, table: str, *, filters: dict[str, Any]) -> list[dict[str, Any]]:
+        if table != "recipe_media":
+            raise AssertionError(f"unexpected table {table!r}")
+        if self.store.media_delete_error is not None:
+            raise self.store.media_delete_error
+        owned = self._owned_recipe_ids()
+        matched = [
+            media
+            for media in self.store.media.values()
+            if media["recipe_id"] in owned
+            and all(media.get(column) == value for column, value in filters.items())
+        ]
+        for media in matched:
+            self.store.media.pop(media["id"], None)
+        return copy.deepcopy(matched)
+
+
+class FakeMediaStorage:
+    """In-memory ImageKit replacement; records every upload/delete/sign call."""
+
+    def __init__(
+        self,
+        *,
+        enabled: bool = True,
+        upload_error: Exception | None = None,
+        delete_error: Exception | None = None,
+        base_url: str = "https://ik.imagekit.io/test",
+    ) -> None:
+        self._enabled = enabled
+        self.upload_error = upload_error
+        self.delete_error = delete_error
+        self.base_url = base_url.rstrip("/")
+        self.uploads: list[dict[str, Any]] = []
+        self.deleted: list[str] = []
+        self.signed: list[tuple[str, int]] = []
+
+    @property
+    def enabled(self) -> bool:
+        return self._enabled
+
+    async def upload_private(self, *, content: bytes, file_name: str, folder: str) -> UploadedAsset:
+        if self.upload_error is not None:
+            raise self.upload_error
+        file_id = f"file_{len(self.uploads) + 1}"
+        file_path = f"{folder}/{file_name}"
+        self.uploads.append(
+            {
+                "content": content,
+                "file_name": file_name,
+                "folder": folder,
+                "file_path": file_path,
+            }
+        )
+        return UploadedAsset(
+            file_id=file_id,
+            url=f"{self.base_url}{file_path}",
+            file_path=file_path,
+            name=file_name,
+            size=len(content),
+        )
+
+    async def delete_file(self, file_id: str) -> None:
+        if self.delete_error is not None:
+            raise self.delete_error
+        self.deleted.append(file_id)
+
+    async def build_signed_url(self, *, file_path: str, expires_in: int) -> str:
+        self.signed.append((file_path, expires_in))
+        return f"{self.base_url}{file_path}?ik-t=1&ik-s=test&ttl={expires_in}"
+
+    async def aclose(self) -> None:
+        return None
+
+
 def build_test_app(
     settings: Settings,
     verifier: FakeTokenVerifier,
     store: FakeStore,
+    media_storage: MediaStorage | None = None,
 ) -> FastAPI:
-    app = create_app(settings, token_verifier=verifier)
+    storage = media_storage if media_storage is not None else FakeMediaStorage()
+    app = create_app(settings, token_verifier=verifier, media_storage=storage)
 
     def override_repository(
         auth: AuthContext = Depends(get_auth_context),
     ) -> RecipeRepository:
         return RecipeRepository(FakeRpcClient(store, auth.user.id), auth.user.id)
 
+    def override_media_repository(
+        auth: AuthContext = Depends(get_auth_context),
+    ) -> RecipeMediaRepository:
+        return RecipeMediaRepository(FakeMediaClient(store, auth.user.id))
+
     app.dependency_overrides[get_repository] = override_repository
+    app.dependency_overrides[get_media_repository] = override_media_repository
     return app
 
 
