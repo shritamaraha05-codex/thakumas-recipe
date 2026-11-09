@@ -1,0 +1,305 @@
+/* =============================================================================
+   skeleton.css — Thakuma's Recipe Shared Skeleton Loading System
+   Cream/beige palette with subtle shimmer. Respects prefers-reduced-motion.
+   ============================================================================= */
+
+/* ── Core shimmer keyframe ─────────────────────────────────────────────────── */
+@keyframes sk-shimmer {
+  0%   { background-position: -600px 0; }
+  100% { background-position:  600px 0; }
+}
+
+/* ── Base skeleton element ─────────────────────────────────────────────────── */
+.sk {
+  display: block;
+  border-radius: 6px;
+  background: linear-gradient(
+    90deg,
+    #f0e4cc 0%,
+    #faf2e4 40%,
+    #ede0c4 60%,
+    #f0e4cc 100%
+  );
+  background-size: 1200px 100%;
+  animation: sk-shimmer 1.6s ease-in-out infinite;
+  /* Prevent layout shift: always reserve the right size */
+  flex-shrink: 0;
+}
+
+/* Reduced-motion: static warm fill, no animation */
+@media (prefers-reduced-motion: reduce) {
+  .sk {
+    animation: none;
+    background: #ede0c4;
+  }
+}
+
+/* ── Utility size helpers ──────────────────────────────────────────────────── */
+.sk-line        { height: 14px; border-radius: 4px; }
+.sk-line-sm     { height: 11px; border-radius: 3px; }
+.sk-line-lg     { height: 20px; border-radius: 5px; }
+.sk-line-xl     { height: 28px; border-radius: 6px; }
+.sk-line-title  { height: 36px; border-radius: 7px; }
+.sk-circle      { border-radius: 50%; }
+.sk-pill        { border-radius: 999px; }
+.sk-card        { border-radius: 14px; }
+.sk-img         { border-radius: 10px; aspect-ratio: 16 / 10; }
+.sk-avatar      { border-radius: 50%; width: 56px; height: 56px; flex-shrink: 0; }
+
+/* ── Width helpers ─────────────────────────────────────────────────────────── */
+.sk-w-full  { width: 100%; }
+.sk-w-3-4   { width: 75%; }
+.sk-w-2-3   { width: 66%; }
+.sk-w-1-2   { width: 50%; }
+.sk-w-1-3   { width: 33%; }
+.sk-w-1-4   { width: 25%; }
+.sk-w-fit   { width: fit-content; min-width: 60px; }
+
+/* ── Spacing ───────────────────────────────────────────────────────────────── */
+.sk-gap-6  { margin-bottom: 6px; }
+.sk-gap-8  { margin-bottom: 8px; }
+.sk-gap-10 { margin-bottom: 10px; }
+.sk-gap-14 { margin-bottom: 14px; }
+.sk-gap-18 { margin-bottom: 18px; }
+
+/* ── Wrapper / layout containers ──────────────────────────────────────────── */
+.sk-block {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sk-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* ── Skeleton visibility state ────────────────────────────────────────────── */
+/* Add .sk-hidden to remove skeleton without layout shift */
+.sk-hidden { display: none !important; }
+
+/* When a container has [aria-busy="true"], child .sk-skeleton-only are shown;
+   .sk-content-only are hidden. Reversed when loading is done. */
+[aria-busy="true"]  .sk-content-only  { display: none !important; }
+[aria-busy="false"] .sk-skeleton-only { display: none !important; }
+/* Default (no aria-busy yet = still authenticating): hide content */
+[data-loading]      .sk-content-only  { display: none !important; }
+
+/* ════════════════════════════════════════════════════════════════════════════
+   PAGE-SPECIFIC SKELETON TEMPLATES
+   ════════════════════════════════════════════════════════════════════════════ */
+
+/* ── Library: stat cards ───────────────────────────────────────────────────── */
+.sk-stat-card {
+  display: grid;
+  grid-template-columns: 46px 1fr;
+  gap: 8px 12px;
+  align-items: center;
+  padding: 15px 18px;
+  border: 1px solid rgba(157, 110, 63, .10);
+  border-radius: 14px;
+  background: rgba(255, 253, 248, .82);
+  min-height: 91px;
+}
+
+.sk-stat-icon {
+  width: 46px;
+  height: 46px;
+  border-radius: 13px;
+  grid-row: 1 / span 2;
+}
+
+/* ── Library: recipe cards ─────────────────────────────────────────────────── */
+.sk-recipe-card {
+  background: rgba(255, 253, 248, .92);
+  border: 1px solid rgba(157, 110, 63, .12);
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 5px 16px rgba(75, 43, 22, .045);
+}
+
+.sk-recipe-card .sk-card-media {
+  aspect-ratio: 16 / 10;
+  width: 100%;
+  border-radius: 0;
+}
+
+.sk-recipe-card .sk-card-body {
+  padding: 14px 16px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sk-recipe-card .sk-card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+}
+
+/* ── Recipe detail ─────────────────────────────────────────────────────────── */
+.sk-detail-head {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 22px 25px 17px;
+  background: rgba(255, 251, 242, .96);
+  border: 1px solid rgba(237, 218, 189, .92);
+  border-radius: 15px;
+  margin-bottom: 14px;
+}
+
+.sk-step {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  padding: 14px 0 20px;
+  position: relative;
+}
+
+.sk-step::before {
+  content: '';
+  position: absolute;
+  left: -16px;
+  top: 8px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #e0cdb5;
+}
+
+.sk-ingredient-row {
+  display: grid;
+  grid-template-columns: 1fr 120px 90px;
+  gap: 10px;
+  padding: 7px 9px;
+  border-radius: 8px;
+  background: #fbf3e6;
+  border: 1px solid #f0e3ce;
+  align-items: center;
+}
+
+/* ── Profile ───────────────────────────────────────────────────────────────── */
+.sk-profile-avatar {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.sk-profile-card {
+  background: rgba(255, 251, 242, .92);
+  border: 1px solid rgba(231, 213, 181, .9);
+  border-radius: 20px;
+  padding: 24px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.sk-input-field {
+  height: 44px;
+  border-radius: 10px;
+  width: 100%;
+}
+
+/* ── Cook-mode ─────────────────────────────────────────────────────────────── */
+.sk-cook-step {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, .92fr);
+  gap: 22px;
+  align-items: start;
+  padding: 20px 22px;
+}
+
+@media (max-width: 760px) {
+  .sk-cook-step {
+    grid-template-columns: 1fr;
+  }
+}
+
+.sk-cook-img {
+  aspect-ratio: 16 / 9;
+  border-radius: 17px;
+  width: 100%;
+}
+
+/* ── Inline action spinner (for saves, deletes, refreshes) ─────────────────── */
+@keyframes sk-spin {
+  to { transform: rotate(360deg); }
+}
+
+.sk-spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(179, 35, 27, .2);
+  border-top-color: #b3231b;
+  border-radius: 50%;
+  animation: sk-spin .7s linear infinite;
+  flex-shrink: 0;
+}
+
+.sk-spinner-sm {
+  width: 12px;
+  height: 12px;
+  border-width: 2px;
+}
+
+.sk-spinner-lg {
+  width: 22px;
+  height: 22px;
+  border-width: 2.5px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sk-spinner { animation: none; opacity: .5; }
+}
+
+/* ── Error state helper ────────────────────────────────────────────────────── */
+.sk-error-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 36px 24px;
+  text-align: center;
+  color: #982313;
+  background: rgba(254, 243, 240, .8);
+  border: 1px solid rgba(197, 48, 28, .18);
+  border-radius: 14px;
+}
+
+.sk-error-state .sk-error-icon {
+  font-size: 36px;
+  color: #c5301c;
+  opacity: .85;
+}
+
+.sk-error-state p {
+  margin: 0;
+  font-size: 14px;
+  color: #7a3328;
+  max-width: 400px;
+}
+
+.sk-error-state .sk-retry-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 18px;
+  border: 0;
+  border-radius: 8px;
+  background: #c5301c;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.sk-error-state .sk-retry-btn:hover {
+  background: #982313;
+}
+

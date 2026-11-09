@@ -1,14 +1,21 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="bn">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#fbf4e6">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#c5301c">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Thakuma's Recipe">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/manifest.webmanifest">
 <title>রেসিপি সংগ্রহ · ঠাকুমার রান্না</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&family=Tiro+Bangla:ital@0;1&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,400,0,0" rel="stylesheet">
+<link rel="stylesheet" href="/css/navigation.css">
+<link rel="stylesheet" href="/css/skeleton.css">
 <style>
 :root{--cream:#fbf4e6;--cream-deep:#f2e5cd;--paper:#fffdf8;--paper-warm:#fff8eb;--line:#e7d8bd;--ink:#2e1b12;--muted:#806a57;--red:#c5301c;--red-dark:#982313;--red-pale:#f8e5df;--green:#376446;--green-pale:#e5eee2;--gold:#dca42e;--shadow:0 12px 30px rgba(75,43,22,.075);--shadow-soft:0 5px 16px rgba(75,43,22,.06);--bn:'Hind Siliguri',sans-serif;--en:'Plus Jakarta Sans','Hind Siliguri',sans-serif}
 *{box-sizing:border-box}[hidden]{display:none!important}html{scroll-behavior:smooth}body{margin:0;background:var(--cream);color:var(--ink);font-family:var(--bn);font-size:15px;line-height:1.55;min-height:100vh}button,input,select{font:inherit}button,a{-webkit-tap-highlight-color:transparent}button{cursor:pointer}a{color:inherit;text-decoration:none}img{max-width:100%;display:block}.material-symbols-outlined {
@@ -146,21 +153,7 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
 <body>
 <svg id="spoon" viewBox="0 0 46 46" aria-hidden="true"><g transform="rotate(-40 6 6)"><path d="M6 4 C0 4 0 16 6 18 C12 16 12 4 6 4Z" fill="#e0a526" stroke="#8e5a10" stroke-width="1.2"/><rect x="4.8" y="17" width="2.4" height="26" rx="1.2" fill="#b07a1c"/></g></svg>
 
-<header class="site-header">
-  <div class="header-inner">
-    <a class="brand" href="/" aria-label="Thakuma’s Recipe home">
-      <img class="brand-mark" src="/assets/images/thakuma_brand_mark.webp" alt="" aria-hidden="true">
-      <span class="brand-copy"><span class="brand-name bn">ঠাকুমার রান্না</span><span class="brand-name en">Thakuma’s Recipe</span><span class="brand-caption bn">ঘরের স্বাদ</span><span class="brand-caption en">A taste of home</span></span>
-    </a>
-    <div class="main-nav" role="navigation" aria-label="Main navigation"><a class="nav-link active" href="#library"><span class="bn">রেসিপি</span><span class="en">Recipes</span></a><a class="nav-link" href="#hands" data-coming="hands"><span class="bn">হাতের মাপ</span><span class="en">Hands</span></a><a class="nav-link" href="#accuracy" data-coming="accuracy"><span class="bn">নির্ভুলতা</span><span class="en">Accuracy</span></a></div>
-    <div class="header-actions">
-      <div class="language-switch" id="lang" role="group" aria-label="Choose language"><button type="button" data-lang="bn" data-l="bn" data-language="bn" aria-pressed="true" class="active">বাংলা</button><button type="button" data-lang="en" data-l="en" data-language="en" aria-pressed="false">EN</button></div>
-      <button aria-label="Settings" class="header-icon" id="settings-open" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-1.8 1.8-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5v.2h-2.6v-.2a1.7 1.7 0 0 0-1-1.5 1.7 1.7 0 0 0-1.9.3l-.1.1-1.8-1.8.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H6.3v-2.6h.2a1.7 1.7 0 0 0 1.5-1 1.7 1.7 0 0 0-.3-1.9l-.1-.1 1.8-1.8.1.1a1.7 1.7 0 0 0 1.9.3 1.7 1.7 0 0 0 1-1.5v-.2H15v.2a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1 1.8 1.8-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.5 1h.2V14h-.2a1.7 1.7 0 0 0-1.5 1Z"/></svg></button><button aria-label="Profile" class="avatar-mini" id="profile-btn" type="button"><span>ঠা</span></button>
-      <button id="new-recipe-top" type="button" hidden aria-hidden="true" tabindex="-1"></button>
-    </div>
-  </div>
-  <div class="mobile-nav" role="navigation" aria-label="Mobile navigation"><a class="nav-link active" href="#library"><span class="bn">রেসিপি</span><span class="en">Recipes</span></a><a class="nav-link" href="#hands" data-coming="hands"><span class="bn">হাতের মাপ</span><span class="en">Hands</span></a><a class="nav-link" href="#accuracy" data-coming="accuracy"><span class="bn">নির্ভুলতা</span><span class="en">Accuracy</span></a></div>
-</header>
+<div id="app-navigation"></div>
 <div class="notice" id="notice">
   <div class="notice-inner">
     <div class="notice-copy"><span class="material-symbols-outlined">auto_stories</span><span class="bn">ঠাকুমার হাতের মাপজোখ: স্মৃতি থেকে স্বাদ, প্রতিটি পদে নিজের গল্প।</span><span class="en">Her measures, your memories — every recipe keeps its own story.</span></div>
@@ -183,7 +176,7 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
       <div class="room-caption"><span class="room-flower">✿</span><span class="bn">ঘরের গন্ধে, স্মৃতির স্বাদে</span><span class="en">A little warmth from home</span></div>
     </div>
   </section>
-  <section class="archive-stats" aria-label="Family archive statistics">
+  <section class="archive-stats" id="archive-stats" aria-label="Family archive statistics">
     <article class="stat-card recipe-stat">
       <span class="stat-icon"><span class="material-symbols-outlined">menu_book</span></span>
       <div class="stat-copy"><strong id="stat-recipe-count">০</strong><span class="bn">সংরক্ষিত রেসিপি</span><span class="en">Saved recipes</span></div>
@@ -261,11 +254,16 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
 <script type="module">
   import { requireAuth } from './js/session.js';
   import { api } from './js/api.js';
-  import { getPreferredLanguage, setPreferredLanguage, initNavigation } from './js/navigation.js';
+  import { initNavigation } from './js/navigation.js';
   import { initIcons } from './js/icons.js';
+  import { initPWA } from './js/pwa.js';
+  import { getLanguage, setLanguage, applyI18n, initI18n, t } from './js/i18n.js';
+  import { showSkeleton, hideSkeleton, showError, showEmpty, timedSkeleton } from './js/skeleton.js';
+
+  initPWA();
 
   let currentToken = null;
-  let currentLanguage = getPreferredLanguage();
+  let currentLanguage = getLanguage();
   let currentFilter = 'all';
   let currentQuery = '';
   let searchTimeout = null;
@@ -284,7 +282,7 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
   }
 
   function toDigits(n) {
-    return currentLanguage === 'bn' ? String(n).replace(/\d/g, d => '০১২৩৪৫৬৭৮৯'[d]) : String(n);
+    return getLanguage() === 'bn' ? String(n).replace(/\d/g, d => '০১২৩৪৫৬৭৮৯'[d]) : String(n);
   }
 
   function escapeHtml(str) {
@@ -297,24 +295,9 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
   }
 
   function applyLanguage(lang) {
-    currentLanguage = lang === 'en' ? 'en' : 'bn';
-    setPreferredLanguage(currentLanguage);
-    document.documentElement.lang = currentLanguage;
-    document.body.classList.toggle('lang-en', currentLanguage === 'en');
-    document.body.classList.toggle('lang-bn', currentLanguage === 'bn');
-
-    document.querySelectorAll('.lang-switch button').forEach(b => {
-      const active = b.dataset.lang === currentLanguage;
-      b.classList.toggle('active', active);
-      b.setAttribute('aria-pressed', String(active));
-    });
-
-    document.querySelectorAll('.site-header .language-switch button').forEach(b => {
-      const active = (b.dataset.language || b.dataset.lang) === currentLanguage;
-      b.setAttribute('aria-pressed', String(active));
-      b.classList.toggle('active', active);
-    });
-
+    setLanguage(lang);
+    currentLanguage = getLanguage();
+    applyI18n();
     renderRecipes(getFilteredRecipes());
     initIcons();
   }
@@ -378,38 +361,30 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
 
   async function loadLibrary() {
     const grid = document.getElementById('recipe-grid');
-    grid.innerHTML = `
-      <div class="empty-state" style="grid-column: 1 / -1;">
-        <span class="material-symbols-outlined" style="animation: spin 1s linear infinite;">sync</span>
-        <p class="${currentLanguage === 'en' ? 'en' : 'bn'}">${currentLanguage === 'en' ? 'Loading recipes…' : 'রেসিপি লোড হচ্ছে…'}</p>
-      </div>
-    `;
+    const done = timedSkeleton(350);
+    // Show recipe-card skeletons while API is pending
+    showSkeleton(grid, 'library-grid', { count: 6 });
 
     try {
       const res = await api.listRecipes(currentToken);
       allRecipes = res?.items || [];
-      updateStats(allRecipes.length);
-      updateDynamicTags();
-      renderRecipes(getFilteredRecipes());
+      done(() => {
+        hideSkeleton(grid);
+        updateStats(allRecipes.length);
+        updateDynamicTags();
+        renderRecipes(getFilteredRecipes());
+      });
     } catch (err) {
       console.error('[library] Load failed:', err);
       const isEn = currentLanguage === 'en';
-      const friendlyMsg = err.message || (isEn ? 'Failed to connect to the recipe service.' : 'রেসিপি সার্ভিসের সাথে যোগাযোগ করা সম্ভব হয়নি।');
-      const hint = err.hint ? `<p style="font-size: 12px; color: #886248; margin-top: 6px;">${escapeHtml(err.hint)}</p>` : '';
-
-      grid.innerHTML = `
-        <div class="empty-state" style="grid-column: 1 / -1; border-color: #c5301c; background: rgba(254, 243, 240, 0.7);">
-          <span class="material-symbols-outlined" style="color: #c5301c; font-size: 38px;">error_outline</span>
-          <p style="color: #982313; font-weight: 600; font-size: 15px; margin: 8px 0 4px;" id="load-err-msg">${escapeHtml(friendlyMsg)}</p>
-          ${hint}
-          <button type="button" class="primary-btn" id="retry-btn" style="margin-top: 14px;">
-            <span class="material-symbols-outlined">refresh</span>
-            <span>${isEn ? 'Retry Connection' : 'পুনরায় চেষ্টা করুন'}</span>
-          </button>
-        </div>
-      `;
-      document.getElementById('retry-btn')?.addEventListener('click', () => loadLibrary());
-      initIcons();
+      done(() => {
+        showError(grid, {
+          message: err.message || (isEn ? 'Failed to connect to the recipe service.' : 'রেসিপি সার্ভিসের সাথে যোগাযোগ করা সম্ভব হয়নি।'),
+          hint: err.hint,
+          retry: loadLibrary,
+          lang: currentLanguage
+        });
+      });
     }
   }
 
@@ -667,22 +642,20 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
     const authState = await requireAuth({ redirectTo: '/login.html' });
     currentToken = authState.token;
 
-    initNavigation({ activePage: 'library' });
+    initNavigation({ activePage: 'recipes' });
+    initI18n();
+
+    window.addEventListener('languagechange', () => {
+      currentLanguage = getLanguage();
+      renderRecipes(getFilteredRecipes());
+      initIcons();
+    });
 
     // Connect top Record buttons
     document.querySelectorAll('.add-btn, .top-add, a[href*="record"], #record-cta').forEach(el => {
       el.addEventListener('click', (e) => {
         e.preventDefault();
         window.location.href = '/record.html';
-      });
-    });
-
-    // Language buttons
-    document.querySelectorAll('.lang-switch button, .site-header .language-switch button').forEach(b => {
-      b.addEventListener('click', (e) => {
-        e.preventDefault();
-        const lang = b.dataset.lang || b.dataset.language;
-        applyLanguage(lang);
       });
     });
 
@@ -710,7 +683,7 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
       });
     }
 
-    applyLanguage(currentLanguage);
+    applyI18n();
     initIcons();
     await loadLibrary();
   }

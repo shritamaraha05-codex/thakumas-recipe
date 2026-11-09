@@ -1,7 +1,15 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="bn"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#c5301c">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Thakuma's Recipe">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/manifest.webmanifest">
 <title>ঠাকুমার রান্না · Record a recipe</title>
+<link rel="stylesheet" href="/css/navigation.css">
+<link rel="stylesheet" href="/css/skeleton.css">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Tiro+Bangla:ital@0;1&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
 <style>
@@ -107,21 +115,7 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200">
 </head><body>
 <svg id="spoon" viewBox="0 0 46 46" aria-hidden="true"><g transform="rotate(-40 6 6)"><path d="M6 4 C0 4 0 16 6 18 C12 16 12 4 6 4Z" fill="#e0a526" stroke="#8e5a10" stroke-width="1.2"/><rect x="4.8" y="17" width="2.4" height="26" rx="1.2" fill="#b07a1c"/></g></svg>
-<header class="site-header">
-  <div class="header-inner">
-    <a class="brand" href="/" aria-label="Thakuma’s Recipe home">
-      <img class="brand-mark" src="/assets/images/thakuma_brand_mark.webp" alt="" aria-hidden="true">
-      <span class="brand-copy"><span class="brand-name" data-bn="ঠাকুমার রান্না" data-en="Thakuma’s Recipe">ঠাকুমার রান্না</span><span class="brand-caption" data-bn="ঘরের স্বাদ" data-en="A taste of home">ঘরের স্বাদ</span></span>
-    </a>
-    <div class="main-nav" role="navigation" aria-label="Main navigation"><a class="nav-link active" href="#/"><span data-bn="রেসিপি" data-en="Recipes">রেসিপি</span></a><a class="nav-link" href="#/hands"><span data-bn="হাতের মাপ" data-en="Hands">হাতের মাপ</span></a><a class="nav-link" href="#/accuracy"><span data-bn="নির্ভুলতা" data-en="Accuracy">নির্ভুলতা</span></a></div>
-    <div class="header-actions">
-      <div class="language-switch" id="lang" role="group" aria-label="Choose language"><button type="button" data-l="bn" data-language="bn" aria-pressed="true" class="on">বাংলা</button><button type="button" data-l="en" data-language="en" aria-pressed="false">EN</button></div>
-      <div class="avatar-mini" aria-label="Profile">ঠা</div>
-      <button id="new-recipe-top" type="button" hidden aria-hidden="true" tabindex="-1"></button>
-    </div>
-  </div>
-  <div class="mobile-nav" role="navigation" aria-label="Mobile navigation"><a class="nav-link active" href="#/"><span data-bn="রেসিপি" data-en="Recipes">রেসিপি</span></a><a class="nav-link" href="#/hands"><span data-bn="হাতের মাপ" data-en="Hands">হাতের মাপ</span></a><a class="nav-link" href="#/accuracy"><span data-bn="নির্ভুলতা" data-en="Accuracy">নির্ভুলতা</span></a></div>
-</header>
+<div id="app-navigation"></div>
 
 <div class="banner" id="bn"><span>🍃</span><span data-bn="<b>হাতের মাপজোখ:</b> স্মৃতি থেকে সত্যতা, প্রতিটি পদ নির্ভুল পরিমাণে।" data-en="<b>Hand measures:</b> authentic from memory, every step in honest amounts."></span><button aria-label="Dismiss" onclick="bn.remove()">×</button></div>
 
@@ -276,46 +270,34 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
 <script type="module">
   import { requireAuth } from './js/session.js';
   import { api } from './js/api.js';
-  import { getPreferredLanguage, setPreferredLanguage, initNavigation } from './js/navigation.js';
+  import { initNavigation } from './js/navigation.js';
+  import { showSkeleton, hideSkeleton, showError, timedSkeleton } from './js/skeleton.js';
+  import { initI18n, getLanguage, setLanguage, applyI18n } from './js/i18n.js';
   import { initIcons } from './js/icons.js';
+  import { initPWA } from './js/pwa.js';
+
+  initPWA();
+  initI18n();
 
   let currentToken = null;
-  let currentLanguage = getPreferredLanguage();
+  let currentLanguage = getLanguage();
   let latestParseResult = null;
   let originalTranscriptText = '';
   let selectedPhotoUrl = null;
   let selectedPhotoFile = null;
 
   function applyLanguage(lang) {
-    currentLanguage = lang === 'en' ? 'en' : 'bn';
-    setPreferredLanguage(currentLanguage);
-    document.documentElement.lang = currentLanguage;
-    document.body.classList.toggle('lang-en', currentLanguage === 'en');
-    document.body.classList.toggle('lang-bn', currentLanguage === 'bn');
-
-    document.querySelectorAll('[data-bn]').forEach(e => {
-      const v = e.dataset[currentLanguage];
-      if (v !== undefined) {
-        if (e.tagName === 'OPTION' || !/</.test(v)) e.textContent = v;
-        else e.innerHTML = v;
-      }
-    });
-
-    document.querySelectorAll('[data-ph-bn]').forEach(e => {
-      const ph = e.dataset['ph' + (currentLanguage === 'bn' ? 'Bn' : 'En')];
-      if (ph) e.placeholder = ph;
-    });
-
-    document.querySelectorAll('#lang button').forEach(b => {
-      const on = b.dataset.l === currentLanguage;
-      b.classList.toggle('on', on);
-      b.setAttribute('aria-pressed', String(on));
-    });
-
-    // Toggle custom labels
-    document.querySelectorAll('.bn').forEach(el => el.style.display = currentLanguage === 'bn' ? '' : 'none');
-    document.querySelectorAll('.en').forEach(el => el.style.display = currentLanguage === 'en' ? '' : 'none');
+    if (lang && lang !== getLanguage()) {
+      setLanguage(lang);
+    }
+    currentLanguage = getLanguage();
+    applyI18n();
   }
+
+  window.addEventListener('languagechange', (e) => {
+    currentLanguage = e.detail?.language || getLanguage();
+    applyI18n();
+  });
 
   // Toast helper
   function notify(msg) {
@@ -440,8 +422,10 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
     }
 
     parseBtn.disabled = true;
-    loadingEl.style.display = 'block';
-    resultContainer.style.display = 'none';
+    loadingEl.style.display = 'none';
+    resultContainer.style.display = 'block';
+    const done = timedSkeleton();
+    showSkeleton(resultContainer, 'parse-preview');
 
     try {
       const result = await api.parse(text, 'rules');
@@ -494,15 +478,21 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
         stepsList.appendChild(stepCard);
       });
 
-      resultContainer.style.display = 'block';
-      resultContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-      notify(currentLanguage === 'en' ? 'Recipe analysed successfully! Review and save.' : 'রেসিপি বিশ্লেষণ সম্পন্ন হয়েছে! যাচাই করে সংরক্ষণ করুন।');
+      done(() => {
+        hideSkeleton(resultContainer);
+        resultContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        notify(currentLanguage === 'en' ? 'Recipe analysed successfully! Review and save.' : 'রেসিপি বিশ্লেষণ সম্পন্ন হয়েছে! যাচাই করে সংরক্ষণ করুন।');
+      });
     } catch (err) {
       console.error('[record] Parse failed:', err);
-      notify(err.message || 'Parsing failed.');
+      const lang = currentLanguage || 'en';
+      done(() => showError(resultContainer, {
+        message: lang === 'bn' ? 'রেসিপি বিশ্লেষণ ব্যর্থ হয়েছে' : 'Recipe analysis failed',
+        hint: err.message,
+        lang
+      }));
     } finally {
       parseBtn.disabled = false;
-      loadingEl.style.display = 'none';
     }
   });
 
@@ -566,17 +556,7 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
     const authState = await requireAuth({ redirectTo: '/login.html' });
     currentToken = authState.token;
     initNavigation({ activePage: 'record' });
-
-    // Language buttons
-    document.querySelectorAll('#lang button, .site-header .language-switch button').forEach(b => {
-      b.addEventListener('click', (e) => {
-        e.preventDefault();
-        const l = b.dataset.l || b.dataset.language || b.dataset.lang;
-        applyLanguage(l);
-      });
-    });
-
-    applyLanguage(currentLanguage);
+    applyI18n();
     initIcons();
 
     // Default to the text paste tab for immediate usability

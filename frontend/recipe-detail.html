@@ -1,9 +1,16 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="bn" class="lang-bn">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#542d1d">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#c5301c">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Thakuma's Recipe">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="stylesheet" href="/css/navigation.css">
+<link rel="stylesheet" href="/css/skeleton.css">
 <title>খিচুড়ি · ঠাকুমার রান্না</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -240,21 +247,7 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
 </head>
 <body>
 <svg id="spoon" viewBox="0 0 46 46" aria-hidden="true"><g transform="rotate(-40 6 6)"><path d="M6 4 C0 4 0 16 6 18 C12 16 12 4 6 4Z" fill="#e0a526" stroke="#8e5a10" stroke-width="1.2"/><rect x="4.8" y="17" width="2.4" height="26" rx="1.2" fill="#b07a1c"/></g></svg>
-<header class="site-header">
-  <div class="header-inner">
-    <a class="brand" href="/" aria-label="Thakuma’s Recipe home">
-      <img class="brand-mark" src="/assets/images/thakuma_brand_mark.webp" alt="" aria-hidden="true">
-      <span class="brand-copy"><span class="brand-name i18n" data-bn="ঠাকুমার রান্না" data-en="Thakuma’s Recipe">ঠাকুমার রান্না</span><span class="brand-caption i18n" data-bn="ঘরের স্বাদ" data-en="A taste of home">ঘরের স্বাদ</span></span>
-    </a>
-    <div class="main-nav" role="navigation" aria-label="Main navigation"><a class="nav-link active" href="#/"><span class="i18n" data-bn="রেসিপি" data-en="Recipes">রেসিপি</span></a><a class="nav-link" href="#/hands"><span class="i18n" data-bn="হাতের মাপ" data-en="Hands">হাতের মাপ</span></a><a class="nav-link" href="#/accuracy"><span class="i18n" data-bn="নির্ভুলতা" data-en="Accuracy">নির্ভুলতা</span></a></div>
-    <div class="header-actions">
-      <div class="language-switch" id="lang" role="group" aria-label="Choose language"><button type="button" id="lang-bn" data-l="bn" data-language="bn" aria-pressed="true" class="active selected" onclick="setLanguage('bn')">বাংলা</button><button type="button" id="lang-en" data-l="en" data-language="en" aria-pressed="false" onclick="setLanguage('en')">EN</button></div>
-      <button class="avatar-mini" aria-label="Profile" type="button" onclick="notify(currentLang==='bn'?'প্রোফাইল':'Profile')">ঠা</button>
-      <button id="new-recipe-top" type="button" hidden aria-hidden="true" tabindex="-1"></button>
-    </div>
-  </div>
-  <div class="mobile-nav" role="navigation" aria-label="Mobile navigation"><a class="nav-link active" href="#/"><span class="i18n" data-bn="রেসিপি" data-en="Recipes">রেসিপি</span></a><a class="nav-link" href="#/hands"><span class="i18n" data-bn="হাতের মাপ" data-en="Hands">হাতের মাপ</span></a><a class="nav-link" href="#/accuracy"><span class="i18n" data-bn="নির্ভুলতা" data-en="Accuracy">নির্ভুলতা</span></a></div>
-</header>
+<div id="app-navigation"></div>
 
 <div class="notice" id="notice">
   <div class="notice-inner">
@@ -265,7 +258,7 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
   </div>
 </div>
 
-<main class="page">
+<main class="page" id="recipe-content-zone">
   <section class="panel recipe-head">
     <div class="head-top">
       <div>
@@ -524,11 +517,17 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
 <script type="module">
   import { requireAuth } from './js/session.js';
   import { api } from './js/api.js';
-  import { getPreferredLanguage, setPreferredLanguage, initNavigation } from './js/navigation.js';
+  import { initNavigation } from './js/navigation.js';
+  import { showSkeleton, hideSkeleton, showError, timedSkeleton } from './js/skeleton.js';
+  import { initI18n, getLanguage, setLanguage, applyI18n } from './js/i18n.js';
   import { initIcons } from './js/icons.js';
+  import { initPWA } from './js/pwa.js';
+
+  initPWA();
+  initI18n();
 
   let currentToken = null;
-  let currentLanguage = getPreferredLanguage();
+  let currentLanguage = getLanguage();
   let currentRecipe = null;
   let recipeId = null;
 
@@ -537,31 +536,33 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
   }
 
   function applyLanguage(lang) {
-    currentLanguage = lang === 'en' ? 'en' : 'bn';
-    setPreferredLanguage(currentLanguage);
-    document.documentElement.lang = currentLanguage;
-    document.documentElement.classList.toggle("lang-bn", currentLanguage === "bn");
-    document.documentElement.classList.toggle("lang-en", currentLanguage === "en");
-    document.body.classList.toggle("lang-bn", currentLanguage === "bn");
-    document.body.classList.toggle("lang-en", currentLanguage === "en");
+    if (lang && lang !== getLanguage()) {
+      setLanguage(lang);
+    }
+    currentLanguage = getLanguage();
+    applyI18n();
 
     document.querySelectorAll(".i18n").forEach(el => {
       const value = el.dataset[currentLanguage];
       if (value !== undefined) el.textContent = value;
     });
 
-    const btnBn = document.getElementById("lang-bn");
-    const btnEn = document.getElementById("lang-en");
-    if (btnBn) btnBn.classList.toggle("selected", currentLanguage === "bn");
-    if (btnEn) btnEn.classList.toggle("selected", currentLanguage === "en");
-
-    document.querySelectorAll('.bn').forEach(el => el.style.display = currentLanguage === 'bn' ? '' : 'none');
-    document.querySelectorAll('.en').forEach(el => el.style.display = currentLanguage === 'en' ? '' : 'none');
-
     if (currentRecipe) {
       renderRecipeData(currentRecipe);
     }
   }
+
+  window.addEventListener('languagechange', (e) => {
+    currentLanguage = e.detail?.language || getLanguage();
+    applyI18n();
+    document.querySelectorAll(".i18n").forEach(el => {
+      const value = el.dataset[currentLanguage];
+      if (value !== undefined) el.textContent = value;
+    });
+    if (currentRecipe) {
+      renderRecipeData(currentRecipe);
+    }
+  });
 
   function notify(msg) {
     const toast = document.getElementById('toast');
@@ -725,6 +726,9 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
       .replace(/"/g, '&quot;');
   }
 
+  // Saved HTML structure for recipe-content-zone (set once on first load)
+  let _recipeZoneHTML = null;
+
   async function loadRecipe() {
     const params = new URLSearchParams(window.location.search);
     recipeId = params.get('id');
@@ -735,13 +739,36 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
       return;
     }
 
+    const zone = document.getElementById('recipe-content-zone');
+    // Save the original HTML structure on first call so we can restore it
+    if (zone && !_recipeZoneHTML) _recipeZoneHTML = zone.innerHTML;
+
+    const done = timedSkeleton();
+    if (zone) showSkeleton(zone, 'recipe-detail');
+
     try {
       const recipe = await api.getRecipe(currentToken, recipeId);
       currentRecipe = recipe;
-      renderRecipeData(recipe);
+      done(() => {
+        if (zone && _recipeZoneHTML) zone.innerHTML = _recipeZoneHTML;
+        if (zone) hideSkeleton(zone);
+        renderRecipeData(recipe);
+      });
     } catch (err) {
       console.error('[detail] Failed to load:', err);
-      notify(err.message || 'Recipe not found');
+      const lang = currentLanguage || 'en';
+      done(() => {
+        if (zone) {
+          showError(zone, {
+            message: lang === 'bn' ? 'রেসিপি লোড করা যায়নি' : 'Failed to load recipe',
+            hint: err.message,
+            retry: loadRecipe,
+            lang
+          });
+        } else {
+          notify(err.message || 'Recipe not found');
+        }
+      });
     }
   }
 
@@ -842,15 +869,8 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
   async function init() {
     const authState = await requireAuth({ redirectTo: '/login.html' });
     currentToken = authState.token;
-    initNavigation({ activePage: 'detail' });
-
-    // Language toggle
-    const btnBn = document.getElementById("lang-bn");
-    const btnEn = document.getElementById("lang-en");
-    btnBn?.addEventListener("click", () => applyLanguage("bn"));
-    btnEn?.addEventListener("click", () => applyLanguage("en"));
-
-    applyLanguage(currentLanguage);
+    initNavigation({ activePage: 'recipes' });
+    applyI18n();
     initIcons();
     await loadRecipe();
   }
