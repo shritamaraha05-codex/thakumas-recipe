@@ -60,7 +60,7 @@ footer{margin-top:32px;background:#f2e6d0;border-top:1px solid #e9d9bb}.footer-i
 
 /* Archive hero: the room photograph is a quiet emotional companion to the recipe tools. */
 @media(pointer:fine){body,body a,body button,body input,body select{cursor:none!important}}
-#spoon-cursor{position:fixed;left:-80px;top:-80px;width:46px;height:46px;z-index:120;pointer-events:none;filter:drop-shadow(0 4px 4px rgba(80,20,10,.35));transform:translate(-6px,-6px);transition:transform .14s ease-out;transform-origin:6px 6px}
+#spoon-cursor{position:fixed;left:-80px;top:-80px;width:46px;height:46px;z-index:99999;pointer-events:none;filter:drop-shadow(0 4px 4px rgba(80,20,10,.35));transform:translate(-6px,-6px);transition:transform .14s ease-out;transform-origin:6px 6px}
 @media(pointer:coarse){#spoon-cursor{display:none}}
 .archive-hero{display:grid;grid-template-columns:minmax(0,1.02fr) minmax(330px,.98fr);align-items:stretch;gap:0;min-height:262px;margin:0 0 20px;border:1px solid rgba(157,110,63,.16);border-radius:19px;overflow:hidden;background:linear-gradient(110deg,#fffaf0 0%,#fbf0dc 100%);box-shadow:0 12px 27px rgba(76,44,20,.07);}
 .archive-copy{position:relative;z-index:2;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;min-width:0;padding:27px 30px 27px 34px;background:linear-gradient(100deg,rgba(255,250,240,.99) 0%,rgba(255,250,240,.985) 68%,rgba(255,250,240,.88) 86%,rgba(255,250,240,.28) 100%)}
@@ -128,7 +128,7 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
 .site-header .header-icon svg{width:17px;height:17px;display:block}
 .site-header .mobile-nav{display:none}
 /* Profile-page spoon cursor. No particles or particle canvas. */
-#spoon{position:fixed;left:0;top:0;z-index:120;width:46px;height:46px;margin:-6px 0 0 -6px;pointer-events:none;filter:drop-shadow(0 4px 4px rgba(80,20,10,.35));transform-origin:6px 6px;will-change:transform}
+#spoon{position:fixed;left:0;top:0;z-index:99999;width:46px;height:46px;margin:-6px 0 0 -6px;pointer-events:none;filter:drop-shadow(0 4px 4px rgba(80,20,10,.35));transform-origin:6px 6px;will-change:transform}
 @media(pointer:fine){body,body a,body button,body input,body select{cursor:none!important}}
 @media(pointer:coarse){#spoon{display:none!important}}
 @media(prefers-reduced-motion:reduce){#spoon{display:none!important}body,body a,body button,body input,body select{cursor:auto!important}}
@@ -184,12 +184,12 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
     </article>
     <article class="stat-card family-stat">
       <span class="stat-icon"><span class="material-symbols-outlined">auto_stories</span></span>
-      <div class="stat-copy"><strong>ঐতিহ্য</strong><span class="bn">মুখে মুখে শেখা পদ</span><span class="en">Spoken recipes</span></div>
+      <div class="stat-copy"><strong class="bn">ঐতিহ্য</strong><strong class="en">Heritage</strong><span class="bn">মুখে মুখে শেখা পদ</span><span class="en">Spoken recipes</span></div>
       <span class="stat-note bn">স্মৃতি থেকে স্বাদের খাতা</span><span class="stat-note en">Captured in her own words</span>
     </article>
     <article class="stat-card love-stat">
       <span class="stat-icon"><span class="material-symbols-outlined">straighten</span></span>
-      <div class="stat-copy"><strong>আন্দাজ</strong><span class="bn">হাতের খাঁটি মাপ</span><span class="en">Honest ranges</span></div>
+      <div class="stat-copy"><strong class="bn">আন্দাজ</strong><strong class="en">Intuition</strong><span class="bn">হাতের খাঁটি মাপ</span><span class="en">Honest ranges</span></div>
       <span class="stat-note bn">এক মুঠো, এক চিমটি যত্নে রাখা</span><span class="stat-note en">Ranges, not rigid grams</span>
     </article>
   </section>
@@ -647,6 +647,7 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
 
     window.addEventListener('languagechange', () => {
       currentLanguage = getLanguage();
+      updateStats(allRecipes.length);
       renderRecipes(getFilteredRecipes());
       initIcons();
     });

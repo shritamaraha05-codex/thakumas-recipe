@@ -38,7 +38,7 @@ export function renderNavigation({ activePage = '', mountId = 'app-navigation' }
     else if (path === '/' || path.endsWith('index.html')) activePage = 'home';
   }
 
-  // Construct unified navbar markup
+  // Construct initial unified navbar markup (defaults to guest, upgraded asynchronously by auth check)
   container.outerHTML = `
     <header class="site-header unified-nav" id="${mountId}" role="banner">
       <div class="header-inner">
@@ -50,10 +50,8 @@ export function renderNavigation({ activePage = '', mountId = 'app-navigation' }
           </span>
         </a>
 
-        <nav class="main-nav" aria-label="Main navigation">
-          <a class="nav-link ${activePage === 'recipes' ? 'active' : ''}" href="/library.html" data-nav="recipes" data-i18n="nav.recipes">রেসিপি</a>
-          <a class="nav-link ${activePage === 'hands' ? 'active' : ''}" href="/profile.html#hand-measures" data-nav="hands" data-i18n="nav.herHand">হাতের মাপ</a>
-          <a class="nav-link ${activePage === 'accuracy' ? 'active' : ''}" href="/#accuracy" data-nav="accuracy" data-i18n="nav.accuracy">নির্ভুলতা</a>
+        <nav class="main-nav" id="navDesktopMenu" aria-label="Main navigation">
+          <!-- Populated dynamically based on auth state & page -->
         </nav>
 
         <div class="header-actions">
@@ -73,9 +71,9 @@ export function renderNavigation({ activePage = '', mountId = 'app-navigation' }
       </div>
 
       <nav class="mobile-nav" id="navMobileMenu" aria-label="Mobile navigation">
-        <a class="mobile-nav-link ${activePage === 'recipes' ? 'active' : ''}" href="/library.html" data-nav="recipes" data-i18n="nav.recipes">রেসিপি</a>
-        <a class="mobile-nav-link ${activePage === 'hands' ? 'active' : ''}" href="/profile.html#hand-measures" data-nav="hands" data-i18n="nav.herHand">হাতের মাপ</a>
-        <a class="mobile-nav-link ${activePage === 'accuracy' ? 'active' : ''}" href="/#accuracy" data-nav="accuracy" data-i18n="nav.accuracy">নির্ভুলতা</a>
+        <div class="mobile-links-area" id="navMobileLinks">
+          <!-- Populated dynamically based on auth state & page -->
+        </div>
         <div class="mobile-nav-divider"></div>
         <div class="mobile-auth-area" id="navMobileAuthArea"></div>
       </nav>
@@ -94,6 +92,65 @@ export function renderNavigation({ activePage = '', mountId = 'app-navigation' }
   window.addEventListener('languagechange', () => {
     applyI18n(header);
   });
+}
+
+/**
+ * Render main navigation links dynamically according to login state and active page.
+ */
+function renderNavLinks(header, isLoggedIn, activePage) {
+  const desktopNav = header.querySelector('#navDesktopMenu');
+  const mobileLinks = header.querySelector('#navMobileLinks');
+  const mobileToggle = header.querySelector('#navMobileToggle');
+  if (!desktopNav) return;
+
+  if (activePage === 'login' && !isLoggedIn) {
+    // On login page when logged out: nothing other than home button in brand
+    desktopNav.innerHTML = '';
+    if (mobileLinks) mobileLinks.innerHTML = '';
+    if (mobileToggle) mobileToggle.style.display = 'none';
+    return;
+  }
+
+  if (mobileToggle) mobileToggle.style.display = '';
+
+  if (isLoggedIn) {
+    // Logged-in application navigation
+    const linksHtml = `
+      <a class="nav-link ${activePage === 'recipes' ? 'active' : ''}" href="/library.html" data-nav="recipes" data-i18n="nav.recipes">রেসিপি</a>
+      <a class="nav-link ${activePage === 'record' ? 'active' : ''}" href="/record.html" data-nav="record" data-i18n="nav.record">নতুন রেসিপি</a>
+      <a class="nav-link ${activePage === 'cook' ? 'active' : ''}" href="/cook-mode.html" data-nav="cook" data-i18n="nav.cook">রান্না মোড</a>
+      <a class="nav-link ${activePage === 'hands' ? 'active' : ''}" href="/profile.html#hand-measures" data-nav="hands" data-i18n="nav.herHand">হাতের মাপ</a>
+    `;
+
+    const mobileHtml = `
+      <a class="mobile-nav-link ${activePage === 'recipes' ? 'active' : ''}" href="/library.html" data-nav="recipes" data-i18n="nav.recipes">রেসিপি</a>
+      <a class="mobile-nav-link ${activePage === 'record' ? 'active' : ''}" href="/record.html" data-nav="record" data-i18n="nav.record">নতুন রেসিপি</a>
+      <a class="mobile-nav-link ${activePage === 'cook' ? 'active' : ''}" href="/cook-mode.html" data-nav="cook" data-i18n="nav.cook">রান্না মোড</a>
+      <a class="mobile-nav-link ${activePage === 'hands' ? 'active' : ''}" href="/profile.html#hand-measures" data-nav="hands" data-i18n="nav.herHand">হাতের মাপ</a>
+    `;
+
+    desktopNav.innerHTML = linksHtml;
+    if (mobileLinks) mobileLinks.innerHTML = mobileHtml;
+  } else {
+    // Guest navigation (Landing page & unauthenticated views)
+    const linksHtml = `
+      <a class="nav-link ${activePage === 'recipes' ? 'active' : ''}" href="/#stories" data-nav="recipes" data-i18n="nav.recipes">রেসিপি</a>
+      <a class="nav-link ${activePage === 'hands' ? 'active' : ''}" href="/#measure" data-nav="hands" data-i18n="nav.herHand">হাতের মাপ</a>
+      <a class="nav-link ${activePage === 'accuracy' ? 'active' : ''}" href="/#accuracy" data-nav="accuracy" data-i18n="nav.accuracy">নির্ভুলতা</a>
+    `;
+
+    const mobileHtml = `
+      <a class="mobile-nav-link ${activePage === 'recipes' ? 'active' : ''}" href="/#stories" data-nav="recipes" data-i18n="nav.recipes">রেসিপি</a>
+      <a class="mobile-nav-link ${activePage === 'hands' ? 'active' : ''}" href="/#measure" data-nav="hands" data-i18n="nav.herHand">হাতের মাপ</a>
+      <a class="mobile-nav-link ${activePage === 'accuracy' ? 'active' : ''}" href="/#accuracy" data-nav="accuracy" data-i18n="nav.accuracy">নির্ভুলতা</a>
+    `;
+
+    desktopNav.innerHTML = linksHtml;
+    if (mobileLinks) mobileLinks.innerHTML = mobileHtml;
+  }
+
+  applyI18n(desktopNav);
+  if (mobileLinks) applyI18n(mobileLinks);
 }
 
 /**
@@ -139,15 +196,15 @@ function setupMobileToggle(header) {
 }
 
 /**
- * Check Supabase session asynchronously and update auth actions.
+ * Check Supabase session asynchronously and update auth actions & navigation links.
  */
 async function setupAuthAwareNavigation(header, activePage) {
   const desktopAuthArea = header.querySelector('#navAuthArea');
   const mobileAuthArea = header.querySelector('#navMobileAuthArea');
-  if (!desktopAuthArea && !mobileAuthArea) return;
 
   if (!supabaseConfigured) {
-    // If Supabase is not configured, show simple Sign In link
+    // If Supabase is not configured, show guest navigation
+    renderNavLinks(header, false, activePage);
     renderLoggedOutNav(desktopAuthArea, mobileAuthArea, activePage);
     return;
   }
@@ -155,12 +212,15 @@ async function setupAuthAwareNavigation(header, activePage) {
   try {
     const { data: { session } } = await getSession();
     if (session && session.user) {
+      renderNavLinks(header, true, activePage);
       renderLoggedInNav(desktopAuthArea, mobileAuthArea, session.user, activePage);
     } else {
+      renderNavLinks(header, false, activePage);
       renderLoggedOutNav(desktopAuthArea, mobileAuthArea, activePage);
     }
   } catch (err) {
     console.debug('[navigation] Session check:', err);
+    renderNavLinks(header, false, activePage);
     renderLoggedOutNav(desktopAuthArea, mobileAuthArea, activePage);
   }
 }
@@ -207,7 +267,7 @@ function renderLoggedInNav(desktopArea, mobileArea, user, activePage) {
     });
   }
 
-  applyI18n(desktopArea);
+  if (desktopArea) applyI18n(desktopArea);
   if (mobileArea) applyI18n(mobileArea);
 }
 
@@ -215,6 +275,13 @@ function renderLoggedInNav(desktopArea, mobileArea, user, activePage) {
  * Render logged-out guest navigation (Sign in button).
  */
 function renderLoggedOutNav(desktopArea, mobileArea, activePage) {
+  if (activePage === 'login') {
+    // When on login page and logged out, show nothing extra in auth area
+    if (desktopArea) desktopArea.innerHTML = '';
+    if (mobileArea) mobileArea.innerHTML = '';
+    return;
+  }
+
   if (desktopArea) {
     desktopArea.innerHTML = `
       <a class="nav-btn-signin ${activePage === 'login' ? 'active' : ''}" href="/login.html">
@@ -233,7 +300,7 @@ function renderLoggedOutNav(desktopArea, mobileArea, activePage) {
     `;
   }
 
-  applyI18n(desktopArea);
+  if (desktopArea) applyI18n(desktopArea);
   if (mobileArea) applyI18n(mobileArea);
 }
 
@@ -241,14 +308,15 @@ function renderLoggedOutNav(desktopArea, mobileArea, activePage) {
  * Intercept navigation to protected routes for unauthenticated users.
  */
 function setupProtectedNavInterception(header) {
-  header.querySelectorAll('a[href*="library.html"]').forEach((link) => {
+  header.querySelectorAll('a[href*="library.html"], a[href*="record.html"], a[href*="cook-mode.html"]').forEach((link) => {
     link.addEventListener('click', async (e) => {
       if (!supabaseConfigured) return;
       try {
         const { data: { session } } = await getSession();
         if (!session) {
           e.preventDefault();
-          window.location.href = `/login.html?returnTo=${encodeURIComponent('/library.html')}`;
+          const target = link.getAttribute('href');
+          window.location.href = `/login.html?returnTo=${encodeURIComponent(target)}`;
         }
       } catch (err) {
         console.debug('[navigation] Protected link check:', err);
@@ -277,6 +345,11 @@ export function initNavigation({ activePage = '', mountId = 'app-navigation' } =
 export function initSpoonCursor() {
   const spoon = document.getElementById('spoon') || document.getElementById('spoon-cursor');
   if (!spoon) return;
+
+  // Enforce high z-index and non-blocking interaction
+  spoon.style.zIndex = '99999';
+  spoon.style.pointerEvents = 'none';
+
   const finePointer = window.matchMedia && window.matchMedia('(pointer: fine)').matches;
   const reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   if (!finePointer || reducedMotion) return;

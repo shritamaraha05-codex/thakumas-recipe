@@ -347,3 +347,58 @@
   }
 }
 
+
+/* Global Spoon Cursor Guarantee — always stays above headers, dialogs, and skeleton loaders */
+#spoon, #spoon-cursor {
+  position: fixed !important;
+  z-index: 99999 !important;
+  pointer-events: none !important;
+}
+
+/* Defensive styling: Prevent any global 'nav' CSS from breaking the unified topbar */
+.site-header.unified-nav .main-nav {
+  position: static !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 24px !important;
+  height: 100% !important;
+  margin: 0 auto 0 28px !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  width: auto !important;
+  top: auto !important;
+  left: auto !important;
+  right: auto !important;
+}
+
+.site-header.unified-nav .main-nav a.nav-link {
+  height: 100% !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  position: relative !important;
+  color: #705846 !important;
+  font-size: 15px !important;
+  font-weight: 600 !important;
+  text-decoration: none !important;
+  white-space: nowrap !important;
+  transition: color 0.2s ease !important;
+  padding: 0 4px !important;
+}
+
+.site-header.unified-nav .main-nav a.nav-link:hover,
+.site-header.unified-nav .main-nav a.nav-link.active {
+  color: var(--nav-ink) !important;
+}
+
+.site-header.unified-nav .main-nav a.nav-link.active::after {
+  content: "" !important;
+  position: absolute !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 12px !important;
+  height: 2.5px !important;
+  background: var(--nav-red) !important;
+  border-radius: 3px !important;
+}
