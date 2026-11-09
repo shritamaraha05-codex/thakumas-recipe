@@ -52,8 +52,14 @@ export async function getCurrentUser() {
   return session?.user || null
 }
 
+export async function updateUserProfile({ data = {} }) {
+  ensureSupabase()
+  return await supabase.auth.updateUser({
+    data,
+  })
+}
+
 export function onAuthStateChange(callback) {
   if (!supabase) return { data: { subscription: { unsubscribe: () => {} } } }
   return supabase.auth.onAuthStateChange(callback)
 }
-

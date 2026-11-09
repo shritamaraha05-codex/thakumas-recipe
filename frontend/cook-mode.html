@@ -93,7 +93,9 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
  .site-header .mobile-nav .nav-link:after{display:none}
  .site-header .mobile-nav .nav-link.active{color:#b3231b}
 }
-</style><style id="shared-header-content-offset">main.wrap{padding-top:126px!important}@media(max-width:620px){main.wrap{padding-top:140px!important}}</style></head>
+</style><style id="shared-header-content-offset">main.wrap{padding-top:126px!important}@media(max-width:620px){main.wrap{padding-top:140px!important}}</style><link rel="stylesheet" href="/assets/icons.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200">
+</head>
 <body>
 <svg id="spoon" viewBox="0 0 46 46" aria-hidden="true"><g transform="rotate(-40 6 6)"><path d="M6 4 C0 4 0 16 6 18 C12 16 12 4 6 4Z" fill="#e0a526" stroke="#8e5a10" stroke-width="1.2"/><rect x="4.8" y="17" width="2.4" height="26" rx="1.2" fill="#b07a1c"/></g></svg>
 <header class="site-header">
@@ -243,6 +245,7 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
   import { requireAuth } from './js/session.js';
   import { api } from './js/api.js';
   import { getPreferredLanguage, setPreferredLanguage, initNavigation } from './js/navigation.js';
+  import { initIcons } from './js/icons.js';
 
   let currentToken = null;
   let currentLang = getPreferredLanguage();
@@ -250,30 +253,21 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
   let timerInterval = null;
   let timeLeft = 0;
   let timerRunning = false;
-  let synth = window.speechSynthesis;
-
-  let steps = [
-    {
-      title: { bn: 'ফোড়ন দিন', en: 'Temper the spices' },
-      desc: {
-        bn: 'কড়াইতে সরষের তেল গরম করুন। তেল হালকা গরম হলে পাঁচফোড়ন, শুকনো লঙ্কা আর তেজপাতা দিন। ২০–৩০ সেকেন্ড নেড়ে নিন, যতক্ষণ সুন্দর গন্ধ বের হয়।',
-        en: 'Warm mustard oil in a kadai. Add panch phoron, dried red chillies and a bay leaf. Stir for 20–30 seconds, just until the spices become fragrant.'
-      },
-      hint: {
-        bn: 'ঠাকুমার টিপস: মশলা পুড়তে দেবেন না—ফোড়নের গন্ধ উঠলেই পরের ধাপে যান।',
-        en: 'Thakuma’s tip: Don’t let the spices burn—move on as soon as they become fragrant.'
-      },
-      duration: 30,
-      ingredients: [
-        ['সরষের তেল', 'Mustard oil', '১ চামচ', '1 spoon', '◓'],
-        ['পাঁচফোড়ন', 'Panch phoron', '১ চিমটি', '1 pinch', '✻']
-      ],
-      photo: true
-    }
-  ];
+  let synth = typeof window !== 'undefined' ? window.speechSynthesis : null;
+  let steps = [];
+  let recipeTitle = '';
 
   function toDigits(n) {
     return currentLang === 'bn' ? String(n).replace(/\d/g, d => '০১২৩৪৫৬৭৮৯'[d]) : String(n);
+  }
+
+  function escapeHtml(str) {
+    if (!str) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
   }
 
   function applyLanguage(lang) {
@@ -297,6 +291,7 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
 
     renderStepsList();
     renderCurrentStep();
+    initIcons();
   }
 
   function notify(msg) {
@@ -311,6 +306,8 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
     const listEl = document.getElementById('step-list');
     if (!listEl) return;
     listEl.innerHTML = '';
+
+    if (steps.length === 0) return;
 
     steps.forEach((s, i) => {
       const btn = document.createElement('button');
@@ -335,6 +332,11 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
   }
 
   function renderCurrentStep() {
+    if (steps.length === 0) {
+      renderNoStepsState();
+      return;
+    }
+
     if (!steps[currentStep]) return;
     const s = steps[currentStep];
 
@@ -389,7 +391,7 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
       }
     }
 
-    // Timer
+    // Timer - only for steps with explicit positive duration
     resetTimer(s.duration || 0);
 
     // Sidebar active item
@@ -406,6 +408,34 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
         ? (currentLang === 'en' ? 'Finish cooking ✓' : 'রান্না সম্পন্ন ✓')
         : (currentLang === 'en' ? 'Next step →' : 'পরের ধাপ →');
     }
+  }
+
+  function renderNoStepsState(customMsg = null) {
+    const titleEl = document.getElementById('step-title');
+    if (titleEl) {
+      titleEl.textContent = customMsg || (currentLang === 'en' ? 'No recipe selected' : 'কোনো রেসিপি নির্বাচন করা হয়নি');
+    }
+    const descEl = document.getElementById('step-desc');
+    if (descEl) {
+      descEl.innerHTML = `
+        <div style="padding: 16px 0; text-align: center;">
+          <p style="margin-bottom: 16px; color: #7f6450;">
+            ${currentLang === 'en' ? 'Open a saved recipe from your library to start step-by-step cooking.' : 'রান্না শুরু করতে আপনার রেসিপি লাইব্রেরি থেকে একটি রেসিপি খুলুন।'}
+          </p>
+          <a href="/library.html" class="primary-btn" style="display: inline-flex; text-decoration: none; padding: 10px 20px; border-radius: 8px; background: var(--red); color: white; font-weight: 600;">
+            <span class="material-symbols-outlined" style="margin-right: 6px;">menu_book</span>
+            <span>${currentLang === 'en' ? 'Back to Library' : 'লাইব্রেরিতে যান'}</span>
+          </a>
+        </div>
+      `;
+    }
+    const ingContainer = document.getElementById('ing-list');
+    if (ingContainer) ingContainer.innerHTML = '';
+    resetTimer(0);
+    const prevBtn = document.getElementById('prev-step-btn');
+    const nextBtn = document.getElementById('next-step-btn');
+    if (prevBtn) prevBtn.disabled = true;
+    if (nextBtn) nextBtn.disabled = true;
   }
 
   function goToStep(idx) {
@@ -429,6 +459,7 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
   }
 
   function repeatStep() {
+    if (steps.length === 0 || !steps[currentStep]) return;
     const s = steps[currentStep];
     const textToSpeak = s.desc[currentLang] || s.desc.bn;
 
@@ -437,13 +468,13 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
       const utterance = new SpeechSynthesisUtterance(textToSpeak);
       utterance.lang = currentLang === 'bn' ? 'bn-IN' : 'en-US';
       synth.speak(utterance);
-      notify(currentLang === 'en' ? 'Repeating step…' : 'ধাপটি পড়ে শোনানো হচ্ছে…');
+      notify(currentLang === 'en' ? 'Repeating step aloud…' : 'ধাপটি পড়ে শোনানো হচ্ছে…');
     } else {
       notify(textToSpeak);
     }
   }
 
-  // Timer logic
+  // Timer logic - strictly explicit positive durations only
   function resetTimer(seconds) {
     clearInterval(timerInterval);
     timerRunning = false;
@@ -496,18 +527,16 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
     const id = params.get('id');
 
     if (!id) {
-      // Use existing demo steps
-      renderStepsList();
-      renderCurrentStep();
+      renderNoStepsState();
       return;
     }
 
     try {
       const recipe = await api.getRecipe(currentToken, id);
       if (recipe) {
-        // Set page header title
+        recipeTitle = recipe.title || '';
         const h1 = document.querySelector('.recipe-head h1 span');
-        if (h1) h1.textContent = recipe.title;
+        if (h1) h1.textContent = recipeTitle;
 
         // Parse steps from draft
         const draftSteps = recipe.draft?.recipe?.steps || [];
@@ -521,31 +550,42 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
               return [name, name, amt, amt, '◌'];
             });
 
-            const durSec = ds.durations?.[0]?.value ? Math.round(ds.durations[0].value * 60) : 0;
+            // Extract explicit duration only (never fabricate)
+            let durSec = 0;
+            if (typeof ds.timer_seconds === 'number' && ds.timer_seconds > 0) {
+              durSec = ds.timer_seconds;
+            } else if (Array.isArray(ds.durations) && ds.durations.length > 0) {
+              const d = ds.durations[0];
+              if (d && typeof d.value === 'number' && d.value > 0) {
+                if (d.unit === 'hour' || d.unit === 'ঘন্টা') durSec = Math.round(d.value * 3600);
+                else if (d.unit === 'minute' || d.unit === 'মিনিট' || !d.unit) durSec = Math.round(d.value * 60);
+                else if (d.unit === 'second' || d.unit === 'সেকেন্ড') durSec = Math.round(d.value);
+              }
+            }
 
+            const stepTitle = ds.text.slice(0, 36) + (ds.text.length > 36 ? '…' : '');
             return {
-              title: {
-                bn: ds.text.slice(0, 32) + (ds.text.length > 32 ? '…' : ''),
-                en: ds.text.slice(0, 32) + (ds.text.length > 32 ? '…' : '')
-              },
+              title: { bn: stepTitle, en: stepTitle },
               desc: { bn: ds.text, en: ds.text },
               hint: {
                 bn: 'ঠাকুমার পরামর্শ: মনোযোগ দিয়ে ধাপে ধাপে সম্পন্ন করুন।',
-                en: 'Thakuma’s guidance: Proceed step by step with care.'
+                en: 'Thakuma’s advice: Proceed step by step with care.'
               },
               duration: durSec,
               ingredients: ings,
               photo: i === 0
             };
           });
+          renderStepsList();
+          renderCurrentStep();
+        } else {
+          renderNoStepsState(currentLang === 'en' ? 'No steps recorded in this recipe' : 'এই রেসিপিতে কোনো ধাপ রেকর্ড করা নেই');
         }
       }
     } catch (err) {
-      console.warn('[cook-mode] Could not load recipe by id, using standard steps:', err);
+      console.warn('[cook-mode] Could not load recipe by id:', err);
+      renderNoStepsState(err.message || (currentLang === 'en' ? 'Recipe not found' : 'রেসিপি পাওয়া যায়নি'));
     }
-
-    renderStepsList();
-    renderCurrentStep();
   }
 
   async function init() {
@@ -574,10 +614,10 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
     }
 
     applyLanguage(currentLang);
+    initIcons();
     await loadRecipeForCooking();
   }
 
-  // Expose global step triggers for inline click handlers
   window.goToStep = goToStep;
   window.nextStep = nextStep;
   window.prevStep = prevStep;

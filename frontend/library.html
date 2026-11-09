@@ -11,7 +11,25 @@
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,400,0,0" rel="stylesheet">
 <style>
 :root{--cream:#fbf4e6;--cream-deep:#f2e5cd;--paper:#fffdf8;--paper-warm:#fff8eb;--line:#e7d8bd;--ink:#2e1b12;--muted:#806a57;--red:#c5301c;--red-dark:#982313;--red-pale:#f8e5df;--green:#376446;--green-pale:#e5eee2;--gold:#dca42e;--shadow:0 12px 30px rgba(75,43,22,.075);--shadow-soft:0 5px 16px rgba(75,43,22,.06);--bn:'Hind Siliguri',sans-serif;--en:'Plus Jakarta Sans','Hind Siliguri',sans-serif}
-*{box-sizing:border-box}[hidden]{display:none!important}html{scroll-behavior:smooth}body{margin:0;background:var(--cream);color:var(--ink);font-family:var(--bn);font-size:15px;line-height:1.55;min-height:100vh}button,input,select{font:inherit}button,a{-webkit-tap-highlight-color:transparent}button{cursor:pointer}a{color:inherit;text-decoration:none}img{max-width:100%;display:block}.material-symbols-outlined{font-family:inherit;font-weight:400;font-style:normal;font-size:20px;line-height:1;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;white-space:nowrap;direction:ltr}.material-symbols-outlined svg{width:1em;height:1em;display:block;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+*{box-sizing:border-box}[hidden]{display:none!important}html{scroll-behavior:smooth}body{margin:0;background:var(--cream);color:var(--ink);font-family:var(--bn);font-size:15px;line-height:1.55;min-height:100vh}button,input,select{font:inherit}button,a{-webkit-tap-highlight-color:transparent}button{cursor:pointer}a{color:inherit;text-decoration:none}img{max-width:100%;display:block}.material-symbols-outlined {
+  font-family: 'Material Symbols Outlined' !important;
+  font-weight: normal;
+  font-style: normal;
+  font-size: 20px;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  white-space: nowrap;
+  direction: ltr;
+  vertical-align: middle;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: 'liga';
+}.material-symbols-outlined svg{width:1em;height:1em;display:block;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 body.lang-en{font-family:var(--en)}body.lang-en .bn{display:none!important}body:not(.lang-en) .en{display:none!important}.bn{font-family:var(--bn)}.en{font-family:var(--en)}
 /* soft printed-paper atmosphere */
 body:before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(ellipse at 8% 14%,rgba(229,178,98,.12),transparent 34%),radial-gradient(ellipse at 90% 65%,rgba(112,133,86,.07),transparent 35%),linear-gradient(135deg,rgba(255,255,255,.18),transparent 55%)}
@@ -123,7 +141,8 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
  .site-header .mobile-nav .nav-link:after{display:none}
  .site-header .mobile-nav .nav-link.active{color:#b3231b}
 }
-</style><style id="shared-header-content-offset">.notice{margin-top:104px!important}@media(max-width:620px){.notice{margin-top:132px!important}}</style></head>
+</style><style id="shared-header-content-offset">.notice{margin-top:104px!important}@media(max-width:620px){.notice{margin-top:132px!important}}</style><link rel="stylesheet" href="/assets/icons.css">
+</head>
 <body>
 <svg id="spoon" viewBox="0 0 46 46" aria-hidden="true"><g transform="rotate(-40 6 6)"><path d="M6 4 C0 4 0 16 6 18 C12 16 12 4 6 4Z" fill="#e0a526" stroke="#8e5a10" stroke-width="1.2"/><rect x="4.8" y="17" width="2.4" height="26" rx="1.2" fill="#b07a1c"/></g></svg>
 
@@ -167,55 +186,26 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
   <section class="archive-stats" aria-label="Family archive statistics">
     <article class="stat-card recipe-stat">
       <span class="stat-icon"><span class="material-symbols-outlined">menu_book</span></span>
-      <div class="stat-copy"><strong id="stat-recipe-count">৬</strong><span class="bn">সংরক্ষিত রেসিপি</span><span class="en">Saved recipes</span></div>
-      <span class="stat-note bn">প্রতিটি পদ, একটি গল্প</span><span class="stat-note en">Every dish has a story</span>
+      <div class="stat-copy"><strong id="stat-recipe-count">০</strong><span class="bn">সংরক্ষিত রেসিপি</span><span class="en">Saved recipes</span></div>
+      <span class="stat-note bn">পারিবারিক রন্ধন খাতা</span><span class="stat-note en">Family heirloom archive</span>
     </article>
     <article class="stat-card family-stat">
-      <span class="stat-icon"><span class="material-symbols-outlined">groups</span></span>
-      <div class="stat-copy"><strong id="stat-member-count">৮</strong><span class="bn">পরিবারের সদস্য</span><span class="en">Family members</span></div>
-      <span class="stat-note bn">একসাথে রাখা স্মৃতি</span><span class="stat-note en">Memories kept together</span>
+      <span class="stat-icon"><span class="material-symbols-outlined">auto_stories</span></span>
+      <div class="stat-copy"><strong>ঐতিহ্য</strong><span class="bn">মুখে মুখে শেখা পদ</span><span class="en">Spoken recipes</span></div>
+      <span class="stat-note bn">স্মৃতি থেকে স্বাদের খাতা</span><span class="stat-note en">Captured in her own words</span>
     </article>
     <article class="stat-card love-stat">
-      <span class="stat-icon"><span class="material-symbols-outlined">favorite</span></span>
-      <div class="stat-copy"><strong id="stat-favorite-count">২</strong><span class="bn">পছন্দের পদ</span><span class="en">Loved recipes</span></div>
-      <span class="stat-note bn">যে স্বাদে মন ফিরে যায়</span><span class="stat-note en">The flavours we return to</span>
+      <span class="stat-icon"><span class="material-symbols-outlined">straighten</span></span>
+      <div class="stat-copy"><strong>আন্দাজ</strong><span class="bn">হাতের খাঁটি মাপ</span><span class="en">Honest ranges</span></div>
+      <span class="stat-note bn">এক মুঠো, এক চিমটি যত্নে রাখা</span><span class="stat-note en">Ranges, not rigid grams</span>
     </article>
   </section>
   <section class="filter-row" aria-label="Recipe filters">
-    <div class="filters">
-      <button class="filter-chip active" data-filter="all" type="button"><span class="bn">সব পদ</span><span class="en">All recipes</span><span class="count" id="count-all">৬</span></button>
-      <button class="filter-chip" data-filter="recent" type="button"><span class="bn">সাম্প্রতিক</span><span class="en">Recent</span></button>
-      <button class="filter-chip" data-filter="calibrated" type="button"><span class="bn">মাপ যাচাই করা</span><span class="en">Calibrated</span></button>
-      <button class="filter-chip" data-filter="favorites" type="button"><span class="material-symbols-outlined" style="font-size:15px;color:#c28b27">star</span><span class="bn">পছন্দের</span><span class="en">Favourites</span></button>
+    <div class="filters" id="recipe-filters">
+      <button class="filter-chip active" data-filter="all" type="button"><span class="bn">সব পদ</span><span class="en">All recipes</span><span class="count" id="count-all">০</span></button>
     </div>
-    <div class="calibration-status"><span class="material-symbols-outlined">verified_user</span><span class="bn">হাতের মাপ সক্রিয়</span><span class="en">Personal measures active</span></div>
   </section>
-  <section class="recipe-grid" id="recipe-grid" aria-label="Saved recipes">
-    <article class="recipe-card" data-id="khichuri" data-tags="recent calibrated vegetarian rice comfort" data-search="খিচুড়ি khichuri sample bhoger rice lentil vegetarian ভোগের খিচুড়ি">
-      <div class="card-media"><img src="/assets/images/library_card_sample_1.webp" alt="মাটির বাটিতে ভোগের খিচুড়ি"><div class="media-shade"></div><div class="card-pills"><span class="pill"><span class="material-symbols-outlined">mic</span><span class="bn">বাংলা কণ্ঠ</span><span class="en">Bengali voice</span></span><span class="pill green"><span class="material-symbols-outlined">pan_tool</span><span class="bn">মাপ যাচাই করা</span><span class="en">Calibrated</span></span></div><span class="time-label"><span class="bn">৩৫ মিনিট · ৩ জন</span><span class="en">35 min · Serves 3</span></span></div>
-      <div class="card-content"><div class="card-title-row"><h2 class="recipe-title"><span class="bn">ভোগের খিচুড়ি</span><span class="en">Bhoger Khichuri</span></h2><div class="menu-wrap"><button class="menu-trigger" type="button" aria-label="More options"><span class="material-symbols-outlined">more_horiz</span></button><div class="menu-dropdown" hidden><button type="button" data-action="open"><span class="material-symbols-outlined">visibility</span><span class="bn">রেসিপি দেখুন</span><span class="en">View recipe</span></button><button type="button" data-action="cook"><span class="material-symbols-outlined">soup_kitchen</span><span class="bn">রান্না শুরু করুন</span><span class="en">Start cooking</span></button><button type="button" data-action="share"><span class="material-symbols-outlined">share</span><span class="bn">শেয়ার করুন</span><span class="en">Share</span></button></div></div></div><p class="card-source"><span class="material-symbols-outlined">record_voice_over</span><span class="bn">ঠাকুমার মুখে শোনা · ৭ নভেম্বর ২০২৬</span><span class="en">From Thakuma · 7 Nov 2026</span></p><div class="meta-strip"><span class="meta-item"><span class="material-symbols-outlined">format_list_numbered</span><span class="bn">৩টি ধাপ</span><span class="en">3 steps</span></span><span class="meta-item measure"><span class="material-symbols-outlined">straighten</span><span class="bn">৩টি মাপ</span><span class="en">3 measures</span></span></div><div class="card-footer"><button class="text-action" type="button" data-action="cook"><span class="bn">রান্না শুরু করুন</span><span class="en">Start cooking</span><span class="material-symbols-outlined">arrow_forward</span></button><button class="favorite-btn is-fav" aria-pressed="true" type="button" aria-label="Add to favourites" aria-pressed="false"><span class="material-symbols-outlined">star</span></button></div></div>
-    </article>
-    <article class="recipe-card" data-id="ilish" data-tags="recent fish estimated" data-search="ইলিশ মাছের পাতলা ঝোল ilish macher patla jhol hilsa fish curry">
-      <div class="card-media"><img src="/assets/images/library_card_sample_2.webp" alt="সরষে ইলিশের ঝোল"><div class="media-shade"></div><div class="card-pills"><span class="pill"><span class="material-symbols-outlined">mic</span><span class="bn">বাংলা কণ্ঠ</span><span class="en">Bengali voice</span></span><span class="pill"><span class="material-symbols-outlined">psychology</span><span class="bn">আনুমানিক মাপ</span><span class="en">Estimated</span></span></div><span class="time-label"><span class="bn">২৫ মিনিট · ৪ জন</span><span class="en">25 min · Serves 4</span></span></div>
-      <div class="card-content"><div class="card-title-row"><h2 class="recipe-title"><span class="bn">ইলিশ মাছের পাতলা ঝোল</span><span class="en">Ilish Macher Patla Jhol</span></h2><div class="menu-wrap"><button class="menu-trigger" type="button" aria-label="More options"><span class="material-symbols-outlined">more_horiz</span></button><div class="menu-dropdown" hidden><button type="button" data-action="open"><span class="material-symbols-outlined">visibility</span><span class="bn">রেসিপি দেখুন</span><span class="en">View recipe</span></button><button type="button" data-action="cook"><span class="material-symbols-outlined">soup_kitchen</span><span class="bn">রান্না শুরু করুন</span><span class="en">Start cooking</span></button><button type="button" data-action="share"><span class="material-symbols-outlined">share</span><span class="bn">শেয়ার করুন</span><span class="en">Share</span></button></div></div></div><p class="card-source"><span class="material-symbols-outlined">record_voice_over</span><span class="bn">ঠাকুমার মুখে শোনা · ২ নভেম্বর ২০২৬</span><span class="en">From Thakuma · 2 Nov 2026</span></p><div class="meta-strip"><span class="meta-item"><span class="material-symbols-outlined">format_list_numbered</span><span class="bn">৫টি ধাপ</span><span class="en">5 steps</span></span><span class="meta-item measure"><span class="material-symbols-outlined">straighten</span><span class="bn">৬টি মাপ</span><span class="en">6 measures</span></span></div><div class="card-footer"><button class="text-action" type="button" data-action="cook"><span class="bn">রান্না শুরু করুন</span><span class="en">Start cooking</span><span class="material-symbols-outlined">arrow_forward</span></button><button class="favorite-btn" type="button" aria-label="Add to favourites" aria-pressed="false"><span class="material-symbols-outlined">star</span></button></div></div>
-    </article>
-    <article class="recipe-card" data-id="aluposto" data-tags="calibrated vegetarian" data-search="আলু পোস্ত alu posto potato poppy seed vegetarian">
-      <div class="card-media"><img src="/assets/images/library_card_sample_3.webp" alt="আলু পোস্ত"><div class="media-shade"></div><div class="card-pills"><span class="pill"><span class="material-symbols-outlined">mic</span><span class="bn">বাংলা কণ্ঠ</span><span class="en">Bengali voice</span></span><span class="pill green"><span class="material-symbols-outlined">pan_tool</span><span class="bn">চামচের মাপ</span><span class="en">Spoon measure</span></span></div><span class="time-label"><span class="bn">২০ মিনিট · ২ জন</span><span class="en">20 min · Serves 2</span></span></div>
-      <div class="card-content"><div class="card-title-row"><h2 class="recipe-title"><span class="bn">আলু পোস্ত</span><span class="en">Alu Posto</span></h2><div class="menu-wrap"><button class="menu-trigger" type="button" aria-label="More options"><span class="material-symbols-outlined">more_horiz</span></button><div class="menu-dropdown" hidden><button type="button" data-action="open"><span class="material-symbols-outlined">visibility</span><span class="bn">রেসিপি দেখুন</span><span class="en">View recipe</span></button><button type="button" data-action="cook"><span class="material-symbols-outlined">soup_kitchen</span><span class="bn">রান্না শুরু করুন</span><span class="en">Start cooking</span></button><button type="button" data-action="share"><span class="material-symbols-outlined">share</span><span class="bn">শেয়ার করুন</span><span class="en">Share</span></button></div></div></div><p class="card-source"><span class="material-symbols-outlined">record_voice_over</span><span class="bn">দিদার মুখে শোনা · ২৮ অক্টোবর ২০২৬</span><span class="en">From Dida · 28 Oct 2026</span></p><div class="meta-strip"><span class="meta-item"><span class="material-symbols-outlined">format_list_numbered</span><span class="bn">৪টি ধাপ</span><span class="en">4 steps</span></span><span class="meta-item measure"><span class="material-symbols-outlined">straighten</span><span class="bn">৪টি মাপ</span><span class="en">4 measures</span></span></div><div class="card-footer"><button class="text-action" type="button" data-action="cook"><span class="bn">রান্না শুরু করুন</span><span class="en">Start cooking</span><span class="material-symbols-outlined">arrow_forward</span></button><button class="favorite-btn is-fav" aria-pressed="true" type="button" aria-label="Add to favourites" aria-pressed="false"><span class="material-symbols-outlined">star</span></button></div></div>
-    </article>
-    <article class="recipe-card" data-id="chingri" data-tags="recent seafood calibrated" data-search="চিংড়ির মালাইকারি chingri malaikari prawn coconut curry seafood">
-      <div class="card-media"><img src="/assets/images/library_card_sample_4.webp" alt="চিংড়ির মালাইকারি"><div class="media-shade"></div><div class="card-pills"><span class="pill"><span class="material-symbols-outlined">mic</span><span class="bn">বাংলা কণ্ঠ</span><span class="en">Bengali voice</span></span><span class="pill green"><span class="material-symbols-outlined">pan_tool</span><span class="bn">মাপ যাচাই করা</span><span class="en">Calibrated</span></span></div><span class="time-label"><span class="bn">৪০ মিনিট · ৪ জন</span><span class="en">40 min · Serves 4</span></span></div>
-      <div class="card-content"><div class="card-title-row"><h2 class="recipe-title"><span class="bn">চিংড়ির মালাইকারি</span><span class="en">Chingri Malaikari</span></h2><div class="menu-wrap"><button class="menu-trigger" type="button" aria-label="More options"><span class="material-symbols-outlined">more_horiz</span></button><div class="menu-dropdown" hidden><button type="button" data-action="open"><span class="material-symbols-outlined">visibility</span><span class="bn">রেসিপি দেখুন</span><span class="en">View recipe</span></button><button type="button" data-action="cook"><span class="material-symbols-outlined">soup_kitchen</span><span class="bn">রান্না শুরু করুন</span><span class="en">Start cooking</span></button><button type="button" data-action="share"><span class="material-symbols-outlined">share</span><span class="bn">শেয়ার করুন</span><span class="en">Share</span></button></div></div></div><p class="card-source"><span class="material-symbols-outlined">record_voice_over</span><span class="bn">ঠাকুমার মুখে শোনা · ১৯ অক্টোবর ২০২৬</span><span class="en">From Thakuma · 19 Oct 2026</span></p><div class="meta-strip"><span class="meta-item"><span class="material-symbols-outlined">format_list_numbered</span><span class="bn">৬টি ধাপ</span><span class="en">6 steps</span></span><span class="meta-item measure"><span class="material-symbols-outlined">straighten</span><span class="bn">৫টি মাপ</span><span class="en">5 measures</span></span></div><div class="card-footer"><button class="text-action" type="button" data-action="cook"><span class="bn">রান্না শুরু করুন</span><span class="en">Start cooking</span><span class="material-symbols-outlined">arrow_forward</span></button><button class="favorite-btn" type="button" aria-label="Add to favourites" aria-pressed="false"><span class="material-symbols-outlined">star</span></button></div></div>
-    </article>
-    <article class="recipe-card" data-id="labra" data-tags="vegetarian recent" data-search="লাবড়া labra mixed vegetable puja bhog">
-      <div class="card-media"><img src="/assets/images/library_card_sample_5.webp" alt="বাংলার লাবড়া"><div class="media-shade"></div><div class="card-pills"><span class="pill"><span class="material-symbols-outlined">mic</span><span class="bn">বাংলা কণ্ঠ</span><span class="en">Bengali voice</span></span><span class="pill"><span class="material-symbols-outlined">psychology</span><span class="bn">আনুমানিক মাপ</span><span class="en">Estimated</span></span></div><span class="time-label"><span class="bn">৩০ মিনিট · ৫ জন</span><span class="en">30 min · Serves 5</span></span></div>
-      <div class="card-content"><div class="card-title-row"><h2 class="recipe-title"><span class="bn">লাবড়া</span><span class="en">Labra</span></h2><div class="menu-wrap"><button class="menu-trigger" type="button" aria-label="More options"><span class="material-symbols-outlined">more_horiz</span></button><div class="menu-dropdown" hidden><button type="button" data-action="open"><span class="material-symbols-outlined">visibility</span><span class="bn">রেসিপি দেখুন</span><span class="en">View recipe</span></button><button type="button" data-action="cook"><span class="material-symbols-outlined">soup_kitchen</span><span class="bn">রান্না শুরু করুন</span><span class="en">Start cooking</span></button><button type="button" data-action="share"><span class="material-symbols-outlined">share</span><span class="bn">শেয়ার করুন</span><span class="en">Share</span></button></div></div></div><p class="card-source"><span class="material-symbols-outlined">record_voice_over</span><span class="bn">পুজোর রান্নার খাতা · ১২ অক্টোবর ২০২৬</span><span class="en">Puja recipe book · 12 Oct 2026</span></p><div class="meta-strip"><span class="meta-item"><span class="material-symbols-outlined">format_list_numbered</span><span class="bn">৫টি ধাপ</span><span class="en">5 steps</span></span><span class="meta-item measure"><span class="material-symbols-outlined">straighten</span><span class="bn">২টি মাপ</span><span class="en">2 measures</span></span></div><div class="card-footer"><button class="text-action" type="button" data-action="cook"><span class="bn">রান্না শুরু করুন</span><span class="en">Start cooking</span><span class="material-symbols-outlined">arrow_forward</span></button><button class="favorite-btn" type="button" aria-label="Add to favourites" aria-pressed="false"><span class="material-symbols-outlined">star</span></button></div></div>
-    </article>
-    <article class="recipe-card" data-id="muri" data-tags="fish calibrated" data-search="মুড়ি ঘন্ট muri ghonto fish head rice">
-      <div class="card-media"><img src="/assets/images/library_card_sample_6.webp" alt="মুড়ি ঘন্ট"><div class="media-shade"></div><div class="card-pills"><span class="pill"><span class="material-symbols-outlined">mic</span><span class="bn">বাংলা কণ্ঠ</span><span class="en">Bengali voice</span></span><span class="pill green"><span class="material-symbols-outlined">pan_tool</span><span class="bn">মাপ যাচাই করা</span><span class="en">Calibrated</span></span></div><span class="time-label"><span class="bn">৪৫ মিনিট · ৪ জন</span><span class="en">45 min · Serves 4</span></span></div>
-      <div class="card-content"><div class="card-title-row"><h2 class="recipe-title"><span class="bn">মুড়ি ঘন্ট</span><span class="en">Muri Ghonto</span></h2><div class="menu-wrap"><button class="menu-trigger" type="button" aria-label="More options"><span class="material-symbols-outlined">more_horiz</span></button><div class="menu-dropdown" hidden><button type="button" data-action="open"><span class="material-symbols-outlined">visibility</span><span class="bn">রেসিপি দেখুন</span><span class="en">View recipe</span></button><button type="button" data-action="cook"><span class="material-symbols-outlined">soup_kitchen</span><span class="bn">রান্না শুরু করুন</span><span class="en">Start cooking</span></button><button type="button" data-action="share"><span class="material-symbols-outlined">share</span><span class="bn">শেয়ার করুন</span><span class="en">Share</span></button></div></div></div><p class="card-source"><span class="material-symbols-outlined">record_voice_over</span><span class="bn">বাড়ির পুরনো খাতা · ৬ অক্টোবর ২০২৬</span><span class="en">Old family notebook · 6 Oct 2026</span></p><div class="meta-strip"><span class="meta-item"><span class="material-symbols-outlined">format_list_numbered</span><span class="bn">৬টি ধাপ</span><span class="en">6 steps</span></span><span class="meta-item measure"><span class="material-symbols-outlined">straighten</span><span class="bn">৪টি মাপ</span><span class="en">4 measures</span></span></div><div class="card-footer"><button class="text-action" type="button" data-action="cook"><span class="bn">রান্না শুরু করুন</span><span class="en">Start cooking</span><span class="material-symbols-outlined">arrow_forward</span></button><button class="favorite-btn" type="button" aria-label="Add to favourites" aria-pressed="false"><span class="material-symbols-outlined">star</span></button></div></div>
-    </article>
-  </section>
+  <section class="recipe-grid" id="recipe-grid" aria-label="Saved recipes"></section>
   <section class="memory-panel" aria-label="Preserve another family recipe">
     <div class="memory-icon"><svg viewBox="0 0 48 48" fill="none" aria-hidden="true"><path d="M9 21h30c-.6 10-6.5 16-15 16S9.6 31 9 21Z" stroke="currentColor" stroke-width="1.8"/><path d="M6 19h36M17 14c-2-3 2-4 0-7m7 7c-2-3 2-4 0-7m7 7c-2-3 2-4 0-7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M17 40h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div>
     <div class="memory-copy"><div class="memory-kicker"><span class="material-symbols-outlined" style="font-size:13px">favorite</span><span class="bn">পরিবারের স্মৃতির খাতা</span><span class="en">A growing family archive</span></div><h2><span class="bn">আরও একটি পারিবারিক স্বাদ যোগ করবেন?</span><span class="en">There’s room for one more family favourite.</span></h2><p><span class="bn">ঠাকুমার মুখে শোনা ছোট্ট টিপস, এক মুঠো আন্দাজ, আর রান্নাঘরের গল্প—সবই এখানে যত্নে রাখা যায়।</span><span class="en">Keep the little tips, the handfuls and pinches, and the kitchen stories that make each dish yours.</span></p></div>
@@ -272,6 +262,7 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
   import { requireAuth } from './js/session.js';
   import { api } from './js/api.js';
   import { getPreferredLanguage, setPreferredLanguage, initNavigation } from './js/navigation.js';
+  import { initIcons } from './js/icons.js';
 
   let currentToken = null;
   let currentLanguage = getPreferredLanguage();
@@ -292,24 +283,40 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
     return fallbackImages[index % fallbackImages.length];
   }
 
+  function toDigits(n) {
+    return currentLanguage === 'bn' ? String(n).replace(/\d/g, d => '০১২৩৪৫৬৭৮৯'[d]) : String(n);
+  }
+
+  function escapeHtml(str) {
+    if (!str) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
   function applyLanguage(lang) {
     currentLanguage = lang === 'en' ? 'en' : 'bn';
     setPreferredLanguage(currentLanguage);
     document.documentElement.lang = currentLanguage;
     document.body.classList.toggle('lang-en', currentLanguage === 'en');
     document.body.classList.toggle('lang-bn', currentLanguage === 'bn');
+
     document.querySelectorAll('.lang-switch button').forEach(b => {
       const active = b.dataset.lang === currentLanguage;
       b.classList.toggle('active', active);
       b.setAttribute('aria-pressed', String(active));
     });
+
     document.querySelectorAll('.site-header .language-switch button').forEach(b => {
       const active = (b.dataset.language || b.dataset.lang) === currentLanguage;
       b.setAttribute('aria-pressed', String(active));
       b.classList.toggle('active', active);
     });
-    // Re-render recipes to match language
-    renderRecipes(allRecipes);
+
+    renderRecipes(getFilteredRecipes());
+    initIcons();
   }
 
   function showToast(message) {
@@ -320,53 +327,100 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
     setTimeout(() => toast.classList.remove('show'), 3500);
   }
 
+  function updateDynamicTags() {
+    const filtersContainer = document.getElementById('recipe-filters');
+    if (!filtersContainer) return;
+
+    // Collect unique tags from actual recipes
+    const tagSet = new Set();
+    allRecipes.forEach(r => {
+      if (Array.isArray(r.tags)) {
+        r.tags.forEach(t => { if (t && t.trim()) tagSet.add(t.trim()); });
+      }
+    });
+
+    // Remove any previously generated tag chips (keep 'all')
+    filtersContainer.querySelectorAll('.dynamic-tag-chip').forEach(c => c.remove());
+
+    tagSet.forEach(tag => {
+      const chip = document.createElement('button');
+      chip.type = 'button';
+      chip.className = `filter-chip dynamic-tag-chip ${currentFilter === tag ? 'active' : ''}`;
+      chip.dataset.filter = tag;
+      chip.innerHTML = `<span>#${escapeHtml(tag)}</span>`;
+      chip.addEventListener('click', (e) => {
+        e.preventDefault();
+        filtersContainer.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+        currentFilter = tag;
+        renderRecipes(getFilteredRecipes());
+      });
+      filtersContainer.appendChild(chip);
+    });
+  }
+
+  function getFilteredRecipes() {
+    let list = allRecipes;
+    if (currentFilter && currentFilter !== 'all') {
+      list = list.filter(r => Array.isArray(r.tags) && r.tags.includes(currentFilter));
+    }
+    if (currentQuery.trim()) {
+      const q = currentQuery.trim().toLowerCase();
+      list = list.filter(r => {
+        const title = (r.title || '').toLowerCase();
+        const transcript = (r.original_transcript || '').toLowerCase();
+        const tags = (r.tags || []).join(' ').toLowerCase();
+        return title.includes(q) || transcript.includes(q) || tags.includes(q);
+      });
+    }
+    return list;
+  }
+
   async function loadLibrary() {
     const grid = document.getElementById('recipe-grid');
     grid.innerHTML = `
-      <div class="empty-state">
+      <div class="empty-state" style="grid-column: 1 / -1;">
         <span class="material-symbols-outlined" style="animation: spin 1s linear infinite;">sync</span>
         <p class="${currentLanguage === 'en' ? 'en' : 'bn'}">${currentLanguage === 'en' ? 'Loading recipes…' : 'রেসিপি লোড হচ্ছে…'}</p>
       </div>
     `;
 
     try {
-      const params = {};
-      if (currentQuery.trim()) params.query = currentQuery.trim();
-      if (currentFilter && currentFilter !== 'all') params.tag = currentFilter;
-
-      const res = await api.listRecipes(currentToken, params);
+      const res = await api.listRecipes(currentToken);
       allRecipes = res?.items || [];
-      renderRecipes(allRecipes);
-
-      // Update total count
-      const totalCount = res?.total !== undefined ? res.total : allRecipes.length;
-      updateStats(totalCount);
+      updateStats(allRecipes.length);
+      updateDynamicTags();
+      renderRecipes(getFilteredRecipes());
     } catch (err) {
       console.error('[library] Load failed:', err);
+      const isEn = currentLanguage === 'en';
+      const friendlyMsg = err.message || (isEn ? 'Failed to connect to the recipe service.' : 'রেসিপি সার্ভিসের সাথে যোগাযোগ করা সম্ভব হয়নি।');
+      const hint = err.hint ? `<p style="font-size: 12px; color: #886248; margin-top: 6px;">${escapeHtml(err.hint)}</p>` : '';
+
       grid.innerHTML = `
-        <div class="empty-state" style="border-color: #c5301c;">
-          <span class="material-symbols-outlined" style="color: #c5301c;">error_outline</span>
-          <p style="color: #982313; font-weight: 600;" id="load-err-msg"></p>
-          <button type="button" class="primary-btn" id="retry-btn" style="margin-top: 12px;">
+        <div class="empty-state" style="grid-column: 1 / -1; border-color: #c5301c; background: rgba(254, 243, 240, 0.7);">
+          <span class="material-symbols-outlined" style="color: #c5301c; font-size: 38px;">error_outline</span>
+          <p style="color: #982313; font-weight: 600; font-size: 15px; margin: 8px 0 4px;" id="load-err-msg">${escapeHtml(friendlyMsg)}</p>
+          ${hint}
+          <button type="button" class="primary-btn" id="retry-btn" style="margin-top: 14px;">
             <span class="material-symbols-outlined">refresh</span>
-            <span>${currentLanguage === 'en' ? 'Retry' : 'আবার চেষ্টা করুন'}</span>
+            <span>${isEn ? 'Retry Connection' : 'পুনরায় চেষ্টা করুন'}</span>
           </button>
         </div>
       `;
-      document.getElementById('retry-btn')?.addEventListener('click', loadLibrary);
-      const errMsgEl = document.getElementById('load-err-msg');
-      if (errMsgEl) errMsgEl.textContent = err.message || (currentLanguage === 'en' ? 'Failed to load recipes.' : 'রেসিপি লোড করা সম্ভব হয়নি।');
+      document.getElementById('retry-btn')?.addEventListener('click', () => loadLibrary());
+      initIcons();
     }
   }
 
   function updateStats(total) {
-    const statEl = document.querySelector('.recipe-stat strong');
+    const statEl = document.getElementById('stat-recipe-count');
     if (statEl) {
-      statEl.textContent = currentLanguage === 'bn' ? String(total).replace(/\d/g, d => '০১২৩৪৫৬৭৮৯'[d]) : String(total);
+      statEl.textContent = toDigits(total);
     }
-    const filterAllCount = document.querySelector('.filter-chip[data-filter="all"] .count');
+    const filterAllCount = document.getElementById('count-all');
     if (filterAllCount) {
-      filterAllCount.textContent = currentLanguage === 'bn' ? String(total).replace(/\d/g, d => '০১২৩৪৫৬৭৮৯'[d]) : String(total);
+      filterAllCount.textContent = toDigits(total);
     }
   }
 
@@ -375,26 +429,42 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
     grid.innerHTML = '';
 
     if (!recipes || recipes.length === 0) {
-      const isSearchOrFilter = currentQuery.trim() || (currentFilter && currentFilter !== 'all');
+      const isFiltering = currentQuery.trim() || (currentFilter && currentFilter !== 'all');
       grid.innerHTML = `
-        <div class="empty-state">
-          <span class="material-symbols-outlined">menu_book</span>
-          <p style="font-size: 16px; font-weight: 600; margin-bottom: 6px;">
-            ${isSearchOrFilter
-              ? (currentLanguage === 'en' ? 'No matching recipes found.' : 'এই অনুসন্ধানে কোনো রেসিপি পাওয়া যায়নি।')
-              : (currentLanguage === 'en' ? 'Your family recipe collection is empty.' : 'আপনার রেসিপি খাতা এখনো খালি।')}
+        <div class="empty-state" style="grid-column: 1 / -1; padding: 48px 24px;">
+          <span class="material-symbols-outlined" style="font-size: 44px; color: #a4714d;">${isFiltering ? 'search' : 'auto_stories'}</span>
+          <h3 style="font-family: 'Tiro Bangla', serif; font-size: 22px; color: var(--red); margin: 12px 0 6px;">
+            ${isFiltering
+              ? (currentLanguage === 'en' ? 'No matching recipes found' : 'কোনো রেসিপি খুঁজে পাওয়া যায়নি')
+              : (currentLanguage === 'en' ? 'No recipes saved yet' : 'এখনো কোনো রেসিপি সংরক্ষণ করা হয়নি')}
+          </h3>
+          <p style="font-size: 14px; color: #7f6450; max-width: 440px; margin: 0 auto 18px;">
+            ${isFiltering
+              ? (currentLanguage === 'en' ? 'Try searching with a different recipe name or tag.' : 'ভিন্ন কোনো নাম বা ট্যাগ দিয়ে অনুসন্ধান করে দেখুন।')
+              : (currentLanguage === 'en' ? 'Start building your family heirloom recipe collection by recording your Thakuma’s spoken recipe.' : 'ঠাকুমার মুখে মুখে শেখা রান্না রেকর্ড করে পরিবারের রেসিপি খাতা শুরু করুন।')}
           </p>
-          <p style="font-size: 13px; color: #806b57; margin-bottom: 16px;">
-            ${isSearchOrFilter
-              ? (currentLanguage === 'en' ? 'Try searching for something else or clear filters.' : 'অন্য কোনো শব্দ দিয়ে খুঁজুন বা ফিল্টার পরিবর্তন করুন।')
-              : (currentLanguage === 'en' ? 'Record grandmother\'s spoken recipes to start preserving them.' : 'ঠাকুমার মুখের রন্ধনপ্রণালী রেকর্ড করে আজই সংগ্রহ শুরু করুন।')}
-          </p>
-          <a href="/record.html" class="primary-btn" style="margin: 0 auto; display: inline-flex;">
-            <span class="material-symbols-outlined">mic</span>
-            <span>${currentLanguage === 'en' ? 'Record New Recipe' : 'নতুন রেসিপি রেকর্ড করুন'}</span>
-          </a>
+          ${!isFiltering ? `
+            <a href="/record.html" class="primary-btn" style="display: inline-flex; margin: 0 auto;">
+              <span class="material-symbols-outlined">mic</span>
+              <span>${currentLanguage === 'en' ? 'Record Your First Recipe' : 'প্রথম রেসিপি যোগ করুন'}</span>
+            </a>
+          ` : `
+            <button type="button" class="primary-btn" id="clear-filters-btn" style="display: inline-flex; margin: 0 auto;">
+              <span class="material-symbols-outlined">refresh</span>
+              <span>${currentLanguage === 'en' ? 'Show All Recipes' : 'সব রেসিপি দেখুন'}</span>
+            </button>
+          `}
         </div>
       `;
+      document.getElementById('clear-filters-btn')?.addEventListener('click', () => {
+        currentQuery = '';
+        currentFilter = 'all';
+        const searchInput = document.getElementById('recipe-search');
+        if (searchInput) searchInput.value = '';
+        document.querySelectorAll('.filter-chip').forEach(c => c.classList.toggle('active', c.dataset.filter === 'all'));
+        renderRecipes(getFilteredRecipes());
+      });
+      initIcons();
       return;
     }
 
@@ -403,21 +473,12 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
       card.className = 'recipe-card';
       card.dataset.id = item.id;
 
-      const title = item.title || (currentLanguage === 'en' ? 'Untitled Recipe' : 'শিরোনামহীন রেসিপি');
-      const tags = Array.isArray(item.tags) ? item.tags : [];
-      const imageSrc = getFallbackImage(index);
-
-      // Safe DOM construction
+      // Card media
       const mediaDiv = document.createElement('div');
       mediaDiv.className = 'card-media';
-      mediaDiv.style.cursor = 'pointer';
-      mediaDiv.addEventListener('click', () => {
-        window.location.href = `/recipe-detail.html?id=${encodeURIComponent(item.id)}`;
-      });
-
       const img = document.createElement('img');
-      img.src = imageSrc;
-      img.alt = title;
+      img.src = item.image_url || getFallbackImage(index);
+      img.alt = item.title;
       img.loading = 'lazy';
       mediaDiv.appendChild(img);
 
@@ -428,17 +489,28 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
       const pillsDiv = document.createElement('div');
       pillsDiv.className = 'card-pills';
 
-      const tagPill = document.createElement('span');
-      tagPill.className = 'pill';
-      tagPill.innerHTML = `<span class="material-symbols-outlined">local_dining</span><span>${tags[0] || (currentLanguage === 'en' ? 'Family Recipe' : 'পারিবারিক রেসিপি')}</span>`;
-      pillsDiv.appendChild(tagPill);
+      const voicePill = document.createElement('span');
+      voicePill.className = 'pill';
+      voicePill.innerHTML = `<span class="material-symbols-outlined">mic</span><span>${currentLanguage === 'en' ? 'Voice' : 'কণ্ঠ'}</span>`;
+      pillsDiv.appendChild(voicePill);
 
-      const versionPill = document.createElement('span');
-      versionPill.className = 'pill green';
-      versionPill.innerHTML = `<span class="material-symbols-outlined">verified</span><span>${currentLanguage === 'en' ? `v${item.version || 1}` : `সংস্করণ ${item.version || 1}`}</span>`;
-      pillsDiv.appendChild(versionPill);
-
+      const tags = Array.isArray(item.tags) ? item.tags : [];
+      if (tags.length > 0) {
+        const tagPill = document.createElement('span');
+        tagPill.className = 'pill green';
+        tagPill.innerHTML = `<span class="material-symbols-outlined">tag</span><span>${escapeHtml(tags[0])}</span>`;
+        pillsDiv.appendChild(tagPill);
+      }
       mediaDiv.appendChild(pillsDiv);
+
+      const stepsCount = item.draft?.recipe?.steps?.length || 0;
+      if (stepsCount > 0) {
+        const stepBadge = document.createElement('span');
+        stepBadge.className = 'time-label';
+        stepBadge.innerHTML = `<span>${toDigits(stepsCount)} ${currentLanguage === 'en' ? 'steps' : 'টি ধাপ'}</span>`;
+        mediaDiv.appendChild(stepBadge);
+      }
+
       card.appendChild(mediaDiv);
 
       // Card content
@@ -450,81 +522,81 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
 
       const h2 = document.createElement('h2');
       h2.className = 'recipe-title';
-      h2.style.cursor = 'pointer';
-      h2.textContent = title;
-      h2.addEventListener('click', () => {
-        window.location.href = `/recipe-detail.html?id=${encodeURIComponent(item.id)}`;
-      });
+      h2.textContent = item.title || (currentLanguage === 'en' ? 'Untitled Recipe' : 'নামহীন রেসিপি');
       titleRow.appendChild(h2);
 
-      // Menu dropdown
+      // Options dropdown
       const menuWrap = document.createElement('div');
       menuWrap.className = 'menu-wrap';
-
       const menuTrigger = document.createElement('button');
       menuTrigger.className = 'menu-trigger';
       menuTrigger.type = 'button';
       menuTrigger.setAttribute('aria-label', 'Options');
       menuTrigger.innerHTML = '<span class="material-symbols-outlined">more_horiz</span>';
 
-      const menuDropdown = document.createElement('div');
-      menuDropdown.className = 'menu-dropdown';
-      menuDropdown.hidden = true;
+      const dropdown = document.createElement('div');
+      dropdown.className = 'menu-dropdown';
+      dropdown.hidden = true;
 
-      const viewBtn = document.createElement('button');
-      viewBtn.type = 'button';
-      viewBtn.innerHTML = `<span class="material-symbols-outlined">visibility</span><span>${currentLanguage === 'en' ? 'View recipe' : 'রেসিপি দেখুন'}</span>`;
-      viewBtn.addEventListener('click', () => {
+      const openAction = document.createElement('button');
+      openAction.type = 'button';
+      openAction.innerHTML = `<span class="material-symbols-outlined">visibility</span><span>${currentLanguage === 'en' ? 'View details' : 'রেসিপি দেখুন'}</span>`;
+      openAction.addEventListener('click', (e) => {
+        e.stopPropagation();
         window.location.href = `/recipe-detail.html?id=${encodeURIComponent(item.id)}`;
       });
 
-      const cookBtn = document.createElement('button');
-      cookBtn.type = 'button';
-      cookBtn.innerHTML = `<span class="material-symbols-outlined">soup_kitchen</span><span>${currentLanguage === 'en' ? 'Start cooking' : 'রান্না শুরু করুন'}</span>`;
-      cookBtn.addEventListener('click', () => {
+      const cookMenuAction = document.createElement('button');
+      cookMenuAction.type = 'button';
+      cookMenuAction.innerHTML = `<span class="material-symbols-outlined">soup_kitchen</span><span>${currentLanguage === 'en' ? 'Cook mode' : 'রান্না মোড'}</span>`;
+      cookMenuAction.addEventListener('click', (e) => {
+        e.stopPropagation();
         window.location.href = `/cook-mode.html?id=${encodeURIComponent(item.id)}`;
       });
 
-      const delBtn = document.createElement('button');
-      delBtn.type = 'button';
-      delBtn.className = 'danger';
-      delBtn.innerHTML = `<span class="material-symbols-outlined">delete</span><span>${currentLanguage === 'en' ? 'Delete recipe' : 'মুছে ফেলুন'}</span>`;
-      delBtn.addEventListener('click', async (e) => {
+      const deleteAction = document.createElement('button');
+      deleteAction.type = 'button';
+      deleteAction.style.color = '#b52d1c';
+      deleteAction.innerHTML = `<span class="material-symbols-outlined">delete</span><span>${currentLanguage === 'en' ? 'Delete' : 'মুছে ফেলুন'}</span>`;
+      deleteAction.addEventListener('click', async (e) => {
         e.stopPropagation();
+        dropdown.hidden = true;
         const confirmMsg = currentLanguage === 'en'
-          ? `Are you sure you want to delete "${title}"?`
-          : `আপনি কি নিশ্চিতভাবে "${title}" মুছে ফেলতে চান?`;
+          ? `Are you sure you want to delete "${item.title}"?`
+          : `আপনি কি নিশ্চিতভাবে "${item.title}" রেসিপিটি মুছে ফেলতে চান?`;
         if (window.confirm(confirmMsg)) {
           try {
             await api.deleteRecipe(currentToken, item.id);
             showToast(currentLanguage === 'en' ? 'Recipe deleted.' : 'রেসিপি মুছে ফেলা হয়েছে।');
-            loadLibrary();
-          } catch (err) {
-            showToast(err.message || 'Delete failed');
+            await loadLibrary();
+          } catch (delErr) {
+            showToast(delErr.message || 'Delete failed.');
           }
         }
       });
 
-      menuDropdown.appendChild(viewBtn);
-      menuDropdown.appendChild(cookBtn);
-      menuDropdown.appendChild(delBtn);
+      dropdown.appendChild(openAction);
+      dropdown.appendChild(cookMenuAction);
+      dropdown.appendChild(deleteAction);
 
       menuTrigger.addEventListener('click', (e) => {
         e.stopPropagation();
-        const isOpen = !menuDropdown.hidden;
+        const willShow = dropdown.hidden;
         document.querySelectorAll('.menu-dropdown').forEach(d => d.hidden = true);
-        menuDropdown.hidden = isOpen;
+        dropdown.hidden = !willShow;
       });
 
       menuWrap.appendChild(menuTrigger);
-      menuWrap.appendChild(menuDropdown);
+      menuWrap.appendChild(dropdown);
       titleRow.appendChild(menuWrap);
       contentDiv.appendChild(titleRow);
 
       // Card date
       const sourceP = document.createElement('p');
       sourceP.className = 'card-source';
-      const createdDate = item.created_at ? new Date(item.created_at).toLocaleDateString(currentLanguage === 'bn' ? 'bn-BD' : 'en-US', { day: 'numeric', month: 'short', year: 'numeric' }) : '';
+      const createdDate = item.created_at
+        ? new Date(item.created_at).toLocaleDateString(currentLanguage === 'bn' ? 'bn-BD' : 'en-US', { day: 'numeric', month: 'short', year: 'numeric' })
+        : '';
       sourceP.innerHTML = `<span class="material-symbols-outlined">calendar_today</span><span>${createdDate || (currentLanguage === 'en' ? 'Saved recipe' : 'সংরক্ষিত রেসিপি')}</span>`;
       contentDiv.appendChild(sourceP);
 
@@ -534,7 +606,7 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
 
       const tagCountItem = document.createElement('span');
       tagCountItem.className = 'meta-item';
-      tagCountItem.innerHTML = `<span class="material-symbols-outlined">tag</span><span>${tags.length > 0 ? tags.slice(0, 2).join(', ') : (currentLanguage === 'en' ? 'Tradition' : 'ঐতিহ্য')}</span>`;
+      tagCountItem.innerHTML = `<span class="material-symbols-outlined">tag</span><span>${tags.length > 0 ? escapeHtml(tags.slice(0, 2).join(', ')) : (currentLanguage === 'en' ? 'Family recipe' : 'পারিবারিক রেসিপি')}</span>`;
 
       const viewAction = document.createElement('span');
       viewAction.className = 'meta-item measure';
@@ -551,30 +623,38 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
       const cookAction = document.createElement('button');
       cookAction.className = 'text-action';
       cookAction.type = 'button';
-      cookAction.innerHTML = `<span>${currentLanguage === 'en' ? 'Cook mode' : 'রান্না মোড'}</span><span class="material-symbols-outlined">soup_kitchen</span>`;
-      cookAction.addEventListener('click', () => {
+      cookAction.innerHTML = `<span>${currentLanguage === 'en' ? 'Cook mode' : 'রান্না শুরু করুন'}</span><span class="material-symbols-outlined">soup_kitchen</span>`;
+      cookAction.addEventListener('click', (e) => {
+        e.stopPropagation();
         window.location.href = `/cook-mode.html?id=${encodeURIComponent(item.id)}`;
       });
 
-      const favBtn = document.createElement('button');
-      favBtn.className = 'favorite-btn';
-      favBtn.type = 'button';
-      favBtn.innerHTML = '<span class="material-symbols-outlined">bookmark_border</span>';
-      favBtn.addEventListener('click', (e) => {
+      const openBtn = document.createElement('button');
+      openBtn.className = 'text-action';
+      openBtn.type = 'button';
+      openBtn.style.color = '#7d5c43';
+      openBtn.innerHTML = `<span>${currentLanguage === 'en' ? 'Details' : 'বিবরণ'}</span><span class="material-symbols-outlined">visibility</span>`;
+      openBtn.addEventListener('click', (e) => {
         e.stopPropagation();
-        favBtn.classList.toggle('is-fav');
-        const isFav = favBtn.classList.contains('is-fav');
-        favBtn.innerHTML = `<span class="material-symbols-outlined">${isFav ? 'bookmark' : 'bookmark_border'}</span>`;
-        showToast(isFav ? (currentLanguage === 'en' ? 'Marked as saved' : 'বুকমার্কে রাখা হলো') : (currentLanguage === 'en' ? 'Bookmark removed' : 'বুকমার্ক সরানো হলো'));
+        window.location.href = `/recipe-detail.html?id=${encodeURIComponent(item.id)}`;
       });
 
       footerDiv.appendChild(cookAction);
-      footerDiv.appendChild(favBtn);
+      footerDiv.appendChild(openBtn);
       contentDiv.appendChild(footerDiv);
 
       card.appendChild(contentDiv);
+
+      // Entire card navigates to recipe detail
+      card.style.cursor = 'pointer';
+      card.addEventListener('click', () => {
+        window.location.href = `/recipe-detail.html?id=${encodeURIComponent(item.id)}`;
+      });
+
       grid.appendChild(card);
     });
+
+    initIcons();
   }
 
   // Close dropdowns on outside click
@@ -590,7 +670,7 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
     initNavigation({ activePage: 'library' });
 
     // Connect top Record buttons
-    document.querySelectorAll('.add-btn, .top-add, a[href*="record"]').forEach(el => {
+    document.querySelectorAll('.add-btn, .top-add, a[href*="record"], #record-cta').forEach(el => {
       el.addEventListener('click', (e) => {
         e.preventDefault();
         window.location.href = '/record.html';
@@ -613,23 +693,25 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
         clearTimeout(searchTimeout);
         currentQuery = e.target.value;
         searchTimeout = setTimeout(() => {
-          loadLibrary();
-        }, 300);
+          renderRecipes(getFilteredRecipes());
+        }, 250);
       });
     });
 
-    // Filter chips
-    document.querySelectorAll('.filter-chip').forEach(chip => {
-      chip.addEventListener('click', (e) => {
+    // All-recipes filter chip
+    const allChip = document.querySelector('.filter-chip[data-filter="all"]');
+    if (allChip) {
+      allChip.addEventListener('click', (e) => {
         e.preventDefault();
         document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
-        chip.classList.add('active');
-        currentFilter = chip.dataset.filter || 'all';
-        loadLibrary();
+        allChip.classList.add('active');
+        currentFilter = 'all';
+        renderRecipes(getFilteredRecipes());
       });
-    });
+    }
 
     applyLanguage(currentLanguage);
+    initIcons();
     await loadLibrary();
   }
 

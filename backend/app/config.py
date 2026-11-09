@@ -103,7 +103,7 @@ class Settings(BaseSettings):
 
     @property
     def frontend_origin_list(self) -> list[str]:
-        return [origin.strip() for origin in self.frontend_origins.split(",") if origin.strip()]
+        return [origin.strip().rstrip('/') for origin in self.frontend_origins.split(",") if origin.strip()]
 
 
 @lru_cache

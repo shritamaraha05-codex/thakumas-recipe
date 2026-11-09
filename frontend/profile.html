@@ -284,6 +284,8 @@
       *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; }
     }
   </style>
+<link rel="stylesheet" href="/assets/icons.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200">
 </head>
 <body>
   <svg id="spoon" viewBox="0 0 46 46" aria-hidden="true"><g transform="rotate(-40 6 6)"><path d="M6 4 C0 4 0 16 6 18 C12 16 12 4 6 4Z" fill="#e0a526" stroke="#8e5a10" stroke-width="1.2"/><rect x="4.8" y="17" width="2.4" height="26" rx="1.2" fill="#b07a1c"/></g></svg>
@@ -480,6 +482,8 @@
 
 <script type="module">
   import { requireAuth, logoutUser } from './js/session.js';
+  import { updateUserProfile } from './js/auth.js';
+  import { initIcons } from './js/icons.js';
   import { api } from './js/api.js';
   import { getPreferredLanguage, setPreferredLanguage, initNavigation } from './js/navigation.js';
 
@@ -607,10 +611,35 @@
     refreshPreview();
   }
 
-  document.getElementById('profileForm')?.addEventListener('submit', (e) => {
+  document.getElementById('profileForm')?.addEventListener('submit', async (e) => {
     e.preventDefault();
-    refreshPreview();
-    showToast(translations[currentLanguage].profileSaved);
+    const saveBtn = e.target.querySelector('button[type="submit"]');
+    const origText = saveBtn ? saveBtn.textContent : '';
+    if (saveBtn) {
+      saveBtn.disabled = true;
+      saveBtn.textContent = currentLanguage === 'en' ? 'Saving…' : 'সংরক্ষণ হচ্ছে…';
+    }
+
+    try {
+      const name = nameInput.value.trim();
+      const kitchen = kitchenInput.value.trim();
+      await updateUserProfile({
+        data: {
+          display_name: name,
+          kitchen_name: kitchen
+        }
+      });
+      refreshPreview();
+      showToast(translations[currentLanguage].profileSaved);
+    } catch (err) {
+      console.error('[profile] Failed to save profile:', err);
+      showToast(err.message || (currentLanguage === 'en' ? 'Failed to save profile' : 'প্রোফাইল সংরক্ষণ ব্যর্থ হয়েছে'));
+    } finally {
+      if (saveBtn) {
+        saveBtn.disabled = false;
+        saveBtn.textContent = origText;
+      }
+    }
   });
 
   document.getElementById('logout-btn')?.addEventListener('click', () => {
@@ -622,6 +651,7 @@
       document.querySelectorAll('[data-unit]').forEach(b => b.setAttribute('aria-pressed', 'false'));
       btn.setAttribute('aria-pressed', 'true');
       currentUnits = btn.dataset.unit;
+      try { localStorage.setItem('thakuma-units', currentUnits); } catch {}
       showToast(translations[currentLanguage][currentUnits === 'metric' ? 'unitSavedMetric' : 'unitSavedTraditional']);
     });
   });
@@ -640,7 +670,15 @@
     currentUser = authState.user;
 
     initNavigation({ activePage: 'profile' });
+    try {
+      const savedUnits = localStorage.getItem('thakuma-units');
+      if (savedUnits) currentUnits = savedUnits;
+    } catch {}
+    document.querySelectorAll('[data-unit]').forEach(b => {
+      b.setAttribute('aria-pressed', String(b.dataset.unit === currentUnits));
+    });
     applyLanguage(currentLanguage);
+    initIcons();
     await loadProfile();
   }
 

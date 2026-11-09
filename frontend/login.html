@@ -391,6 +391,8 @@
     @media(max-height:700px) and (min-width:621px){.auth-card{margin-top:100px}.hero{flex-basis:220px;height:220px}.content{padding-top:62px}}
 
 </style>
+<link rel="stylesheet" href="/assets/icons.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200">
 </head>
 <body class="lang-bn">
 <svg id="spoon" viewBox="0 0 46 46" aria-hidden="true"><g transform="rotate(-40 6 6)"><path d="M6 4 C0 4 0 16 6 18 C12 16 12 4 6 4Z" fill="#e0a526" stroke="#8e5a10" stroke-width="1.2"/><rect x="4.8" y="17" width="2.4" height="26" rx="1.2" fill="#b07a1c"/></g></svg>
@@ -481,8 +483,12 @@
           <button class="submit-button" id="submit-button" type="submit">খাতা তৈরি করুন (Create account)</button>
         </form>
         <p class="form-switch" id="form-switch">Already have an account? <button class="text-button" id="switch-to-login" type="button">Login</button></p>
-        <div class="form-extras">
-          <button id="guest-demo" type="button">অতিথি হিসেবে দেখুন · Explore demo</button>
+        <div class="form-extras" style="margin-top: 14px; text-align: center;">
+          <a href="/" id="back-home-link" style="color: #8c6e56; font-size: 13px; text-decoration: none; display: inline-flex; align-items: center; gap: 4px;">
+            <span>←</span>
+            <span class="bn">মূল পাতায় ফিরে যান</span>
+            <span class="en" style="display:none;">Back to home</span>
+          </a>
         </div>
       </div>
     </section>
@@ -706,12 +712,7 @@
       showAuthToast(languageCopy[currentLanguage].resetNotice);
     });
 
-    document.getElementById('guest-demo').addEventListener('click', () => {
-      showAuthToast(languageCopy[currentLanguage].demoNotice);
-      setTimeout(() => {
-        window.location.href = '/library.html';
-      }, 700);
-    });
+    // Guest demo removed - authentication requires real credentials
 
     document.getElementById('auth-form').addEventListener('submit', async (event) => {
       event.preventDefault();
@@ -730,10 +731,14 @@
       }
 
       if (!supabaseConfigured) {
-        showAuthToast(languageCopy[currentLanguage].unconfiguredNotice);
-        setTimeout(() => {
-          window.location.href = '/library.html';
-        }, 1200);
+        const banner = document.getElementById('auth-config-banner');
+        if (banner) {
+          banner.style.display = 'block';
+          banner.textContent = currentLanguage === 'en'
+            ? 'Supabase authentication is not configured. Please provide VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY in your environment configuration.'
+            : 'Supabase প্রমাণীকরণ কনফিগার করা নেই। অনুগ্রহ করে এনভায়রনমেন্টে VITE_SUPABASE_URL এবং VITE_SUPABASE_PUBLISHABLE_KEY যুক্ত করুন।';
+        }
+        showAuthToast(currentLanguage === 'en' ? 'Supabase configuration missing.' : 'Supabase কনফিগারেশন পাওয়া যায়নি।', true);
         return;
       }
 
@@ -755,8 +760,9 @@
 
           if (data.session) {
             showAuthToast(languageCopy[currentLanguage].signupSuccess);
+            const returnTo = new URLSearchParams(window.location.search).get('returnTo');
             setTimeout(() => {
-              window.location.href = '/library.html';
+              window.location.href = returnTo ? decodeURIComponent(returnTo) : '/library.html';
             }, 800);
           } else {
             showAuthToast(languageCopy[currentLanguage].signupConfirm);
@@ -779,8 +785,9 @@
           if (error) throw error;
 
           showAuthToast(currentLanguage === 'en' ? 'Welcome back! Loading recipes…' : 'স্বাগতম! রেসিপি লোড হচ্ছে…');
+          const returnTo = new URLSearchParams(window.location.search).get('returnTo');
           setTimeout(() => {
-            window.location.href = '/library.html';
+            window.location.href = returnTo ? decodeURIComponent(returnTo) : '/library.html';
           }, 600);
         } catch (err) {
           showAuthToast(err.message || 'Login failed. Check your email and password.', true);
@@ -794,6 +801,21 @@
     initNavigation({ activePage: 'login' });
     setAuthMode('signup');
     applyLanguage(currentLanguage);
+    initIcons();
+
+    // Check if Supabase credentials are missing on initial load
+    if (!supabaseConfigured) {
+      const banner = document.getElementById('auth-config-banner');
+      if (banner) {
+        banner.style.display = 'block';
+        banner.textContent = currentLanguage === 'en'
+          ? 'Notice: Supabase environment variables are missing (VITE_SUPABASE_URL / VITE_SUPABASE_PUBLISHABLE_KEY). Live authentication requires these keys.'
+          : 'বিজ্ঞপ্তি: Supabase কনফিগারেশন কী অনুপস্থিত (VITE_SUPABASE_URL / VITE_SUPABASE_PUBLISHABLE_KEY)। সাইন ইন করতে এই কী প্রয়োজন।';
+      }
+    } else {
+      // If user already has a valid session, redirect directly to library
+      redirectIfAuthenticated({ redirectTo: '/library.html' });
+    }
   </script>
 </body>
 </html>
