@@ -20,7 +20,12 @@ venv/
 *.sqlite
 *.sqlite3
 
-# Frontend (Vite/React)
+# Backend (FastAPI)
+backend/.env
+backend/.env.*
+!backend/.env.example
+
+# Frontend (Vite)
 node_modules/
 frontend/dist/
 frontend/.vite/

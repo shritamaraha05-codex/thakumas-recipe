@@ -1,13 +1,93 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Thakuma's Recipe - save and revisit family recipes." />
-    <title>Thakuma's Recipe</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#fbf1df" />
+  <title>ঠাকুমার রান্না · Thakuma's Recipe</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&family=Tiro+Bangla:ital@0;1&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      background: radial-gradient(ellipse at 12% 8%, rgba(255,255,255,.72), transparent 34%),
+                  radial-gradient(ellipse at 88% 85%, rgba(211,157,79,.14), transparent 36%),
+                  #eee2cc;
+      color: #321b12;
+      font-family: 'Hind Siliguri', sans-serif;
+      text-align: center;
+      padding: 20px;
+    }
+    .splash {
+      background: rgba(255, 250, 240, 0.95);
+      border: 1px solid rgba(220, 198, 160, 0.82);
+      border-radius: 18px;
+      padding: 36px 32px;
+      box-shadow: 0 18px 50px rgba(69, 36, 16, 0.12);
+      max-width: 380px;
+      width: 100%;
+    }
+    h1 {
+      margin: 0 0 10px;
+      color: #982017;
+      font-family: 'Tiro Bangla', serif;
+      font-size: 32px;
+    }
+    p {
+      margin: 0 0 16px;
+      color: #795b49;
+      font-size: 14px;
+    }
+    .spinner {
+      width: 28px;
+      height: 28px;
+      margin: 0 auto;
+      border: 3px solid #ead8b9;
+      border-top-color: #982017;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="splash">
+    <h1>ঠাকুমার রান্না</h1>
+    <p>পারিবারিক রান্নাঘরে প্রবেশ করা হচ্ছে…</p>
+    <div class="spinner" aria-label="Loading"></div>
+  </div>
+
+  <script type="module">
+    import { getSession } from './js/auth.js'
+    import { supabaseConfigured } from './js/supabase.js'
+
+    async function route() {
+      if (!supabaseConfigured) {
+        // In local mode without Supabase credentials, go to library
+        window.location.replace('/library.html')
+        return
+      }
+
+      try {
+        const { data: { session } } = await getSession()
+        if (session) {
+          window.location.replace('/library.html')
+        } else {
+          window.location.replace('/login.html')
+        }
+      } catch {
+        window.location.replace('/login.html')
+      }
+    }
+
+    route()
+  </script>
+</body>
 </html>
