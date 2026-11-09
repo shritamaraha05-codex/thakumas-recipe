@@ -2,8 +2,13 @@
 <html lang="bn">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#fbf1df" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#c5301c" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Thakuma's Recipe" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="manifest" href="/manifest.webmanifest" />
   <title>ঠাকুমার রান্না · Welcome to your family kitchen</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -391,35 +396,13 @@
     @media(max-height:700px) and (min-width:621px){.auth-card{margin-top:100px}.hero{flex-basis:220px;height:220px}.content{padding-top:62px}}
 
 </style>
+<link rel="stylesheet" href="/css/navigation.css">
 <link rel="stylesheet" href="/assets/icons.css">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200">
 </head>
 <body class="lang-bn">
 <svg id="spoon" viewBox="0 0 46 46" aria-hidden="true"><g transform="rotate(-40 6 6)"><path d="M6 4 C0 4 0 16 6 18 C12 16 12 4 6 4Z" fill="#e0a526" stroke="#8e5a10" stroke-width="1.2"/><rect x="4.8" y="17" width="2.4" height="26" rx="1.2" fill="#b07a1c"/></g></svg>
-<header class="site-header">
-  <div class="header-inner">
-    <a class="brand" href="/" aria-label="Thakuma's Recipe home">
-      <img class="brand-mark" src="/assets/images/thakuma_brand_mark.webp" alt="" aria-hidden="true" />
-      <span>
-        <span class="brand-name" data-i18n="brand">ঠাকুমার রান্না</span>
-        <span class="brand-caption" data-i18n="brandCaption">ঘরের স্বাদ</span>
-      </span>
-    </a>
-    <nav class="main-nav" aria-label="Main navigation">
-      <a class="nav-link" href="/" data-i18n="navHome">হোম</a>
-    </nav>
-    <div class="header-actions">
-      <div class="language-switch" role="group" aria-label="Choose language">
-        <button type="button" data-language="bn" aria-pressed="true">বাংলা</button>
-        <button type="button" data-language="en" aria-pressed="false">EN</button>
-      </div>
-      <div class="avatar-mini" aria-label="Account">ঠা</div>
-    </div>
-  </div>
-  <nav class="mobile-nav" aria-label="Mobile navigation">
-    <a href="/" data-i18n="navHome">হোম</a>
-  </nav>
-</header>
+<div id="app-navigation"></div>
   <main class="auth-card" aria-label="Thakuma's Recipe sign in">
     <section class="hero" aria-label="A warm traditional Bengali kitchen">
       <img class="hero-photo" src="/assets/images/thakuma_login_kitchen_hero.png" alt="Sunlit Bengali kitchen with a green ceramic jar, mustard flowers and brass vessels" />
@@ -529,13 +512,19 @@
     import { signUp, signIn, signInWithGoogle } from './js/auth.js';
     import { redirectIfAuthenticated } from './js/session.js';
     import { supabaseConfigured } from './js/supabase.js';
-    import { setPreferredLanguage, getPreferredLanguage, initNavigation } from './js/navigation.js';
+    import { initNavigation } from './js/navigation.js';
+    import { getLanguage, setLanguage, applyI18n, initI18n, t } from './js/i18n.js';
+    import { initPWA } from './js/pwa.js';
+
+    initPWA();
+    initNavigation({ activePage: 'login' });
+    initI18n();
 
     // Redirect already authenticated users
     redirectIfAuthenticated({ redirectTo: '/library.html' });
 
     let currentAuthMode = 'signup';
-    let currentLanguage = getPreferredLanguage();
+    let currentLanguage = getLanguage();
     let toastTimer;
 
     const landingView = document.getElementById('landing-view');
@@ -590,8 +579,8 @@
     };
 
     function applyLanguage(language) {
-      currentLanguage = language === 'en' ? 'en' : 'bn';
-      setPreferredLanguage(currentLanguage);
+      setLanguage(language);
+      currentLanguage = getLanguage();
       const copy = languageCopy[currentLanguage];
       document.documentElement.lang = currentLanguage;
       document.documentElement.classList.toggle('lang-en', currentLanguage === 'en');
@@ -622,7 +611,13 @@
       );
 
       setAuthMode(currentAuthMode);
+      applyI18n();
     }
+
+    window.addEventListener('languagechange', () => {
+      currentLanguage = getLanguage();
+      applyLanguage(currentLanguage);
+    });
 
     document.querySelectorAll('[data-language]').forEach((button) =>
       button.addEventListener('click', () => applyLanguage(button.dataset.language))

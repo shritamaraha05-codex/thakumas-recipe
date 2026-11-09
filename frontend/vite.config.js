@@ -15,6 +15,7 @@ export default defineConfig({
         recipeDetail: resolve(__dirname, 'recipe-detail.html'),
         cookMode: resolve(__dirname, 'cook-mode.html'),
         profile: resolve(__dirname, 'profile.html'),
+        offline: resolve(__dirname, 'offline.html'),
       },
     },
   },

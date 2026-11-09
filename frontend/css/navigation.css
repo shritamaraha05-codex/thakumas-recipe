@@ -1,0 +1,349 @@
+/* navigation.css — Unified Navigation Styles for Thakuma's Recipe */
+
+:root {
+  --nav-cream: #fbf4e6;
+  --nav-paper: rgba(255, 253, 248, 0.95);
+  --nav-ink: #2e1b12;
+  --nav-muted: #806a57;
+  --nav-line: rgba(150, 102, 67, 0.14);
+  --nav-red: #c5301c;
+  --nav-red-dark: #982313;
+  --nav-gold: #df9b37;
+  --nav-green: #5b7750;
+  --nav-shadow: 0 4px 18px rgba(60, 36, 20, 0.05);
+}
+
+/* Base Topbar */
+.site-header.unified-nav {
+  position: sticky;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background: var(--nav-paper);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--nav-line);
+  box-shadow: var(--nav-shadow);
+  padding-top: env(safe-area-inset-top, 0px);
+  transition: background 0.3s ease;
+}
+
+/* Heritage Tri-Color Accent Line */
+.site-header.unified-nav::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--nav-red), var(--nav-gold), var(--nav-green));
+  z-index: 1001;
+}
+
+/* Inner Navigation Bar */
+.site-header.unified-nav .header-inner {
+  max-width: 1240px;
+  height: 68px;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+/* Brand Section */
+.site-header.unified-nav .brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  min-width: max-content;
+  color: inherit;
+  transition: transform 0.15s ease;
+}
+
+.site-header.unified-nav .brand:hover {
+  transform: translateY(-1px);
+}
+
+.site-header.unified-nav .brand-mark {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  object-fit: contain;
+  background: rgba(255, 248, 234, 0.9);
+  filter: drop-shadow(0 3px 6px rgba(80, 30, 12, 0.18));
+  flex-shrink: 0;
+}
+
+.site-header.unified-nav .brand-copy {
+  display: flex;
+  flex-direction: column;
+}
+
+.site-header.unified-nav .brand-name {
+  font-family: 'Tiro Bangla', 'Hind Siliguri', serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--nav-red);
+  line-height: 1.15;
+  white-space: nowrap;
+}
+
+.site-header.unified-nav .brand-caption {
+  font-size: 11px;
+  color: var(--nav-muted);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  margin-top: 1px;
+  white-space: nowrap;
+}
+
+/* Main Navigation Links (Desktop) */
+.site-header.unified-nav .main-nav {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  height: 100%;
+  margin: 0 auto 0 28px;
+}
+
+.site-header.unified-nav .nav-link {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  position: relative;
+  color: #705846;
+  font-size: 15px;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+  padding: 0 4px;
+  transition: color 0.2s ease;
+}
+
+.site-header.unified-nav .nav-link:hover {
+  color: var(--nav-red);
+}
+
+.site-header.unified-nav .nav-link.active {
+  color: var(--nav-red-dark);
+}
+
+.site-header.unified-nav .nav-link.active::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 14px;
+  height: 2.5px;
+  background: var(--nav-red);
+  border-radius: 3px;
+}
+
+/* Header Actions Area */
+.site-header.unified-nav .header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Language Switcher */
+.site-header.unified-nav .language-switch {
+  display: flex;
+  align-items: center;
+  background: #f1e4d1;
+  border: 1px solid #e5d5be;
+  border-radius: 20px;
+  padding: 3px;
+  gap: 2px;
+}
+
+.site-header.unified-nav .language-switch .lang-btn {
+  border: 0;
+  background: transparent;
+  color: #775e49;
+  border-radius: 16px;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  min-width: 38px;
+  height: 28px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.site-header.unified-nav .language-switch .lang-btn.active,
+.site-header.unified-nav .language-switch .lang-btn[aria-pressed="true"] {
+  background: #fffdf8;
+  color: var(--nav-red-dark);
+  box-shadow: 0 1px 4px rgba(55, 30, 15, 0.14);
+}
+
+/* Auth Buttons and Profile Area */
+.site-header.unified-nav .auth-action-area {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 38px;
+}
+
+.site-header.unified-nav .nav-btn-signin {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 16px;
+  background: var(--nav-red);
+  color: #ffffff;
+  border: 0;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  box-shadow: 0 3px 10px rgba(197, 48, 28, 0.25);
+  transition: background 0.2s ease, transform 0.15s ease;
+  white-space: nowrap;
+}
+
+.site-header.unified-nav .nav-btn-signin:hover {
+  background: var(--nav-red-dark);
+  transform: translateY(-1px);
+}
+
+.site-header.unified-nav .nav-profile-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.site-header.unified-nav .nav-avatar-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--nav-red);
+  color: #fff8ea;
+  border: 2px solid #f6e6d2;
+  display: grid;
+  place-items: center;
+  font-family: 'Tiro Bangla', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: none;
+  transition: transform 0.15s ease, box-shadow 0.2s ease;
+}
+
+.site-header.unified-nav .nav-avatar-btn:hover,
+.site-header.unified-nav .nav-avatar-btn.active {
+  transform: scale(1.05);
+  box-shadow: 0 0 0 2px var(--nav-red);
+}
+
+.site-header.unified-nav .nav-btn-logout {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  border: 1px solid #ebd9c2;
+  background: #fbf1e0;
+  color: #8c2a1e;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.site-header.unified-nav .nav-btn-logout:hover {
+  background: #f6e1ca;
+  color: var(--nav-red-dark);
+}
+
+/* Mobile Hamburger Toggle */
+.site-header.unified-nav .mobile-menu-btn {
+  display: none;
+  width: 40px;
+  height: 40px;
+  border: 0;
+  background: transparent;
+  color: var(--nav-ink);
+  border-radius: 8px;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+}
+
+/* Mobile Navigation Dropdown */
+.site-header.unified-nav .mobile-nav {
+  display: none;
+  flex-direction: column;
+  background: rgba(255, 253, 248, 0.98);
+  border-top: 1px solid var(--nav-line);
+  padding: 12px 20px 20px;
+  box-shadow: 0 10px 25px rgba(60, 36, 20, 0.08);
+}
+
+.site-header.unified-nav .mobile-nav.is-open {
+  display: flex;
+}
+
+.site-header.unified-nav .mobile-nav-link {
+  display: flex;
+  align-items: center;
+  height: 44px;
+  color: #5c4533;
+  font-size: 15px;
+  font-weight: 600;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(150, 102, 67, 0.08);
+  padding: 0 4px;
+  transition: color 0.2s ease;
+}
+
+.site-header.unified-nav .mobile-nav-link:hover,
+.site-header.unified-nav .mobile-nav-link.active {
+  color: var(--nav-red);
+  font-weight: 700;
+}
+
+.site-header.unified-nav .mobile-nav-divider {
+  height: 1px;
+  background: var(--nav-line);
+  margin: 10px 0 14px;
+}
+
+.site-header.unified-nav .mobile-auth-area {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+/* Responsive Media Queries */
+@media (max-width: 820px) {
+  .site-header.unified-nav .header-inner {
+    height: 60px;
+    padding: 0 16px;
+  }
+
+  .site-header.unified-nav .brand-name {
+    font-size: 18px;
+  }
+
+  .site-header.unified-nav .brand-caption {
+    display: none;
+  }
+
+  .site-header.unified-nav .main-nav {
+    display: none;
+  }
+
+  .site-header.unified-nav .mobile-menu-btn {
+    display: inline-flex;
+  }
+}
+
