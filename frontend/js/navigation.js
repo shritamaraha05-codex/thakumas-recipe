@@ -17,10 +17,15 @@ export function setPreferredLanguage(lang) {
 }
 
 export function initNavigation({ activePage = '' } = {}) {
-  // Update header links to point to the correct multi-page targets
+  // Update header links to point to the correct multi-page targets.
+  // Brand anchors (.brand) always go home (/). Nav links (#/) go to library.
   document.querySelectorAll('a').forEach(anchor => {
     const href = anchor.getAttribute('href') || ''
-    if (href === '#/' || href === '#/library' || href === '#library' || href === '/recipes' || href === '#recipes') {
+    const isBrandLink = anchor.closest('.brand') !== null
+    if (isBrandLink) {
+      // Brand/logo always navigates to the landing page
+      anchor.setAttribute('href', '/')
+    } else if (href === '#/' || href === '#/library' || href === '#library' || href === '/recipes' || href === '#recipes') {
       anchor.setAttribute('href', '/library.html')
     } else if (href === '#/record' || href === '#record' || href === '/record') {
       anchor.setAttribute('href', '/record.html')
