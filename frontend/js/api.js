@@ -167,7 +167,9 @@ export const api = {
     body.append('language', language);
     body.append('consent', String(consent));
     if (previousText) body.append('previous_text', previousText);
-    return request('/api/narrations/transcribe', { method: 'POST', token, body, signal, timeoutMs: 30000 });
+    // Audio upload, WAV preparation on the backend, and Gnani STT can exceed
+    // the short default used by ordinary JSON API calls.
+    return request('/api/narrations/transcribe', { method: 'POST', token, body, signal, timeoutMs: 120000 });
   },
 
   me: (token) => request('/api/me', { token }),

@@ -101,6 +101,7 @@ Multi-person profile and consent management (M-18's original scope) remains post
 
 ## Voice
 - `POST /api/narrations/transcribe` (multipart: `audio`, `language`, `consent`, optional `previous_text`) accepts mono 16 kHz PCM16 WAV or ADTS AAC; consent is required. Each request must contain a valid clip of at most 30 seconds. The browser passes ADTS AAC through without decoding and splits longer AAC recordings at complete frame boundaries into sequential clips of at most 25 seconds; WAV recordings are mixed/resampled and split at low-energy boundaries. Audio is processed in memory and discarded after transcription.
+  - The browser allows up to 120 seconds for upload and transcription; the backend Gnani request timeout defaults to 60 seconds and can be set with `GNANI_STT_TIMEOUT`.
 - `POST /api/speak` `{text, language, voice?, speed?}` -> `audio/wav` (cached by hash of text+voice+language+speed). Applies `tts_text` number-to-words first.
 - `GET /api/recipes/{id}/audio?language=` -> full recipe audio (`audio/wav`)
 - `POST /api/cook/command` (multipart: `audio` <=4 s, `language`) -> `{transcript, command:"next|prev|repeat|stop|timer|null", args}`
