@@ -2,6 +2,16 @@
 import { getSession, signOut } from './auth.js'
 import { supabaseConfigured } from './supabase.js'
 
+export function safeReturnTo(value, fallback = '/library.html') {
+  if (!value || typeof value !== 'string' || !value.startsWith('/') || value.startsWith('//') || value.includes('\\')) return fallback;
+  try {
+    const target = new URL(value, window.location.origin);
+    return target.origin === window.location.origin ? `${target.pathname}${target.search}${target.hash}` : fallback;
+  } catch {
+    return fallback;
+  }
+}
+
 /**
  * Ensures user is authenticated on a protected page.
  * If not, redirects to login.html with safe returnTo parameter.
@@ -58,7 +68,7 @@ export async function redirectIfAuthenticated({ redirectTo = '/library.html' } =
     if (session) {
       const params = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null
       const returnTo = params?.get('returnTo')
-      const target = returnTo ? decodeURIComponent(returnTo) : redirectTo
+      const target = safeReturnTo(returnTo, redirectTo)
       window.location.replace(target)
       return session
     }
@@ -72,11 +82,8 @@ export async function redirectIfAuthenticated({ redirectTo = '/library.html' } =
  * Log out and redirect to login.html or landing page
  */
 export async function logoutUser({ redirectTo = '/login.html' } = {}) {
-  try {
-    await signOut()
-  } catch (err) {
-    console.warn('[session] Sign out error:', err)
-  }
+  const { error } = await signOut();
+  if (error) throw error;
   if (typeof window !== 'undefined') {
     window.location.replace(redirectTo)
   }

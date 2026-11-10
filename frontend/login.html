@@ -510,7 +510,7 @@
 
   <script type="module">
     import { signUp, signIn, signInWithGoogle } from './js/auth.js';
-    import { redirectIfAuthenticated } from './js/session.js';
+    import { redirectIfAuthenticated, safeReturnTo } from './js/session.js';
     import { supabaseConfigured } from './js/supabase.js';
     import { initNavigation } from './js/navigation.js';
     import { getLanguage, setLanguage, applyI18n, initI18n, t } from './js/i18n.js';
@@ -751,9 +751,9 @@
 
           if (data.session) {
             showAuthToast(languageCopy[currentLanguage].signupSuccess);
-            const returnTo = new URLSearchParams(window.location.search).get('returnTo');
+            const returnTo = safeReturnTo(new URLSearchParams(window.location.search).get('returnTo'));
             setTimeout(() => {
-              window.location.href = returnTo ? decodeURIComponent(returnTo) : '/library.html';
+              window.location.href = returnTo;
             }, 800);
           } else {
             showAuthToast(languageCopy[currentLanguage].signupConfirm);
@@ -776,9 +776,9 @@
           if (error) throw error;
 
           showAuthToast(currentLanguage === 'en' ? 'Welcome back! Loading recipes…' : 'স্বাগতম! রেসিপি লোড হচ্ছে…');
-          const returnTo = new URLSearchParams(window.location.search).get('returnTo');
+          const returnTo = safeReturnTo(new URLSearchParams(window.location.search).get('returnTo'));
           setTimeout(() => {
-            window.location.href = returnTo ? decodeURIComponent(returnTo) : '/library.html';
+            window.location.href = returnTo;
           }, 600);
         } catch (err) {
           showAuthToast(err.message || 'Login failed. Check your email and password.', true);

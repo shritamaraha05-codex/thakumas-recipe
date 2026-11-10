@@ -111,8 +111,8 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
   <section class="recipe-head">
     <div>
       <div class="eyebrow"><span class="mini"></span><span class="i18n" data-bn="ঠাকুমার রান্নাঘর থেকে" data-en="From Thakuma’s kitchen">ঠাকুমার রান্নাঘর থেকে</span></div>
-      <h1><span class="i18n" data-bn="খিচুড়ি রান্না" data-en="Cooking Khichuri">খিচুড়ি রান্না</span></h1>
-      <div class="recipe-meta">
+      <h1><span class="i18n" data-bn="রান্না মোড" data-en="Cook Mode">রান্না মোড</span></h1>
+      <div class="recipe-meta" hidden>
         <span class="meta-chip"><span>♧</span><span class="i18n" data-bn="৪ জনের জন্য" data-en="Serves 4">৪ জনের জন্য</span></span>
         <span class="meta-chip"><span>◷</span><span class="i18n" data-bn="মোট সময় প্রায় ৪০ মিনিট" data-en="About 40 minutes total">মোট সময় প্রায় ৪০ মিনিট</span></span>
         <span class="meta-chip"><span>✿</span><span class="i18n" data-bn="সহজ" data-en="Easy">সহজ</span></span>
@@ -124,33 +124,25 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
   <section class="workspace" aria-label="Cooking workspace">
     <aside class="steps-card">
       <h2 class="section-label i18n" data-bn="রান্নার ধাপ" data-en="Cooking steps">রান্নার ধাপ</h2>
-      <div class="step-list" id="step-list">
-        <button class="step-nav current" data-step="0" type="button" onclick="goToStep(0)"><span class="step-no">১</span><span class="step-name i18n" data-bn="ফোড়ন দিন" data-en="Temper spices">ফোড়ন দিন</span></button>
-        <button class="step-nav" data-step="1" type="button" onclick="goToStep(1)"><span class="step-no">২</span><span class="step-name i18n" data-bn="ডাল ও চাল ধুয়ে নিন" data-en="Rinse rice & lentils">ডাল ও চাল ধুয়ে নিন</span></button>
-        <button class="step-nav" data-step="2" type="button" onclick="goToStep(2)"><span class="step-no">৩</span><span class="step-name i18n" data-bn="সবজি মেশান" data-en="Add vegetables">সবজি মেশান</span></button>
-        <button class="step-nav" data-step="3" type="button" onclick="goToStep(3)"><span class="step-no">৪</span><span class="step-name i18n" data-bn="মশলা কষিয়ে নিন" data-en="Cook the spices">মশলা কষিয়ে নিন</span></button>
-        <button class="step-nav" data-step="4" type="button" onclick="goToStep(4)"><span class="step-no">৫</span><span class="step-name i18n" data-bn="জল দিয়ে রান্না করুন" data-en="Add water & simmer">জল দিয়ে রান্না করুন</span></button>
-        <button class="step-nav" data-step="5" type="button" onclick="goToStep(5)"><span class="step-no">৬</span><span class="step-name i18n" data-bn="পরিবেশন করুন" data-en="Serve">পরিবেশন করুন</span></button>
-      </div>
+      <div class="step-list" id="step-list"></div>
     </aside>
 
     <section class="cook-card" aria-live="polite">
       <div class="cook-topline">
-        <div class="step-count" id="step-count">ধাপ ১ / ৬</div>
-        <div class="progress-meta"><span class="i18n" data-bn="রান্নার অগ্রগতি" data-en="Cooking progress">রান্নার অগ্রগতি</span><div class="progress"><div class="progress-fill" id="progress-fill"></div></div><strong id="progress-percent">১৭%</strong></div>
+        <div class="step-count" id="step-count-pill"></div>
+        <div class="progress-meta"><span class="i18n" data-bn="রান্নার অগ্রগতি" data-en="Cooking progress">রান্নার অগ্রগতি</span><div class="progress"><div class="progress-fill" id="progress-bar"></div></div><strong id="progress-percent"></strong></div>
       </div>
-      <div class="active-step" id="cook-active-step">
+        <div class="active-step" id="cook-active-step" style="grid-template-columns:1fr">
         <div class="instruction">
           <div class="instruction-kicker"><span class="kicker-dot"></span><span class="i18n" data-bn="এখন যা করবেন" data-en="What to do now">এখন যা করবেন</span></div>
-          <h2 class="step-title" id="step-title">ফোড়ন দিন</h2>
-          <p class="step-description" id="step-description">কড়াইতে সরষের তেল গরম করুন। তেল হালকা গরম হলে পাঁচফোড়ন, শুকনো লঙ্কা আর তেজপাতা দিন। ২০–৩০ সেকেন্ড নেড়ে নিন, যতক্ষণ সুন্দর গন্ধ বের হয়।</p>
-          <div class="step-hint" id="step-hint"><span class="i18n" data-bn="ঠাকুমার টিপস: মশলা পুড়তে দেবেন না—ফোড়নের গন্ধ উঠলেই পরের ধাপে যান।" data-en="Thakuma’s tip: Don’t let the spices burn—move on as soon as they become fragrant.">ঠাকুমার টিপস: মশলা পুড়তে দেবেন না—ফোড়নের গন্ধ উঠলেই পরের ধাপে যান।</span></div>
+          <h2 class="step-title" id="step-title"></h2>
+          <p class="step-description" id="step-desc"></p>
+          <div class="step-hint" id="tip-text" hidden></div>
         </div>
-        <figure class="photo-frame" id="photo-frame"><img src="/assets/images/Sizzling Phoron in a Black Kadai.png" alt="Hot iron kadai with bubbling oil, panch phoron, dried red chillies and bay leaf"><figcaption class="photo-caption i18n" data-bn="ফোড়নের সঠিক মুহূর্ত" data-en="The tempering stage">ফোড়নের সঠিক মুহূর্ত</figcaption></figure>
       </div>
       <div class="ingredients">
         <h3 class="ingredients-head"><span>✦</span><span class="i18n" data-bn="এই ধাপে লাগবে" data-en="You’ll need for this step">এই ধাপে লাগবে</span></h3>
-        <div class="ingredient-list" id="ingredient-list">
+        <div class="ingredient-list" id="ing-list">
           <div class="ingredient"><span class="ingredient-symbol">◒</span><span class="ingredient-name"><strong class="i18n" data-bn="সরষের তেল" data-en="Mustard oil">সরষের তেল</strong><span class="i18n" data-bn="২ টেবিল চামচ" data-en="2 tbsp">২ টেবিল চামচ</span></span></div>
           <div class="ingredient"><span class="ingredient-symbol">✳</span><span class="ingredient-name"><strong class="i18n" data-bn="পাঁচফোড়ন" data-en="Panch phoron">পাঁচফোড়ন</strong><span class="i18n" data-bn="১ চা চামচ" data-en="1 tsp">১ চা চামচ</span></span></div>
           <div class="ingredient"><span class="ingredient-symbol">♨</span><span class="ingredient-name"><strong class="i18n" data-bn="শুকনো লঙ্কা" data-en="Dried red chilli">শুকনো লঙ্কা</strong><span class="i18n" data-bn="২টি" data-en="2 pieces">২টি</span></span></div>
@@ -158,15 +150,15 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
         </div>
       </div>
       <div class="control-area">
-        <div class="timer-box">
+        <div class="timer-box" id="timer-wrap" style="display:none">
           <div class="timer-icon">◷</div>
-          <div><div class="timer-label i18n" data-bn="এই ধাপের টাইমার" data-en="Step timer">এই ধাপের টাইমার</div><div class="timer-time" id="timer-display">00:30</div></div>
-          <div class="timer-actions"><button class="timer-action" id="timer-toggle" type="button" onclick="toggleTimer()">শুরু</button><button class="timer-action i18n" data-bn="রিসেট" data-en="Reset" type="button" onclick="resetTimer()">রিসেট</button></div>
+          <div><div class="timer-label i18n" data-bn="এই ধাপের টাইমার" data-en="Step timer">এই ধাপের টাইমার</div><div class="timer-time" id="timer-countdown">00:00</div></div>
+          <div class="timer-actions"><button class="timer-action" id="timer-toggle-btn" type="button"></button><button class="timer-action" id="timer-reset-btn" type="button" data-bn="রিসেট" data-en="Reset">রিসেট</button></div>
         </div>
         <div class="main-actions">
-          <button class="action-btn" type="button" onclick="previousStep()"><span>←</span><span class="i18n" data-bn="আগের ধাপ" data-en="Previous">আগের ধাপ</span></button>
-          <button class="action-btn" type="button" onclick="repeatStep()"><span>↻</span><span class="i18n" data-bn="আবার শুনুন" data-en="Repeat step">আবার শুনুন</span></button>
-          <button class="action-btn primary" type="button" onclick="nextStep()"><span class="i18n" data-bn="পরের ধাপ" data-en="Next step">পরের ধাপ</span><span>→</span></button>
+          <button class="action-btn" id="prev-step-btn" type="button"><span>←</span><span class="i18n" data-bn="আগের ধাপ" data-en="Previous">আগের ধাপ</span></button>
+          <button class="action-btn" id="repeat-step-btn" type="button"><span>↻</span><span class="i18n" data-bn="আবার পড়ুন" data-en="Repeat step">Repeat step</span></button>
+          <button class="action-btn primary" id="next-step-btn" type="button"><span class="i18n" data-bn="পরের ধাপ" data-en="Next step">Next step</span><span>→</span></button>
         </div>
       </div>
     </section>
@@ -255,6 +247,12 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
   let synth = typeof window !== 'undefined' ? window.speechSynthesis : null;
   let steps = [];
   let recipeTitle = '';
+
+  // Clear the legacy demonstration content before authentication or API checks.
+  document.getElementById('step-list')?.replaceChildren();
+  document.getElementById('ing-list')?.replaceChildren();
+  document.getElementById('step-title')?.replaceChildren();
+  document.getElementById('step-desc')?.replaceChildren();
 
   function toDigits(n) {
     return currentLang === 'bn' ? String(n).replace(/\d/g, d => '০১২৩৪৫৬৭৮৯'[d]) : String(n);
@@ -356,6 +354,8 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
     if (progBar) {
       const pct = Math.round(((currentStep + 1) / steps.length) * 100);
       progBar.style.width = `${pct}%`;
+      const pctLabel = document.getElementById('progress-percent');
+      if (pctLabel) pctLabel.textContent = `${toDigits(pct)}%`;
     }
 
     // Step title & description
@@ -366,7 +366,10 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
     if (descEl) descEl.textContent = s.desc[currentLang] || s.desc.bn;
 
     const hintEl = document.getElementById('tip-text');
-    if (hintEl) hintEl.textContent = s.hint[currentLang] || s.hint.bn;
+    if (hintEl) {
+      hintEl.textContent = s.hint[currentLang] || s.hint.bn;
+      hintEl.hidden = !s.hint[currentLang] && !s.hint.bn;
+    }
 
     // Ingredients
     const ingContainer = document.getElementById('ing-list');
@@ -414,27 +417,49 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
     }
   }
 
-  function renderNoStepsState(customMsg = null) {
+  function makeActionLink(href, label, primary = false) {
+    const link = document.createElement('a');
+    link.href = href;
+    link.className = primary ? 'action-btn primary' : 'action-btn';
+    link.style.cssText = 'display:inline-flex;align-items:center;text-decoration:none;min-height:48px';
+    link.textContent = label;
+    return link;
+  }
+
+  function renderNoStepsState({ heading, body, retry = false } = {}) {
+    const noId = !new URLSearchParams(window.location.search).has('id');
+    const titleText = heading || (currentLang === 'en' ? 'No recipes to cook yet.' : 'এখনও রান্না করার মতো কোনো রেসিপি নেই।');
+    const bodyText = body || (currentLang === 'en'
+      ? 'Record your first family recipe and it will appear here when you’re ready to cook.'
+      : 'পরিবারের প্রথম রেসিপিটি সংরক্ষণ করুন। রান্নার সময় সেটি এখানেই পাবেন।');
     const titleEl = document.getElementById('step-title');
-    if (titleEl) {
-      titleEl.textContent = customMsg || (currentLang === 'en' ? 'No recipe selected' : 'কোনো রেসিপি নির্বাচন করা হয়নি');
-    }
+    if (titleEl) titleEl.textContent = titleText;
     const descEl = document.getElementById('step-desc');
     if (descEl) {
-      descEl.innerHTML = `
-        <div style="padding: 16px 0; text-align: center;">
-          <p style="margin-bottom: 16px; color: #7f6450;">
-            ${currentLang === 'en' ? 'Open a saved recipe from your library to start step-by-step cooking.' : 'রান্না শুরু করতে আপনার রেসিপি লাইব্রেরি থেকে একটি রেসিপি খুলুন।'}
-          </p>
-          <a href="/library.html" class="primary-btn" style="display: inline-flex; text-decoration: none; padding: 10px 20px; border-radius: 8px; background: var(--red); color: white; font-weight: 600;">
-            <span class="material-symbols-outlined" style="margin-right: 6px;">menu_book</span>
-            <span>${currentLang === 'en' ? 'Back to Library' : 'লাইব্রেরিতে যান'}</span>
-          </a>
-        </div>
-      `;
+      descEl.replaceChildren();
+      const message = document.createElement('p');
+      message.textContent = bodyText;
+      descEl.appendChild(message);
+      const actions = document.createElement('div');
+      actions.style.cssText = 'display:flex;flex-wrap:wrap;gap:10px;margin-top:18px';
+      if (noId) actions.append(makeActionLink('/record.html', currentLang === 'en' ? 'Record a recipe' : 'রেসিপি রেকর্ড করুন', true));
+      actions.append(makeActionLink('/library.html', currentLang === 'en' ? 'Go to recipe library' : 'রেসিপি লাইব্রেরিতে যান'));
+      if (retry) {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'action-btn primary';
+        button.textContent = currentLang === 'en' ? 'Retry' : 'আবার চেষ্টা করুন';
+        button.addEventListener('click', loadRecipeForCooking);
+        actions.appendChild(button);
+      }
+      descEl.appendChild(actions);
     }
+    document.getElementById('step-count-pill')?.replaceChildren();
+    document.getElementById('progress-percent')?.replaceChildren();
+    document.getElementById('progress-bar')?.style.setProperty('width', '0%');
+    document.getElementById('step-list')?.replaceChildren();
     const ingContainer = document.getElementById('ing-list');
-    if (ingContainer) ingContainer.innerHTML = '';
+    if (ingContainer) ingContainer.replaceChildren();
     resetTimer(0);
     const prevBtn = document.getElementById('prev-step-btn');
     const nextBtn = document.getElementById('next-step-btn');
@@ -535,6 +560,14 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
       return;
     }
 
+    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id)) {
+      renderNoStepsState({
+        heading: currentLang === 'en' ? 'Invalid recipe link' : 'রেসিপির লিংকটি সঠিক নয়',
+        body: currentLang === 'en' ? 'Check the link or choose a saved recipe from your library.' : 'লিংকটি পরীক্ষা করুন অথবা লাইব্রেরি থেকে সংরক্ষিত রেসিপি বেছে নিন.'
+      });
+      return;
+    }
+
     const activeStep = document.getElementById('cook-active-step');
     let _activeStepHTML = null;
     if (activeStep) {
@@ -545,7 +578,8 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
 
     try {
       const recipe = await api.getRecipe(currentToken, id);
-      if (recipe) {
+      if (recipe?.id && recipe?.draft) {
+        currentStep = 0;
         recipeTitle = recipe.title || '';
         const h1 = document.querySelector('.recipe-head h1 span');
         if (h1) h1.textContent = recipeTitle;
@@ -575,14 +609,12 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
               }
             }
 
-            const stepTitle = ds.text.slice(0, 36) + (ds.text.length > 36 ? '…' : '');
+            const stepText = typeof ds.text === 'string' ? ds.text : '';
+            const stepTitle = stepText.slice(0, 36) + (stepText.length > 36 ? '…' : '');
             return {
               title: { bn: stepTitle, en: stepTitle },
-              desc: { bn: ds.text, en: ds.text },
-              hint: {
-                bn: 'ঠাকুমার পরামর্শ: মনোযোগ দিয়ে ধাপে ধাপে সম্পন্ন করুন।',
-                en: 'Thakuma’s advice: Proceed step by step with care.'
-              },
+              desc: { bn: stepText, en: stepText },
+              hint: { bn: '', en: '' },
               duration: durSec,
               ingredients: ings,
               photo: i === 0
@@ -596,15 +628,32 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
         } else {
           done(() => {
             if (activeStep && _activeStepHTML) { activeStep.innerHTML = _activeStepHTML; hideSkeleton(activeStep); }
-            renderNoStepsState(currentLang === 'en' ? 'No steps recorded in this recipe' : 'এই রেসিপিতে কোনো ধাপ রেকর্ড করা নেই');
+            renderNoStepsState({
+              heading: currentLang === 'en' ? 'This recipe has no parsed steps' : 'এই রেসিপিতে পার্স করা ধাপ নেই',
+              body: currentLang === 'en' ? 'Return to the recipe and review or parse its narration before cooking.' : 'রান্না শুরুর আগে রেসিপিতে ফিরে কথনটি যাচাই বা বিশ্লেষণ করুন।'
+            });
           });
         }
+      } else {
+        throw new Error(currentLang === 'en' ? 'The recipe response was incomplete.' : 'রেসিপির উত্তর অসম্পূর্ণ।');
       }
     } catch (err) {
       console.warn('[cook-mode] Could not load recipe by id:', err);
       done(() => {
         if (activeStep && _activeStepHTML) { activeStep.innerHTML = _activeStepHTML; hideSkeleton(activeStep); }
-        renderNoStepsState(err.message || (currentLang === 'en' ? 'Recipe not found' : 'রেসিপি পাওয়া যায়নি'));
+        const notFound = err.status === 404;
+        const unauthorized = err.status === 401;
+        const heading = notFound
+          ? (currentLang === 'en' ? 'Recipe not found' : 'রেসিপিটি পাওয়া যায়নি')
+          : unauthorized
+            ? (currentLang === 'en' ? 'Please sign in again' : 'আবার সাইন ইন করুন')
+            : (currentLang === 'en' ? 'Could not load this recipe' : 'রেসিপিটি লোড করা যায়নি');
+        const body = notFound
+          ? (currentLang === 'en' ? 'It may have been deleted or may not belong to this account. Return to your library.' : 'রেসিপিটি মুছে ফেলা হয়েছে বা এই অ্যাকাউন্টের নয়। লাইব্রেরিতে ফিরে যান।')
+          : unauthorized
+            ? (currentLang === 'en' ? 'Your session may have expired. Sign in and reopen this recipe.' : 'আপনার সেশনের মেয়াদ শেষ হতে পারে। সাইন ইন করে রেসিপিটি আবার খুলুন।')
+            : (currentLang === 'en' ? `${err.message || 'The backend is unavailable.'} You can retry this request.` : `${err.message || 'ব্যাকএন্ডে সংযোগ করা যায়নি।'} আবার চেষ্টা করুন।`);
+        renderNoStepsState({ heading, body, retry: !notFound && !unauthorized });
       });
     }
   }
@@ -621,6 +670,7 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
     document.getElementById('next-step-btn')?.addEventListener('click', nextStep);
     document.getElementById('repeat-step-btn')?.addEventListener('click', repeatStep);
     document.getElementById('timer-toggle-btn')?.addEventListener('click', toggleTimer);
+    document.getElementById('timer-reset-btn')?.addEventListener('click', () => resetTimer(steps[currentStep]?.duration || 0));
 
     // Back to recipe detail link
     const backBtn = document.querySelector('a[href*="detail"], a.back-link');
@@ -631,6 +681,12 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
 
     await loadRecipeForCooking();
   }
+
+  window.addEventListener('pagehide', () => {
+    clearInterval(timerInterval);
+    timerRunning = false;
+    synth?.cancel();
+  });
 
   window.goToStep = goToStep;
   window.nextStep = nextStep;

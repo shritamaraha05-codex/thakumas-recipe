@@ -121,13 +121,13 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
 
 <main><div>
 <div class="welcome"><h4 data-bn="প্রথমবার? তিন ধাপে শুরু করুন" data-en="First time here? Start in three steps"></h4>
-<ol><li><b>1</b><span data-bn="বক্তার নাম লিখুন ও সম্মতি দিন" data-en="Enter who is telling it and confirm consent"></span></li><li><b>2</b><span data-bn="রেকর্ড করুন, আপলোড করুন বা লিখে দিন" data-en="Record, upload or paste your recipe"></span></li><li><b>3</b><span data-bn="উপাদান ও পরিমাণ যাচাই করে সংরক্ষণ করুন" data-en="Review ingredients and amounts, then save"></span></li></ol></div>
+<ol><li><b>1</b><span data-bn="কথা বলার সম্মতি দিন, অথবা লিখুন" data-en="Confirm consent to dictate, or type the narration"></span></li><li><b>2</b><span data-bn="মূল কথন যাচাই করে বিশ্লেষণ করুন" data-en="Review the original narration and parse it"></span></li><li><b>3</b><span data-bn="রেসিপি যাচাই করে সংরক্ষণ করুন" data-en="Review and save the recipe"></span></li></ol></div>
 
 <div class="card"><span class="tag" data-bn="ধাপ ০১ / নতুন রেসিপি" data-en="Step 01 / New recipe"></span>
 <div class="hd"><div><h1><span data-bn="রেসিপিটি বলুন" data-en="Tell the recipe"></span> <span class="pf" data-bn="(Tell the recipe)" data-en=""></span></h1><p class="sub" data-bn="ঠাকুমার মুখের মৌখিক আন্দাজকে নির্ভুল ও চিরস্থায়ী পারিবারিক রন্ধনপ্রণালীতে রূপান্তর করুন।" data-en="Turn grandmother's spoken estimates into an accurate, lasting family recipe."></p></div><div class="badge" data-bn="✓ হাতের আন্দাজ সংরক্ষিত" data-en="✓ Hand estimates preserved"></div></div>
 <div class="row"><div><label class="f"><span data-bn="কে বলছেন?" data-en="Who is telling it?"></span></label><input class="in" id="who" value="" placeholder="" data-ph-bn="যেমন: ঠাকুমা" data-ph-en="e.g. Thakuma"></div>
 <div><label class="f" data-bn="কথ্যভাষার ভাষা" data-en="Spoken dialect"></label><select class="in"><option data-bn="বাংলা + English (Banglish / কলকাতা কথ্য)" data-en="Bangla + English (Banglish / Kolkata spoken)"></option><option data-bn="বাংলা (পূর্ববঙ্গীয়)" data-en="Bangla (East Bengal)"></option><option data-bn="বাংলা (রাঢ়ী)" data-en="Bangla (Rarhi)"></option></select></div></div>
-<label class="consent"><input type="checkbox" id="ok"><span><b style="font-size:12px" data-bn="তাঁরা রেকর্ড করার সম্মতি দিয়েছেন" data-en="They agree to be recorded"></b><small data-bn="পারিবারিক স্মৃতি রক্ষায় আপনার অনুমতি দরকার। রেকর্ডিং শুধু আপনার অ্যাকাউন্টে সুরক্ষিত থাকবে।" data-en="We need your permission to preserve family memories. Recordings stay private to your account."></small></span></label></div>
+<label class="consent"><input type="checkbox" id="ok"><span><b style="font-size:12px" data-bn="বক্তার সম্মতি আছে" data-en="The speaker has consented"></b><small data-bn="কথা থেকে লেখা তৈরিতে আপনার ব্রাউজারের স্পিচ পরিষেবা ব্যবহার হতে পারে। অ্যাপ অডিও সংরক্ষণ করে না; শুধু লেখা পার্স করার জন্য সার্ভারে পাঠানো হয়।" data-en="Your browser’s speech service may process audio to create text. The app does not store audio; only text is sent to the backend for parsing."></small></span></label></div>
 
 <div class="card"><div class="tabs" role="tablist"><button class="on" data-t="rec">🎙 <span data-bn="রেকর্ড" data-en="Record"></span></button><button data-t="up">⇪ <span data-bn="অডিও আপলোড" data-en="Upload"></span></button><button data-t="txt">✎ <span data-bn="লেখা লিখুন" data-en="Paste text"></span></button></div>
 <div class="pane on" id="rec"><div class="stage"><div class="mic" id="mic"><button id="rb" type="button" aria-label="Record">🎙</button></div>
@@ -136,7 +136,7 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
 <p class="hint" id="hint" data-bn="প্রথমে উপরে সম্মতি দিন, তারপর মাইক বোতাম চাপুন। মাইক ব্যবহারের অনুমতি চাইলে 'Allow' করুন।" data-en="Confirm consent above first, then tap the mic. Choose 'Allow' if your browser asks for microphone access."></p>
 <div class="tr" id="tr"><div class="t"><span id="tp"></span><span id="pc"></span></div><div class="bar" id="br"></div><p id="tx"></p></div>
 <div class="acts"><button class="go" id="stop" disabled>⏺ <span data-bn="রেকর্ডিং থামান" data-en="Stop recording"></span></button><button id="cancel">⊗ <span data-bn="বাতিল" data-en="Cancel"></span></button></div></div></div>
-<div class="pane" id="up"><div class="drop"><p>⇪</p><p><span data-bn="অডিও ফাইল এখানে ছাড়ুন বা" data-en="Drop an audio file here or"></span> <u onclick="f.click()" data-bn="ফাইল বাছুন" data-en="choose a file"></u></p><p style="font-size:11px;margin-top:4px" data-bn="MP3, WAV, M4A · সর্বোচ্চ ২০০ MB" data-en="MP3, WAV, M4A · up to 200 MB"></p><input type="file" id="f" accept="audio/*" hidden></div><p class="hint" id="fn"></p></div>
+<div class="pane" id="up"><div class="drop" role="status"><p>⇪</p><p data-bn="অডিও ফাইল আপলোড এখন উপলভ্য নয়" data-en="Audio file upload is not available yet"></p><p style="font-size:12px;margin-top:4px" data-bn="এই সংস্করণে অডিও আপলোড বা ট্রান্সক্রিপশনের ব্যাকএন্ড নেই। লেখা লিখুন, অথবা সম্মতি দিয়ে ব্রাউজারের ডিকটেশন ব্যবহার করুন।" data-en="This release has no backend audio upload or transcription route. Type the narration, or use browser dictation with consent."></p></div></div>
 <div class="pane" id="txt"><textarea class="in" data-ph-bn="ঠাকুমার কথা এখানে লিখুন, যেমন: 'একটু তেল দিয়ে এক চিমটি নুন...'" data-ph-en="Paste grandmother's words here, e.g. 'a little oil, one pinch of salt…'"></textarea>
         <!-- Optional Recipe Photo Upload -->
         <div class="photo-upload-container" style="margin-top: 14px; padding: 14px; border: 1px dashed #dfc8a7; border-radius: 10px; background: rgba(255, 253, 248, 0.7);">
@@ -178,15 +178,24 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
         </div>
 <div class="acts"><button class="go" id="ps" data-bn="রেসিপি বিশ্লেষণ করুন" data-en="Analyse recipe"></button></div></div></div>
 
-<div class="card ai"><div class="hd"><h3>✨ <span data-bn="স্মার্ট অনুমান পূর্বরূপ (AI Live Inference)" data-en="Smart estimate preview (AI Live Inference)"></span></h3><span class="tag" data-bn="হাতের মাপ সিঙ্ক" data-en="Hand measure sync"></span></div>
-<p class="note" data-bn="শব্দগুলো থেকে সাথে সাথে তৈরি হচ্ছে উপাদান ও পরিমাণ তালিকা:" data-en="Ingredients and amounts appear here as she speaks:"></p>
-<div class="chips"><div class="chip"><i>◔</i><div><span data-bn="সর্ষের তেল" data-en="Mustard oil"></span><em data-bn="এক চামচ (~১৫ml)" data-en="1 spoon (~15ml)"></em></div></div>
+<div class="card ai"><div class="hd"><h3>✨ <span data-bn="বিশ্লেষণ ও পর্যালোচনা" data-en="Parse and review"></span></h3><span class="tag" data-bn="নিয়মভিত্তিক পার্সার" data-en="Rules parser"></span></div>
+<p class="note" data-bn="বিশ্লেষণের পরে এখানে প্রকৃত কথন থেকে পাওয়া উপকরণ ও ধাপ দেখানো হবে।" data-en="Ingredients and steps found in the narration will appear here after parsing."></p>
+<div class="chips" id="example-chips" hidden></div>
       <div id="parse-loading" style="display: none; padding: 20px; text-align: center; color: var(--red);">
         <span style="font-size: 24px; display: inline-block; animation: spin 1s linear infinite;">⏳</span>
         <p class="bn" style="margin: 8px 0 0; font-weight: 600;">রেসিপি বিশ্লেষণ করা হচ্ছে…</p>
         <p class="en" style="display:none; margin: 8px 0 0; font-weight: 600;">Analysing recipe…</p>
       </div>
       <div id="parsed-result-container" style="display: none; margin-top: 14px;">
+        <div id="save-complete" role="status" aria-live="polite" style="display:none; margin-bottom:14px; padding:14px; border:1px solid #a8c99e; background:#f0f7ed; border-radius:8px;">
+          <strong><span class="bn">রেসিপি সংরক্ষিত হয়েছে</span><span class="en" style="display:none;">Recipe saved</span></strong>
+          <p style="margin:6px 0 12px"><span class="bn">ঐচ্ছিক ছবি বা অডিও আপলোড এখানে উপলভ্য নয়। সংরক্ষিত রেসিপিতে কোনো মিডিয়া যোগ হয়নি।</span><span class="en" style="display:none;">Optional image and audio uploads are unavailable here. No media was added to the saved recipe.</span></p>
+          <div style="display:flex; flex-wrap:wrap; gap:8px">
+            <a id="open-saved-recipe" class="go" href="/library.html"><span class="bn">সংরক্ষিত রেসিপি খুলুন</span><span class="en" style="display:none;">Open saved recipe</span></a>
+            <a class="secondary-btn" href="/library.html"><span class="bn">রেসিপি লাইব্রেরি</span><span class="en" style="display:none;">Recipe library</span></a>
+            <button type="button" id="continue-editing" class="secondary-btn"><span class="bn">সম্পাদনা চালিয়ে যান</span><span class="en" style="display:none;">Continue editing</span></button>
+          </div>
+        </div>
         <div style="margin-bottom: 14px; padding: 12px; background: rgba(255,255,255,0.8); border: 1px solid #ebd8be; border-radius: 8px;">
           <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 4px; color: #4a3023;">
             <span class="bn">রেসিপির নাম (Title)</span>
@@ -220,7 +229,7 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
           </button>
         </div>
       </div>
-    <div class="chip"><i>✻</i><div><span data-bn="গোবিন্দভোগ চাল" data-en="Gobindobhog rice"></span><em data-bn="এক মুঠো (~৪০–৪৯g)" data-en="1 handful (~40–49g)"></em></div></div><div class="chip"><i>⁘</i><div><span data-bn="সৈন্ধব নুন" data-en="Rock salt"></span><em data-bn="এক চিমটি (~৩g)" data-en="1 pinch (~3g)"></em></div></div></div></div>
+    </div>
 </div>
 
 <aside class="side"><div class="photo"><div class="pw"><img src="/assets/images/Traditional Bengali Spice Grinding.png" alt="Grandmother grinding spices on a stone mortar"><div class="cap" data-bn="“আন্দাজই তো রান্নার আসল স্বাদ”" data-en="“Estimation is the real taste of cooking”"></div></div><p data-bn="🛡 স্থানীয় পরিবেশের নিরাপত্তায় আপনার তথ্য নিরাপদ।" data-en="🛡 Your recordings are kept safe and private."></p></div>
@@ -229,7 +238,7 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
 <div class="tip"><i>2</i><div><b data-bn="নিজের আন্দাজে বলুন (Say amounts naturally)" data-en="Say amounts naturally"></b><span data-bn="গ্রাম বা মিলি বলার দরকার নেই; 'এক চিমটি', 'আধ চামচ' বা 'এক আঁজলা' বলুন।" data-en="No need for grams or ml; say 'one pinch', 'half a spoon' or 'a cupped palm'."></span></div></div>
 <div class="tip"><i>3</i><div><b data-bn="ধাপের মাঝে একটু থামুন (Pause between steps)" data-en="Pause between steps"></b><span data-bn="প্রতিটি মূল প্রক্রিয়ার পর ১–২ সেকেন্ড নীরবতা সঠিক সময়সূচি চিহ্নিত করে।" data-en="A 1–2 second silence after each main action helps mark the timing."></span></div></div>
 <p class="sub" style="font-size:10px;margin-top:12px;background:var(--beige);border-radius:8px;padding:6px 10px" data-bn="ছোট ছোট মাপের পরিবর্তন সব সময় দেখানো হবে, নিজের মতো ঠিক করে নিন।" data-en="Small changes in amounts are always shown, so you can adjust to your own hand."></p></div>
-<div class="card pink"><span class="tag" style="background:#fff;color:var(--red2)" data-bn="হাতের মাপ" data-en="Hand measure"></span><h4 data-bn="ঠাকুমার হাত কি পরিমাণ আন্দাজ করে?" data-en="How much does Thakuma's hand really hold?"></h4><p data-bn="তাঁর মুঠো ও চিমটির আসল গ্রাম ওজন ক্যালিব্রেট করা থাকলে রেসিপি নির্ভুলতা ৯৪%–এ পৌঁছায়।" data-en="Once her fistful and pinch are calibrated in grams, recipe accuracy reaches up to 94%."></p><a href="#" data-bn="হাতের পরিমাপে যান ›" data-en="Go to hand calibration ›"></a></div></aside></main>
+<div class="card pink"><span class="tag" style="background:#fff;color:var(--red2)" data-bn="হাতের মাপ" data-en="Hand measure"></span><h4 data-bn="হাতের মাপের ক্যালিব্রেশন এখন উপলভ্য নয়" data-en="Hand-measure calibration is not available yet"></h4><p data-bn="এখন রেসিপিতে শুধু পার্সারে পাওয়া তথ্য দেখানো হয়; কোনো গ্রাম পরিমাণ বা নির্ভুলতার হার অনুমান করা হয় না।" data-en="Recipes currently show only parser output; gram conversions and accuracy figures are not inferred."></p></div></aside></main>
 
 <footer><div class="brand"><b>ঠাকুমার রান্না</b></div><span data-bn="© ২০২৪ বিশ্বাসযোগ্য পারিবারিক রন্ধনপ্রণালী" data-en="© 2024 Trusted family recipes, preserved"></span><span><a data-bn="মোবাইল" data-en="Mobile"></a> <a data-bn="হাতের মাপ" data-en="Hands"></a> <a data-bn="নিয়মাবলী" data-en="Terms"></a></span></footer>
 <div class="toast" id="toast"><i>✓</i><span data-bn="স্বাগতম! ঠাকুমার খাতা প্রস্তুত আছে।" data-en="Welcome! Thakuma's notebook is ready."></span></div>
@@ -283,6 +292,8 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
   let currentLanguage = getLanguage();
   let latestParseResult = null;
   let originalTranscriptText = '';
+  let savedRecipeId = null;
+  let isSaving = false;
   let selectedPhotoUrl = null;
   let selectedPhotoFile = null;
 
@@ -406,20 +417,14 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
   const waveContainer = document.getElementById('wv');
   const transcriptBox = document.getElementById('tr');
   const transcriptPart = document.getElementById('tp');
-  const transcriptPercent = document.getElementById('pc');
-  const transcriptBar = document.getElementById('br');
   const transcriptText = document.getElementById('tx');
   const hintEl = document.getElementById('hint');
-  const audioFileInput = document.getElementById('f');
-  const audioFileName = document.getElementById('fn');
 
   let isRecording = false;
   let recordSeconds = 0;
   let timerInterval = null;
   let waveAnimInterval = null;
   let mediaStream = null;
-  let mediaRecorder = null;
-  let audioChunks = [];
   let audioContext = null;
   let analyserNode = null;
   let audioDataArray = null;
@@ -472,24 +477,6 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
   okCheckbox?.addEventListener('change', updateConsentState);
   updateConsentState();
 
-  // Preset realistic Bengali & English spoken recipe transcripts for live streaming fallback
-  const fallbackTranscripts = {
-    bn: [
-      'প্রথমে কড়াইতে দুই চামচ খাঁটি সর্ষের তেল গরম করে নিই। তেল গরম হলে পাঁচফোড়ন আর তেজপাতা দিন।',
-      'তারপর এক কাপ গোবিন্দভোগ চাল আর আধ কাপ মুগ ডাল ভালো করে ধুয়ে দিয়ে দিন। অল্প আঁচে নেড়ে নিন।',
-      'এক চিমটি হলুদ গুঁড়ো, আধা চামচ জিরে গুঁড়ো আর স্বাদমতো নুন দিন। সুন্দর সুবাস বের হওয়া পর্যন্ত কষুন।',
-      'এবার চার কাপ গরম জল ঢেলে দিন। ফুটে উঠলে আঁচ কমিয়ে ঢাকনা দিয়ে দশ থেকে বারো মিনিট ফুটতে দিন।',
-      'শেষে এক চামচ গাওয়া ঘি আর দুটো কাঁচা লঙ্কা চিরে নামিয়ে নিন। গরম গরম পরিবেশন করুন।'
-    ],
-    en: [
-      'First heat two spoons of pure mustard oil in the pan. Once hot, add panch phoron and bay leaf.',
-      'Then add one cup of washed rice and half a cup of roasted dal. Stir gently for a minute.',
-      'Add a pinch of turmeric, half a teaspoon of cumin powder and salt to taste. Sauté until fragrant.',
-      'Now pour four cups of warm water. Bring to a boil, lower heat and simmer covered for 10 to 12 minutes.',
-      'Finish with a spoonful of ghee and two slit green chillies. Serve piping hot with love.'
-    ]
-  };
-
   // 4. Start recording function — prompts for real mic access
   async function startRecording() {
     if (!okCheckbox?.checked) {
@@ -497,6 +484,14 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
         ? 'Please check the consent box above before recording.'
         : 'অনুগ্রহ করে প্রথমে উপরে সম্মতি দিন।');
       okCheckbox?.focus();
+      return;
+    }
+
+    const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRec) {
+      notify(currentLanguage === 'en'
+        ? 'Dictation is not supported by this browser. Choose Paste text and type the narration.'
+        : 'এই ব্রাউজারে ডিকটেশন সমর্থিত নয়। লেখা লিখুন ট্যাব বেছে কথন লিখুন।');
       return;
     }
 
@@ -514,7 +509,6 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
     isRecording = true;
     recordSeconds = 0;
     speechTranscript = '';
-    audioChunks = [];
 
     // UI Updates
     micContainer?.classList.add('rec');
@@ -548,43 +542,18 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
           const h = Math.max(6, Math.min(65, 6 + (val / 255) * 58));
           bar.style.height = `${h}px`;
         });
-      } else {
-        waveformBars.forEach((bar, idx) => {
-          const h = 8 + Math.random() * (12 + 40 * Math.sin((idx / 26) * Math.PI));
-          bar.style.height = `${h}px`;
-        });
-      }
+      } else waveformBars.forEach(bar => { bar.style.height = '6px'; });
     }, 100);
 
-    // Live timer & progressive transcription
+    // Show elapsed time while the browser's speech service listens. Do not
+    // present a fabricated percentage or transcript as upload progress.
     timerInterval = setInterval(() => {
       recordSeconds++;
       updateTimerDisplay();
-
-      const lang = currentLanguage === 'bn' ? 'bn' : 'en';
-      const phrases = fallbackTranscripts[lang];
-      const partIdx = Math.min(phrases.length, Math.floor(recordSeconds / 3));
-      const phraseIndex = Math.min(phrases.length - 1, partIdx);
-
-      const percent = Math.min(95, Math.round((recordSeconds / 15) * 95));
-      if (transcriptPercent) transcriptPercent.textContent = `${formatDigits(percent)}%`;
-      if (transcriptBar) transcriptBar.style.width = `${percent}%`;
-
-      if (transcriptPart) {
-        transcriptPart.textContent = currentLanguage === 'bn'
-          ? `অংশ ${formatDigits(phraseIndex + 1)} / ${formatDigits(phrases.length)} শোনা হচ্ছে…`
-          : `Listening & processing part ${phraseIndex + 1} of ${phrases.length}…`;
-      }
-
-      if (!speechTranscript && transcriptText) {
-        transcriptText.textContent = phrases.slice(0, phraseIndex + 1).join(' ');
-      }
+      if (transcriptPart) transcriptPart.textContent = currentLanguage === 'bn' ? 'শোনা হচ্ছে…' : 'Listening…';
     }, 1000);
 
-    // Setup Web Speech API for real voice recognition if supported
-    const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (SpeechRec) {
-      try {
+    try {
         speechRecognizer = new SpeechRec();
         speechRecognizer.continuous = true;
         speechRecognizer.interimResults = true;
@@ -606,22 +575,10 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
         };
 
         speechRecognizer.start();
-      } catch (e) {
-        console.debug('[record] SpeechRecognizer init:', e);
-      }
-    }
-
-    // MediaRecorder for recording audio stream
-    try {
-      if (window.MediaRecorder && mediaStream) {
-        mediaRecorder = new MediaRecorder(mediaStream);
-        mediaRecorder.ondataavailable = (e) => {
-          if (e.data && e.data.size > 0) audioChunks.push(e.data);
-        };
-        mediaRecorder.start(250);
-      }
     } catch (e) {
-      console.debug('[record] MediaRecorder setup:', e);
+      console.warn('[record] SpeechRecognizer could not start:', e);
+      await stopRecording(false);
+      notify(currentLanguage === 'en' ? 'Browser dictation could not start. Please type the narration.' : 'ব্রাউজার ডিকটেশন চালু হয়নি। অনুগ্রহ করে কথন লিখুন।');
     }
   }
 
@@ -660,7 +617,6 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
     if (transcriptBox) transcriptBox.classList.remove('on');
     if (hintEl) hintEl.style.display = '';
 
-    const recordedDuration = recordSeconds;
     recordSeconds = 0;
     updateConsentState();
 
@@ -669,11 +625,8 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
       return;
     }
 
-    // Collect recorded text: speechRecognition transcript or streamed narration
-    const lang = currentLanguage === 'bn' ? 'bn' : 'en';
-    const fallbackList = fallbackTranscripts[lang];
-    const phraseCount = Math.max(1, Math.min(fallbackList.length, Math.floor(recordedDuration / 3) + 1));
-    const capturedText = speechTranscript.trim() || fallbackList.slice(0, phraseCount).join(' ');
+    // Only use words actually returned by the browser speech service.
+    const capturedText = speechTranscript.trim();
 
     // Fill the text input tab
     const txtArea = document.querySelector('#txt textarea');
@@ -681,13 +634,13 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
       txtArea.value = capturedText;
     }
 
-    notify(currentLanguage === 'en'
-      ? 'Recording captured! Analyzing ingredients and steps…'
-      : 'রেকর্ডিং সম্পন্ন হয়েছে! রেসিপির মাপ ও ধাপ বিশ্লেষণ করা হচ্ছে…');
-
-    // Trigger recipe parse automatically
-    if (parseBtn) {
-      parseBtn.click();
+    if (capturedText) {
+      notify(currentLanguage === 'en' ? 'Dictation added. Review the narration, then choose Analyse recipe.' : 'ডিকটেশন যোগ হয়েছে। কথন যাচাই করে রেসিপি বিশ্লেষণ করুন।');
+      document.querySelector('.tabs button[data-t="txt"]')?.click();
+    } else {
+      notify(currentLanguage === 'en' ? 'No words were captured. Type or correct the narration before parsing.' : 'কোনো কথা ধরা পড়েনি। বিশ্লেষণের আগে কথন লিখুন বা সংশোধন করুন।');
+      document.querySelector('.tabs button[data-t="txt"]')?.click();
+      txtArea?.focus();
     }
   }
 
@@ -708,28 +661,6 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
     stopRecording(false);
   });
 
-  // Tab 2: Audio File Upload handler
-  audioFileInput?.addEventListener('change', (e) => {
-    const file = e.target.files && e.target.files[0];
-    if (!file) return;
-
-    if (audioFileName) {
-      audioFileName.textContent = `✓ ${file.name} (${(file.size / (1024 * 1024)).toFixed(1)} MB)`;
-    }
-
-    // When an audio file is uploaded, populate text and parse
-    const lang = currentLanguage === 'bn' ? 'bn' : 'en';
-    const fileNarration = fallbackTranscripts[lang].join(' ');
-    const txtArea = document.querySelector('#txt textarea');
-    if (txtArea) txtArea.value = fileNarration;
-
-    notify(currentLanguage === 'en'
-      ? `Audio file "${file.name}" loaded. Analyzing recipe…`
-      : `অডিও ফাইল "${file.name}" যুক্ত হয়েছে। রেসিপি বিশ্লেষণ করা হচ্ছে…`);
-
-    if (parseBtn) parseBtn.click();
-  });
-
   // Parse action
   const textarea = document.querySelector('#txt textarea');
   const parseBtn = document.getElementById('ps');
@@ -740,29 +671,40 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
   const ingredientsList = document.getElementById('parsed-ingredients-list');
   const stepsList = document.getElementById('parsed-steps-list');
   const saveBtn = document.getElementById('save-recipe-btn');
+  const saveComplete = document.getElementById('save-complete');
+  const openSavedRecipe = document.getElementById('open-saved-recipe');
+  document.getElementById('continue-editing')?.addEventListener('click', () => {
+    if (saveComplete) saveComplete.style.display = 'none';
+    titleInput?.focus();
+  });
 
   parseBtn?.addEventListener('click', async () => {
-    const text = textarea.value.trim();
-    if (!text) {
+    const text = textarea.value;
+    if (!text.trim()) {
       notify(currentLanguage === 'en' ? 'Please paste or write your recipe text first.' : 'প্রথমে রেসিপির বিবরণ লিখুন।');
       textarea.focus();
       return;
     }
 
     parseBtn.disabled = true;
-    loadingEl.style.display = 'none';
+    loadingEl.style.display = 'block';
     resultContainer.style.display = 'block';
+    saveComplete.style.display = 'none';
+    latestParseResult = null;
     const done = timedSkeleton();
     showSkeleton(resultContainer, 'parse-preview');
 
     try {
       const result = await api.parse(text, 'rules');
+      if (!result?.recipe || !Array.isArray(result.recipe.steps)) {
+        throw new Error(currentLanguage === 'en' ? 'The parser response was incomplete. Please retry.' : 'পার্সারের উত্তর অসম্পূর্ণ। আবার চেষ্টা করুন।');
+      }
       latestParseResult = result;
       originalTranscriptText = text;
 
       // Populate preview
       const recipe = result.recipe || {};
-      titleInput.value = recipe.title && recipe.title !== 'Untitled recipe' ? recipe.title : (currentLanguage === 'en' ? 'Traditional Bengali Dish' : 'পারিবারিক বাংলা রান্না');
+      titleInput.value = recipe.title && recipe.title !== 'Untitled recipe' ? recipe.title : '';
 
       // Populate ingredients
       ingredientsList.innerHTML = '';
@@ -820,12 +762,14 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
         lang
       }));
     } finally {
+      loadingEl.style.display = 'none';
       parseBtn.disabled = false;
     }
   });
 
   // Save recipe
   saveBtn?.addEventListener('click', async () => {
+    if (isSaving) return;
     if (!latestParseResult) {
       notify(currentLanguage === 'en' ? 'Please analyse the recipe before saving.' : 'সংরক্ষণের আগে রেসিপি বিশ্লেষণ করুন।');
       return;
@@ -840,8 +784,9 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
 
     const tags = tagsInput.value.split(',').map(t => t.trim()).filter(Boolean);
 
+    isSaving = true;
     saveBtn.disabled = true;
-    saveBtn.textContent = currentLanguage === 'en' ? 'Saving…' : 'সংরক্ষণ করা হচ্ছে…';
+    saveBtn.textContent = currentLanguage === 'en' ? (savedRecipeId ? 'Saving changes…' : 'Saving…') : (savedRecipeId ? 'পরিবর্তন সংরক্ষণ হচ্ছে…' : 'সংরক্ষণ করা হচ্ছে…');
 
     try {
       const payload = {
@@ -853,20 +798,24 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
         narrator_person_id: null
       };
 
-      const res = await api.createRecipe(currentToken, payload);
-      notify(currentLanguage === 'en' ? 'Recipe saved successfully!' : 'রেসিপি সফলভাবে সংরক্ষিত হয়েছে!');
-      setTimeout(() => {
-        if (res && res.id) {
-          window.location.href = `/recipe-detail.html?id=${encodeURIComponent(res.id)}`;
-        } else {
-          window.location.href = '/library.html';
-        }
-      }, 700);
+      const res = savedRecipeId
+        ? await api.updateRecipe(currentToken, savedRecipeId, payload)
+        : await api.createRecipe(currentToken, payload);
+      if (!res?.id || (savedRecipeId && !res?.version)) throw new Error(currentLanguage === 'en' ? 'The server did not confirm the saved recipe. Check your library before retrying.' : 'সার্ভার সংরক্ষণ নিশ্চিত করেনি। আবার চেষ্টা করার আগে লাইব্রেরি দেখুন।');
+      savedRecipeId = res.id;
+      openSavedRecipe.href = `/recipe-detail.html?id=${encodeURIComponent(savedRecipeId)}`;
+      saveComplete.style.display = 'block';
+      saveComplete.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      notify(currentLanguage === 'en' ? (res.version > 1 ? `Changes saved as version ${res.version}.` : 'Recipe saved successfully!') : (res.version > 1 ? `পরিবর্তন ${formatDigits(res.version)} নম্বর সংস্করণ হিসেবে সংরক্ষিত হয়েছে।` : 'রেসিপি সফলভাবে সংরক্ষিত হয়েছে!'));
     } catch (err) {
       console.error('[record] Save failed:', err);
-      notify(err.message || 'Save failed.');
+      notify(err.message || (currentLanguage === 'en' ? 'Save failed. Your draft is still here; please retry.' : 'সংরক্ষণ ব্যর্থ। খসড়াটি এখানেই আছে; আবার চেষ্টা করুন।'));
+    } finally {
+      isSaving = false;
       saveBtn.disabled = false;
-      saveBtn.textContent = currentLanguage === 'en' ? 'Save Recipe' : 'রেসিপি সংরক্ষণ করুন';
+      saveBtn.innerHTML = currentLanguage === 'en'
+        ? `✓ <span>${savedRecipeId ? 'Save changes' : 'Save Recipe'}</span>`
+        : `✓ <span>${savedRecipeId ? 'পরিবর্তন সংরক্ষণ করুন' : 'রেসিপি সংরক্ষণ করুন'}</span>`;
     }
   });
 

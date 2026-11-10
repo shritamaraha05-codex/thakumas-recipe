@@ -2,6 +2,7 @@
 
 export const STORAGE_KEY = 'thakuma_language';
 export const LEGACY_STORAGE_KEY = 'thakuma-language';
+let i18nInitialized = false;
 
 export const translations = {
   bn: {
@@ -66,9 +67,9 @@ export const translations = {
       saveNote: 'এই পৃষ্ঠার তথ্য আপনার অ্যাকাউন্ট ও প্রোফাইলে সুরক্ষিত থাকবে।',
       preferencesEyebrow: 'পরিমাপের ধরন',
       preferencesTitle: 'রান্নার পছন্দ',
-      preferencesDescription: 'রেসিপিতে উপকরণের মাপ কীভাবে দেখতে চান?',
+      preferencesDescription: 'এই পছন্দটি শুধু এই ব্রাউজারে থাকে। মেট্রিক রূপান্তর এখনও রেসিপিতে প্রয়োগ হয় না।',
       unitsTitle: 'রান্নার পছন্দ',
-      unitsDescription: 'রেসিপিতে উপকরণের মাপ কীভাবে দেখতে চান?',
+      unitsDescription: 'এই পছন্দটি শুধু এই ব্রাউজারে থাকে। মেট্রিক রূপান্তর এখনও রেসিপিতে প্রয়োগ হয় না।',
       unitsLabel: 'পরিমাপের ধরন',
       traditionalTitle: 'ঐতিহ্যবাহী মাপ',
       traditionalDescription: 'মুঠো, চিমটি ও হাতের আন্দাজ',
@@ -238,9 +239,9 @@ export const translations = {
       saveNote: 'Your profile details are securely saved with your account.',
       preferencesEyebrow: 'JUST THE ESSENTIALS',
       preferencesTitle: 'Cooking Preferences',
-      preferencesDescription: 'Choose how ingredient quantities should be displayed by default.',
+      preferencesDescription: 'This preference stays in this browser. Metric conversions are not applied to recipes yet.',
       unitsTitle: 'Cooking Preferences',
-      unitsDescription: 'Choose how ingredient quantities should be displayed by default.',
+      unitsDescription: 'This preference stays in this browser. Metric conversions are not applied to recipes yet.',
       unitsLabel: 'Measurement System',
       traditionalTitle: 'Traditional Bengali measures',
       traditionalDescription: 'Mutho, chimti and hand-measured intuition',
@@ -533,6 +534,8 @@ export function applyI18n(root = document) {
  * Initialize internationalization system on the page.
  */
 export function initI18n() {
+  if (i18nInitialized) return;
+  i18nInitialized = true;
   applyI18n();
 
   // Attach click listener to all language switches

@@ -11,7 +11,9 @@ export class ApiError extends Error {
   }
 }
 
-async function request(path, { method = 'GET', token, body, params } = {}) {
+const REQUEST_TIMEOUT_MS = 30000;
+
+async function request(path, { method = 'GET', token, body, params, signal, timeoutMs = REQUEST_TIMEOUT_MS } = {}) {
   if (!config.isApiConfigured) {
     throw new ApiError(
       config.configError || 'Backend API URL is not configured.',
@@ -39,13 +41,25 @@ async function request(path, { method = 'GET', token, body, params } = {}) {
   }
 
   let response;
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(new DOMException('Request timed out', 'TimeoutError')), timeoutMs);
+  const abortFromCaller = () => controller.abort(signal.reason);
+  if (signal?.aborted) abortFromCaller();
+  else signal?.addEventListener('abort', abortFromCaller, { once: true });
   try {
     response = await fetch(url.toString(), {
       method,
       headers,
       body: body !== undefined ? JSON.stringify(body) : undefined,
+      signal: controller.signal,
     });
   } catch (err) {
+    clearTimeout(timeoutId);
+    signal?.removeEventListener('abort', abortFromCaller);
+    if (signal?.aborted) throw new ApiError('This request was cancelled.', 0, 'ABORTED');
+    if (err?.name === 'TimeoutError' || controller.signal.reason?.name === 'TimeoutError') {
+      throw new ApiError('The request took too long to finish. Please retry.', 0, 'TIMEOUT', 'The backend did not respond within 30 seconds.');
+    }
     const isLocal = config.isLocalhost;
     const msg = isLocal
       ? `The backend server could not be reached at ${config.apiBaseUrl}. Ensure the FastAPI backend is running (uvicorn backend.app.main:app --reload).`
@@ -56,7 +70,19 @@ async function request(path, { method = 'GET', token, body, params } = {}) {
     throw new ApiError(msg, 0, 'NETWORK_ERROR', hint);
   }
 
-  const text = await response.text();
+  let text;
+  try {
+    text = await response.text();
+  } catch (err) {
+    if (signal?.aborted) throw new ApiError('This request was cancelled.', 0, 'ABORTED');
+    if (controller.signal.reason?.name === 'TimeoutError') {
+      throw new ApiError('The request took too long to finish. Please retry.', 0, 'TIMEOUT', 'The backend did not respond within 30 seconds.');
+    }
+    throw new ApiError('The backend response could not be read. Please retry.', response.status, 'NETWORK_ERROR');
+  } finally {
+    clearTimeout(timeoutId);
+    signal?.removeEventListener('abort', abortFromCaller);
+  }
   let payload = null;
   if (text) {
     try {
@@ -117,6 +143,10 @@ async function request(path, { method = 'GET', token, body, params } = {}) {
     throw new ApiError(customMsg, response.status, code, hint);
   }
 
+  if (text && payload === null) {
+    throw new ApiError('The backend returned an unreadable response.', response.status, 'INVALID_RESPONSE', 'Retry the request. If it continues, check the backend logs.');
+  }
+
   return payload;
 }
 
@@ -134,14 +164,14 @@ export const api = {
       params: { query, tag, limit, offset },
     }),
 
-  getRecipe: (token, id) => request(`/api/recipes/${id}`, { token }),
+  getRecipe: (token, id) => request(`/api/recipes/${encodeURIComponent(id)}`, { token }),
 
   createRecipe: (token, payload) =>
     request('/api/recipes', { method: 'POST', token, body: payload }),
 
   updateRecipe: (token, id, payload) =>
-    request(`/api/recipes/${id}`, { method: 'PUT', token, body: payload }),
+    request(`/api/recipes/${encodeURIComponent(id)}`, { method: 'PUT', token, body: payload }),
 
   deleteRecipe: (token, id) =>
-    request(`/api/recipes/${id}`, { method: 'DELETE', token }),
+    request(`/api/recipes/${encodeURIComponent(id)}`, { method: 'DELETE', token }),
 };

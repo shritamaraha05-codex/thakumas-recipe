@@ -309,6 +309,10 @@
         <p class="page-description" data-i18n="pageDescription">আপনার রান্নার খাতাটি নিজের মতো করে সাজিয়ে নিন। প্রয়োজনীয় তথ্য আর পছন্দ—শুধু এইটুকুই।</p>
       </div>
     </div>
+    <div id="profile-load-error" role="alert" style="display:none; margin:-14px 0 20px; padding:12px 14px; border:1px solid #d9a89c; border-radius:10px; background:#fff4ef; color:#70291f;">
+      <span id="profile-load-error-message"></span>
+      <button type="button" id="profile-retry" class="secondary-btn" style="margin-left:10px; min-height:40px;"><span data-i18n="common.retry">Retry</span></button>
+    </div>
 
     <div class="profile-layout">
       <section class="panel profile-panel" aria-labelledby="detailsTitle">
@@ -521,14 +525,13 @@
       showSkeleton(sidebar, 'profile');
     }
     const done = timedSkeleton();
+    const errorPanel = document.getElementById('profile-load-error');
+    const errorMessage = document.getElementById('profile-load-error-message');
 
     try {
       const profile = await api.me(currentToken);
-      if (profile && profile.display_name) {
-        nameInput.value = profile.display_name;
-      } else if (currentUser?.user_metadata?.display_name) {
-        nameInput.value = currentUser.user_metadata.display_name;
-      }
+      if (errorPanel) errorPanel.style.display = 'none';
+      nameInput.value = currentUser?.user_metadata?.display_name || profile?.display_name || '';
 
       if (currentUser?.email) {
         emailInput.value = currentUser.email;
@@ -544,10 +547,12 @@
         refreshPreview();
       });
     } catch (err) {
-      console.warn('[profile] Could not load profile from /api/me:', err);
-      // Graceful fallback: use auth metadata instead
+      console.error('[profile] Could not load profile from /api/me:', err);
       if (currentUser?.email) emailInput.value = currentUser.email;
       if (currentUser?.user_metadata?.display_name) nameInput.value = currentUser.user_metadata.display_name;
+      if (currentUser?.user_metadata?.kitchen_name) kitchenInput.value = currentUser.user_metadata.kitchen_name;
+      if (errorMessage) errorMessage.textContent = `${t('common.error', getLanguage() === 'en' ? 'Could not verify profile data.' : 'প্রোফাইলের তথ্য যাচাই করা যায়নি।')} ${err.message || ''}`;
+      if (errorPanel) errorPanel.style.display = 'block';
       done(() => {
         if (sidebar && _sidebarHTML) { sidebar.innerHTML = _sidebarHTML; hideSkeleton(sidebar); }
         refreshPreview();
@@ -567,12 +572,14 @@
     try {
       const name = nameInput.value.trim();
       const kitchen = kitchenInput.value.trim();
-      await updateUserProfile({
+      const result = await updateUserProfile({
         data: {
           display_name: name,
           kitchen_name: kitchen
         }
       });
+      if (result?.error) throw result.error;
+      if (result?.data?.user) currentUser = result.data.user;
       refreshPreview();
       showToast(t('profileSaved', getLanguage() === 'en' ? 'Profile details saved.' : 'প্রোফাইলের তথ্য সংরক্ষিত হয়েছে।'));
     } catch (err) {
@@ -586,9 +593,15 @@
     }
   });
 
-  document.getElementById('logout-btn')?.addEventListener('click', () => {
-    logoutUser({ redirectTo: '/login.html' });
+  document.getElementById('logout-btn')?.addEventListener('click', async () => {
+    try {
+      await logoutUser({ redirectTo: '/login.html' });
+    } catch (err) {
+      showToast(err.message || (getLanguage() === 'en' ? 'Could not log out. Please retry.' : 'লগআউট করা যায়নি। আবার চেষ্টা করুন।'));
+    }
   });
+
+  document.getElementById('profile-retry')?.addEventListener('click', loadProfile);
 
   document.querySelectorAll('[data-unit]').forEach(btn => {
     btn.addEventListener('click', () => {

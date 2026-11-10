@@ -175,9 +175,9 @@ function setupMobileToggle(header) {
     toggle();
   });
 
-  // Auto-close on link click
-  menu.querySelectorAll('a').forEach((link) => {
-    link.addEventListener('click', () => toggle(false));
+  // Links are inserted after the auth check, so handle them by delegation.
+  menu.addEventListener('click', (event) => {
+    if (event.target.closest('a')) toggle(false);
   });
 
   // Close when clicking outside
@@ -245,7 +245,11 @@ function renderLoggedInNav(desktopArea, mobileArea, user, activePage) {
 
     desktopArea.querySelector('#navLogoutBtn')?.addEventListener('click', async (e) => {
       e.preventDefault();
-      await logoutUser({ redirectTo: '/login.html' });
+      try {
+        await logoutUser({ redirectTo: '/login.html' });
+      } catch (err) {
+        window.alert(err.message || (getLanguage() === 'en' ? 'Could not log out. Please retry.' : 'লগআউট করা যায়নি। আবার চেষ্টা করুন।'));
+      }
     });
   }
 
@@ -263,7 +267,11 @@ function renderLoggedInNav(desktopArea, mobileArea, user, activePage) {
 
     mobileArea.querySelector('#mobileNavLogoutBtn')?.addEventListener('click', async (e) => {
       e.preventDefault();
-      await logoutUser({ redirectTo: '/login.html' });
+      try {
+        await logoutUser({ redirectTo: '/login.html' });
+      } catch (err) {
+        window.alert(err.message || (getLanguage() === 'en' ? 'Could not log out. Please retry.' : 'লগআউট করা যায়নি। আবার চেষ্টা করুন।'));
+      }
     });
   }
 
@@ -308,20 +316,25 @@ function renderLoggedOutNav(desktopArea, mobileArea, activePage) {
  * Intercept navigation to protected routes for unauthenticated users.
  */
 function setupProtectedNavInterception(header) {
-  header.querySelectorAll('a[href*="library.html"], a[href*="record.html"], a[href*="cook-mode.html"]').forEach((link) => {
-    link.addEventListener('click', async (e) => {
-      if (!supabaseConfigured) return;
-      try {
-        const { data: { session } } = await getSession();
-        if (!session) {
-          e.preventDefault();
-          const target = link.getAttribute('href');
-          window.location.href = `/login.html?returnTo=${encodeURIComponent(target)}`;
-        }
-      } catch (err) {
-        console.debug('[navigation] Protected link check:', err);
-      }
-    });
+  header.addEventListener('click', async (event) => {
+    const link = event.target.closest('a[href*="library.html"], a[href*="record.html"], a[href*="cook-mode.html"]');
+    if (!link || !header.contains(link) || !supabaseConfigured) return;
+    event.preventDefault();
+    const target = link.getAttribute('href');
+    let timeoutId;
+    try {
+      const sessionCheck = getSession();
+      const timeout = new Promise((_, reject) => {
+        timeoutId = window.setTimeout(() => reject(new Error('Session check timed out')), 8000);
+      });
+      const { data: { session } } = await Promise.race([sessionCheck, timeout]);
+      window.location.href = session ? target : `/login.html?returnTo=${encodeURIComponent(target)}`;
+    } catch (err) {
+      console.warn('[navigation] Could not verify the session before navigation:', err);
+      window.location.href = `/login.html?returnTo=${encodeURIComponent(target)}`;
+    } finally {
+      window.clearTimeout(timeoutId);
+    }
   });
 }
 
