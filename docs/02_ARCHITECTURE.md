@@ -50,8 +50,8 @@ docs/   scripts/   contributions/   prototype_v0/ (frozen reference)
 |---|---|
 | GNANI_API_KEY | Gnani key; empty means mock mode only |
 | GNANI_MOCK | `1` returns canned transcripts/audio |
-| GNANI_STT_MODEL, GNANI_TTS_MODEL, GNANI_VOICE | defaults `prisma-v3.0`, `timbre-v3.0`, `Shivani` |
-| GNANI_TTS_URL, GNANI_TTS_TIMEOUT | Gnani Timbre REST endpoint and request timeout |
+| GNANI_STT_MODEL | default `prisma-v3.0` |
+| Timbre model and voice | Selected in code (`timbre-v3.0`, `Shivani`); the Gnani SDK supplies endpoint and timeout defaults |
 | LLM_CHAIN | comma order, e.g. `gemini,ollama,evon_kaggle,rules` (rules is always the last fallback) |
 | GEMINI_API_KEY, GEMINI_MODEL | check current model names; do not hard-code |
 | OLLAMA_BASE_URL, OLLAMA_MODEL | default `http://localhost:11434/v1` |

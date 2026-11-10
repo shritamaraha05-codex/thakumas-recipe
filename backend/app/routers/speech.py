@@ -6,10 +6,13 @@ import asyncio
 from collections import OrderedDict
 import hashlib
 
-import httpx
+import requests
 from fastapi import APIRouter, Depends
 from fastapi.responses import Response
 from pydantic import BaseModel, Field
+from gnani.tts import AudioConfig, GnaniTTSClient
+from gnani.tts.exceptions import APIError as GnaniAPIError
+from gnani.tts.exceptions import AuthenticationError as GnaniAuthenticationError
 
 from ..auth import AuthContext, get_auth_context
 from ..config import Settings
@@ -21,6 +24,8 @@ from ..models import ErrorCode
 router = APIRouter(tags=["speech"])
 _tts_cache: OrderedDict[str, bytes] = OrderedDict()
 _MAX_CACHE_ENTRIES = 128
+_TTS_MODEL = "timbre-v3.0"
+_TTS_VOICE = "Shivani"
 
 
 class SpeakRequest(BaseModel):
@@ -46,7 +51,7 @@ async def _synthesize(text: str, language: str, speed: float, settings: Settings
         )
 
     cache_key = hashlib.sha256(
-        f"{settings.gnani_tts_model}\0{settings.gnani_voice}\0{language}\0{speed}\0{text}".encode()
+        f"{_TTS_MODEL}\0{_TTS_VOICE}\0{language}\0{speed}\0{text}".encode()
     ).hexdigest()
     async with request_lock:
         cached = _tts_cache.get(cache_key)
@@ -54,36 +59,17 @@ async def _synthesize(text: str, language: str, speed: float, settings: Settings
             _tts_cache.move_to_end(cache_key)
             return cached
 
-        payload = {
-            "text": text,
-            "model": settings.gnani_tts_model,
-            "voice": settings.gnani_voice,
-            "language": language,
-            "speed": speed,
-            "audio_config": {
-                "sample_rate": 48000,
-                "num_channels": 1,
-                "sample_width": 2,
-                "encoding": "linear_pcm",
-                "container": "wav",
-            },
-        }
         for attempt in range(2):
             try:
-                async with httpx.AsyncClient(timeout=settings.gnani_tts_timeout) as client:
-                    response = await client.post(
-                        settings.gnani_tts_url,
-                        headers={"X-API-Key-ID": settings.gnani_api_key},
-                        json=payload,
-                    )
-            except httpx.TimeoutException as exc:
+                audio = await asyncio.to_thread(_synthesize_with_sdk, text, language, speed, settings.gnani_api_key)
+            except requests.Timeout as exc:
                 raise ApiError(
                     503,
                     ErrorCode.UPSTREAM_BUSY,
                     "Gnani speech took too long to respond.",
                     "Retry this step or use the browser voice.",
                 ) from exc
-            except httpx.RequestError as exc:
+            except requests.RequestException as exc:
                 raise ApiError(
                     503,
                     ErrorCode.UPSTREAM_BUSY,
@@ -91,38 +77,36 @@ async def _synthesize(text: str, language: str, speed: float, settings: Settings
                     "Retry this step or use the browser voice.",
                 ) from exc
 
-            if response.status_code == 429 or response.status_code >= 500:
-                if attempt == 0:
-                    await asyncio.sleep(1)
-                    continue
-                raise ApiError(
-                    503,
-                    ErrorCode.UPSTREAM_BUSY,
-                    "Gnani speech is temporarily busy.",
-                    "Retry this step or use the browser voice.",
-                )
-            if response.status_code == 401:
-                raise ApiError(503, ErrorCode.NO_API_KEY, "Gnani speech credentials were rejected.")
-            if response.status_code in (402, 403):
-                raise ApiError(
-                    503,
-                    ErrorCode.UPSTREAM_ERROR,
-                    "Gnani speech is unavailable for this account.",
-                    "Check the Gnani account credits and Timbre access.",
-                )
-            if response.status_code >= 400:
+            except GnaniAuthenticationError as exc:
+                raise ApiError(503, ErrorCode.NO_API_KEY, "Gnani speech credentials were rejected.") from exc
+            except GnaniAPIError as exc:
+                if exc.status_code == 429 or exc.status_code >= 500:
+                    if attempt == 0:
+                        await asyncio.sleep(1)
+                        continue
+                    raise ApiError(
+                        503,
+                        ErrorCode.UPSTREAM_BUSY,
+                        "Gnani speech is temporarily busy.",
+                        "Retry this step or use the browser voice.",
+                    ) from exc
+                if exc.status_code == 402 or exc.status_code == 403:
+                    raise ApiError(
+                        503,
+                        ErrorCode.UPSTREAM_ERROR,
+                        "Gnani speech is unavailable for this account.",
+                        "Check the Gnani account credits and Timbre access.",
+                    ) from exc
                 raise ApiError(
                     422,
                     ErrorCode.INVALID_INPUT,
                     "Gnani could not synthesize this step.",
                     "Review the step text or use the browser voice.",
-                )
-            if not response.content:
-                raise ApiError(502, ErrorCode.UPSTREAM_ERROR, "Gnani returned empty speech audio.")
-            if not response.headers.get("content-type", "").startswith("audio/"):
-                raise ApiError(502, ErrorCode.UPSTREAM_ERROR, "Gnani returned an invalid speech-audio response.")
+                ) from exc
 
-            audio = response.content
+            if not audio:
+                raise ApiError(502, ErrorCode.UPSTREAM_ERROR, "Gnani returned empty speech audio.")
+
             _tts_cache[cache_key] = audio
             _tts_cache.move_to_end(cache_key)
             while len(_tts_cache) > _MAX_CACHE_ENTRIES:
@@ -130,6 +114,19 @@ async def _synthesize(text: str, language: str, speed: float, settings: Settings
             return audio
 
     raise ApiError(503, ErrorCode.UPSTREAM_BUSY, "Gnani speech is temporarily busy.")
+
+
+def _synthesize_with_sdk(text: str, language: str, speed: float, api_key: str) -> bytes:
+    """Run the synchronous Gnani SDK request outside the async event loop."""
+    client = GnaniTTSClient(api_key=api_key)
+    return client.synthesize(
+        text,
+        voice=_TTS_VOICE,
+        model=_TTS_MODEL,
+        language=language,
+        speed=speed,
+        audio_config=AudioConfig(container="wav", encoding="linear_pcm", sample_rate=48000),
+    )
 
 
 @router.post("/speak", response_class=Response)

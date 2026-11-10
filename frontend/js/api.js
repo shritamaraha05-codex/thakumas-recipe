@@ -197,7 +197,7 @@ export const api = {
   speak: (token, text, { language = 'bn-IN', speed = 1, signal } = {}) =>
     request('/api/speak', {
       method: 'POST', token, body: { text, language, speed }, signal,
-      timeoutMs: 60000, responseType: 'blob',
+      timeoutMs: 90000, responseType: 'blob',
     }),
 
   createRecipe: (token, payload) =>

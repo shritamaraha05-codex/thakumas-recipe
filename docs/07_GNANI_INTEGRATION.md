@@ -21,7 +21,7 @@ Facts below come from docs.gnani.ai (read 1-3 Nov 2026). **Nothing has been run 
 - Pass numbers, dates and IDs as spoken words: raw digits are mispronounced (see their Text Normalization Guide). Implement `gnani/tts_text.py` (COK-3).
 
 ## Cook Mode integration status
-- `/api/speak` is implemented as an authenticated backend proxy using `GNANI_TTS_MODEL`, `GNANI_VOICE`, `GNANI_TTS_URL` and `GNANI_TTS_TIMEOUT`; the API key is never sent to the browser. WAV responses are cached in a bounded process-local cache. Gnani calls share one request lock with STT because some accounts permit only one concurrent call.
+- `/api/speak` is an authenticated backend proxy using the official `gnani-vachana` SDK and the existing `GNANI_API_KEY`. Timbre model `timbre-v3.0` and voice `Shivani` are code defaults; the SDK provides the endpoint and its 60-second request timeout. The API key is never sent to the browser. WAV responses are cached in a bounded process-local cache. Gnani calls share one request lock with STT because some accounts permit only one concurrent call.
 - `GNANI_MOCK=1` and upstream failures return an error that tells the frontend to use browser speech. Bengali selection sends the original Bengali step to Timbre (`bn-IN`); English selection sends the generated English translation (`en-IN`) when the translation provider is configured.
 - Live audio output has not been smoke-tested in this workspace because no real Gnani request was made.
 
