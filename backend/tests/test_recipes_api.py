@@ -150,6 +150,36 @@ def test_get_recipe_returns_exact_transcript_and_full_draft(client: TestClient) 
     assert body["tags"] == ["fish", "bengali"]
 
 
+def test_recipe_translation_returns_one_english_line_per_bengali_step(client: TestClient) -> None:
+    class FakeTranslationProvider:
+        name = "test"
+
+        async def generate(self, *, system_instruction, prompt, response_schema):
+            assert "Translate each Bengali recipe step" in system_instruction
+            assert "চিতল মাছ" in prompt
+            return response_schema(translations=["Wash the fish well."])
+
+    client.app.state.settings = client.app.state.settings.model_copy(
+        update={"gemini_api_key": "test-key"}
+    )
+    client.app.state.llm_provider_factory = lambda settings: FakeTranslationProvider()
+    created = _create(client).json()
+    response = client.get(
+        f"/api/recipes/{created['id']}/translation", headers=_auth()
+    )
+    assert response.status_code == 200
+    assert response.json() == {"translations": ["Wash the fish well."]}
+
+
+def test_recipe_translation_requires_configured_provider(client: TestClient) -> None:
+    created = _create(client).json()
+    response = client.get(
+        f"/api/recipes/{created['id']}/translation", headers=_auth()
+    )
+    assert response.status_code == 503
+    assert response.json()["error"]["code"] == "LLM_UNAVAILABLE"
+
+
 def test_bengali_unicode_survives_the_round_trip(client: TestClient) -> None:
     created = _create(client).json()
     body = client.get(f"/api/recipes/{created['id']}", headers=_auth()).json()

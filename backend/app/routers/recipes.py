@@ -7,10 +7,12 @@ the SQL functions' explicit ``auth.uid()`` checks.
 
 from __future__ import annotations
 
-from collections.abc import AsyncIterator
+from collections.abc import AsyncIterator, Callable
+import json
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Query
+from pydantic import BaseModel, Field
 
 from ..auth import AuthContext, get_auth_context
 from ..config import Settings
@@ -30,11 +32,20 @@ from ..db import (
     RecipeUpdated,
     build_user_client,
 )
-from ..dependencies import get_settings
+from ..dependencies import get_llm_provider_factory, get_settings
 from ..errors import ApiError
 from ..models import ErrorCode
+from ..providers import ProviderError, StructuredLLMProvider
 
 router = APIRouter(tags=["recipes"])
+
+
+class TranslationResponse(BaseModel):
+    translations: list[str]
+
+
+class _TranslationsSchema(BaseModel):
+    translations: list[str] = Field(min_length=1, max_length=100)
 
 
 async def get_repository(
@@ -93,6 +104,40 @@ async def get_recipe(
     repository: RecipeRepository = Depends(get_repository),
 ) -> RecipeDetail:
     return await _call(repository.get_recipe(str(recipe_id)))
+
+
+@router.get("/recipes/{recipe_id}/translation", response_model=TranslationResponse)
+async def translate_recipe_steps(
+    recipe_id: UUID,
+    repository: RecipeRepository = Depends(get_repository),
+    settings: Settings = Depends(get_settings),
+    provider_factory: Callable[[Settings], StructuredLLMProvider] = Depends(get_llm_provider_factory),
+) -> TranslationResponse:
+    recipe = await _call(repository.get_recipe(str(recipe_id)))
+    steps = recipe.draft.get("recipe", {}).get("steps", [])
+    source_texts = [str(step.get("text", "")) for step in steps]
+    if not source_texts:
+        return TranslationResponse(translations=[])
+    if not settings.gemini_api_key:
+        raise ApiError(503, ErrorCode.LLM_UNAVAILABLE, "English translation is not configured.", "Keep the Bengali recipe visible or configure the translation provider.")
+    try:
+        provider = provider_factory(settings)
+        result = await provider.generate(
+            system_instruction=(
+                "Translate each Bengali recipe step into clear, concise English. "
+                "Preserve ingredients, quantities, order, and cooking meaning. "
+                "Return exactly one translation per input step in the same order. "
+                "Do not add instructions or facts."
+            ),
+            prompt=json.dumps({"steps": source_texts}, ensure_ascii=False),
+            response_schema=_TranslationsSchema,
+        )
+    except ProviderError as exc:
+        raise ApiError(503, ErrorCode.LLM_UNAVAILABLE, "English translation could not be loaded.", "Retry translation; the Bengali recipe is still available.") from exc
+    translations = result.translations
+    if len(translations) != len(source_texts) or any(not value.strip() for value in translations):
+        raise ApiError(502, ErrorCode.UPSTREAM_ERROR, "English translation returned incomplete steps.", "Retry translation; the Bengali recipe is still available.")
+    return TranslationResponse(translations=translations)
 
 
 @router.put("/recipes/{recipe_id}", response_model=RecipeUpdated)

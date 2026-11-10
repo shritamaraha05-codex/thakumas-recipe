@@ -25,6 +25,7 @@ The UI shows a "Running on <provider>" badge only when that provider actually an
 
 ## What the LLM is used for (all optional, all validated)
 UND-2 extraction; CAP-3 interview follow-up questions; COK-4 kitchen rescue (labelled advice); UND-5 later. The LLM never produces grams.
+Recipe-detail English translation is also optional and owner-scoped. It translates only the saved step text when requested by the English-language recipe view; generated translations are not saved. Bengali remains available when the provider is unavailable.
 
 ## Evon on Kaggle: facts and plan
 Facts: Evon v3.3 is a ~31.7B-parameter hybrid Mamba MoE (about 3B active), BF16 weights (~63 GB), Apache-2.0, 131k context. The model card says to pass `enable_thinking=False` to disable reasoning traces. Kaggle free: 2x T4 (32 GB combined) or one P100 (16 GB), roughly 30 GPU-hours/week, sessions 9-12 h, 20 GB disk. The plain `from_pretrained` in the original notebook will run out of memory.

@@ -161,6 +161,9 @@ svg{display:block;flex:none}
 .secondary-action{background:#f4e8d5;color:#604735;border-color:#ead8bd}
 .toast{position:fixed;z-index:50;bottom:76px;left:50%;transform:translateX(-50%) translateY(8px);padding:9px 14px;border-radius:8px;background:#2d1d14;color:#fff7e9;font-size:12px;box-shadow:var(--shadow);opacity:0;pointer-events:none;transition:.2s;white-space:nowrap}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.step-translation{margin:4px 0 12px;padding-left:1px;color:#7a604a;font-size:15px;line-height:1.6;font-weight:400}
+.step-translation-label{display:block;margin-bottom:2px;color:#947b62;font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase}
+.translation-retry{margin-left:8px;padding:3px 8px;border:1px solid #dfc9a9;border-radius:6px;background:#fffaf0;color:#8f301f;font:inherit;font-size:12px;cursor:pointer}
 .hidden{display:none!important}
 @media(max-width:760px){
  .topbar{height:auto;min-height:60px;padding:9px 13px;flex-wrap:wrap;gap:8px}
@@ -531,6 +534,8 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
   let currentToken = null;
   let currentLanguage = getLanguage();
   let currentRecipe = null;
+  let currentTranslations = null;
+  let translationStatus = 'idle';
   let recipeId = null;
 
   function toBanglaDigits(value) {
@@ -642,6 +647,30 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
           const h3 = document.createElement('h3');
           h3.textContent = step.text || '';
           article.appendChild(h3);
+
+          if (currentLanguage === 'en') {
+            const translation = document.createElement('p');
+            translation.className = 'step-translation';
+            const label = document.createElement('span');
+            label.className = 'step-translation-label';
+            label.textContent = 'English translation';
+            translation.appendChild(label);
+            const translationText = document.createElement('span');
+            const translated = currentTranslations?.[idx];
+            translationText.textContent = translated || (translationStatus === 'error'
+              ? 'Translation unavailable.'
+              : translationStatus === 'loading' ? 'Translating…' : 'Translation is loading…');
+            translation.appendChild(translationText);
+            if (idx === 0 && translationStatus === 'error') {
+              const retry = document.createElement('button');
+              retry.type = 'button';
+              retry.className = 'translation-retry';
+              retry.textContent = 'Retry translation';
+              retry.addEventListener('click', () => void loadEnglishTranslations(currentRecipe.id));
+              translation.appendChild(retry);
+            }
+            article.appendChild(translation);
+          }
 
           // Ingredients for this step
           if (step.quantities && step.quantities.length > 0) {
@@ -765,11 +794,16 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
         throw new Error(currentLanguage === 'en' ? 'The recipe service returned incomplete details.' : 'রেসিপি সার্ভিস থেকে অসম্পূর্ণ বিবরণ পাওয়া গেছে।');
       }
       currentRecipe = recipe;
+      currentTranslations = null;
+      translationStatus = 'idle';
       done(() => {
         if (zone && _recipeZoneHTML) zone.innerHTML = _recipeZoneHTML;
         if (zone) hideSkeleton(zone);
         renderRecipeData(recipe);
       });
+      if (recipe.draft.recipe.steps.some(step => /[\u0980-\u09ff]/.test(step.text || ''))) {
+        void loadEnglishTranslations(recipe.id);
+      }
     } catch (err) {
       console.error('[detail] Failed to load:', err);
       const lang = currentLanguage || 'en';
@@ -796,6 +830,22 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
         }
       });
     }
+  }
+
+  async function loadEnglishTranslations(id) {
+    if (translationStatus === 'loading') return;
+    translationStatus = 'loading';
+    if (currentRecipe) renderRecipeData(currentRecipe);
+    try {
+      const result = await api.getRecipeTranslation(currentToken, id);
+      if (currentRecipe?.id !== id) return;
+      currentTranslations = Array.isArray(result?.translations) ? result.translations : [];
+      translationStatus = 'ready';
+    } catch (error) {
+      console.warn('[detail] English translation unavailable:', error);
+      translationStatus = 'error';
+    }
+    if (currentRecipe?.id === id) renderRecipeData(currentRecipe);
   }
 
   // Edit flow

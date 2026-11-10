@@ -50,12 +50,36 @@ def _validate_wav(content: bytes) -> None:
         raise ApiError(422, ErrorCode.AUDIO_TOO_LONG, "Audio chunks must be 30 seconds or shorter.")
 
 
+def _validate_adts_aac(content: bytes) -> None:
+    sample_rates = (96000, 88200, 64000, 48000, 44100, 32000, 24000, 22050, 16000, 12000, 11025, 8000, 7350)
+    offset = 0
+    duration = 0.0
+    frames = 0
+    while offset < len(content):
+        if offset + 7 > len(content) or content[offset] != 0xFF or content[offset + 1] & 0xF6 != 0xF0:
+            raise ApiError(422, ErrorCode.INVALID_INPUT, "Audio must be a valid ADTS AAC file.")
+        rate_index = (content[offset + 2] >> 2) & 0x0F
+        rate = sample_rates[rate_index] if rate_index < len(sample_rates) else 0
+        header_length = 7 if content[offset + 1] & 1 else 9
+        frame_length = ((content[offset + 3] & 3) << 11) | (content[offset + 4] << 3) | (content[offset + 5] >> 5)
+        if not rate or frame_length < header_length or offset + frame_length > len(content):
+            raise ApiError(422, ErrorCode.INVALID_INPUT, "Audio must contain complete ADTS AAC frames.")
+        duration += (1024 * ((content[offset + 6] & 3) + 1)) / rate
+        offset += frame_length
+        frames += 1
+    if not frames:
+        raise ApiError(422, ErrorCode.INVALID_INPUT, "Audio is empty.")
+    if duration > MAX_SECONDS:
+        raise ApiError(422, ErrorCode.AUDIO_TOO_LONG, "Audio chunks must be 30 seconds or shorter.")
+
+
 async def _transcribe_with_gnani(
     content: bytes,
     filename: str,
     language: str,
     previous_text: str | None,
     settings: Settings,
+    content_type: str,
 ) -> TranscriptionResponse:
     if not settings.gnani_api_key:
         raise ApiError(
@@ -81,7 +105,7 @@ async def _transcribe_with_gnani(
                         settings.gnani_stt_url,
                         headers={"X-API-Key-ID": settings.gnani_api_key},
                         data=form,
-                        files={"audio_file": (filename, content, "audio/wav")},
+                        files={"audio_file": (filename, content, content_type)},
                     )
             except httpx.TimeoutException as exc:
                 raise ApiError(504, ErrorCode.UPSTREAM_BUSY, "Speech transcription timed out.", "Retry the chunk.") from exc
@@ -127,15 +151,22 @@ async def transcribe_narration(
 ) -> TranscriptionResponse:
     if not consent:
         raise ApiError(403, ErrorCode.CONSENT_REQUIRED, "Speaker consent is required before transcription.")
-    if audio.content_type not in ("audio/wav", "audio/x-wav", "application/octet-stream"):
-        raise ApiError(422, ErrorCode.INVALID_INPUT, "Audio must be converted to WAV before transcription.")
-    content = await audio.read(MAX_WAV_BYTES + 1)
-    if len(content) > MAX_WAV_BYTES:
-        raise ApiError(422, ErrorCode.AUDIO_TOO_LONG, "Audio chunks must be 30 seconds or shorter.")
-    _validate_wav(content)
+    content_type = audio.content_type or "application/octet-stream"
+    content = await audio.read(MAX_WAV_BYTES + 1 if content_type in ("audio/wav", "audio/x-wav") else -1)
+    if content_type in ("audio/wav", "audio/x-wav"):
+        if len(content) > MAX_WAV_BYTES:
+            raise ApiError(422, ErrorCode.AUDIO_TOO_LONG, "Audio chunks must be 30 seconds or shorter.")
+        _validate_wav(content)
+        provider_type = "audio/wav"
+    elif content_type in ("audio/aac", "audio/x-aac", "application/octet-stream"):
+        _validate_adts_aac(content)
+        provider_type = "audio/aac"
+    else:
+        raise ApiError(422, ErrorCode.INVALID_INPUT, "Audio must be PCM WAV or ADTS AAC.")
 
     if settings.gnani_mock:
         fixture_transcript = MOCK_TRANSCRIPT_PATH.read_text(encoding="utf-8").strip()
         transcript = mock_transcript if mock_transcript is not None else fixture_transcript if not previous_text else ""
         return TranscriptionResponse(transcript=transcript, detected_language_code=language, mock=True)
-    return await _transcribe_with_gnani(content, audio.filename or "narration.wav", language, previous_text, settings)
+    default_name = "narration.aac" if provider_type == "audio/aac" else "narration.wav"
+    return await _transcribe_with_gnani(content, audio.filename or default_name, language, previous_text, settings, provider_type)

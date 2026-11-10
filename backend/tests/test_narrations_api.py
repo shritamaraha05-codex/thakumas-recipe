@@ -21,6 +21,13 @@ def _wav(seconds: float = 1) -> bytes:
     return output.getvalue()
 
 
+def _aac(seconds: float = 1) -> bytes:
+    # Synthetic ADTS frames (no audio content); each frame is 1024 samples at 44.1 kHz.
+    count = int(seconds * 44100 / 1024)
+    frame = bytes((0xFF, 0xF1, 0x50, 0x00, 0x01, 0x00, 0x00, 0x55))
+    return frame * count
+
+
 def _client(*, mock: bool = True, api_key: str = "") -> TestClient:
     settings = Settings(
         supabase_url="https://project.supabase.co",
@@ -181,3 +188,60 @@ def test_transcribe_rejects_audio_longer_than_30_seconds() -> None:
         )
     assert response.status_code == 422
     assert response.json()["error"]["code"] == "AUDIO_TOO_LONG"
+
+
+def test_mock_transcription_accepts_adts_aac() -> None:
+    with _client() as client:
+        response = client.post(
+            "/api/narrations/transcribe",
+            headers={"Authorization": "Bearer token", "X-Mock-Transcript": "aac mock"},
+            data={"consent": "true"},
+            files={"audio": ("recording.aac", _aac(), "audio/aac")},
+        )
+    assert response.status_code == 200
+    assert response.json()["transcript"] == "aac mock"
+
+
+def test_transcribe_rejects_adts_aac_longer_than_30_seconds() -> None:
+    with _client() as client:
+        response = client.post(
+            "/api/narrations/transcribe",
+            headers={"Authorization": "Bearer token"},
+            data={"consent": "true"},
+            files={"audio": ("recording.aac", _aac(31), "audio/aac")},
+        )
+    assert response.status_code == 422
+    assert response.json()["error"]["code"] == "AUDIO_TOO_LONG"
+
+
+def test_live_gnani_request_preserves_aac_format(monkeypatch) -> None:
+    from backend.app.routers import narrations
+
+    captured = {}
+
+    class StubResponse:
+        status_code = 200
+
+        @staticmethod
+        def json():
+            return {"transcript": "aac transcript"}
+
+    class StubAsyncClient:
+        def __init__(self, *, timeout): pass
+        async def __aenter__(self): return self
+        async def __aexit__(self, *args): return None
+        async def post(self, url, *, headers, data, files):
+            captured["files"] = files
+            return StubResponse()
+
+    monkeypatch.setattr(narrations.httpx, "AsyncClient", StubAsyncClient)
+    with _client(mock=False, api_key="test-api-key") as client:
+        response = client.post(
+            "/api/narrations/transcribe",
+            headers={"Authorization": "Bearer token"},
+            data={"consent": "true"},
+            files={"audio": ("recording.aac", _aac(), "audio/aac")},
+        )
+    assert response.status_code == 200
+    assert captured["files"]["audio_file"][0] == "recording.aac"
+    assert captured["files"]["audio_file"][2] == "audio/aac"

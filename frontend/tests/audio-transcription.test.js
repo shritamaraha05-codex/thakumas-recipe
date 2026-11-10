@@ -1,6 +1,14 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { splitMonoSamplesIntoWavChunks } from '../js/audio-transcription.js';
+import { splitAdtsAacIntoChunks, splitMonoSamplesIntoWavChunks } from '../js/audio-transcription.js';
+
+function makeAac(seconds) {
+  const count = Math.ceil(seconds * 44100 / 1024);
+  const frame = new Uint8Array([0xff, 0xf1, 0x50, 0x00, 0x01, 0x00, 0x00, 0x55]);
+  const data = new Uint8Array(count * frame.length);
+  for (let i = 0; i < count; i++) data.set(frame, i * frame.length);
+  return data.buffer;
+}
 
 function readWavChunk(blob) {
   return blob.arrayBuffer().then(buffer => {
@@ -38,4 +46,22 @@ test('splits a long recording sequentially at quiet frames with each REST clip u
   const headers = await Promise.all(chunks.map(readWavChunk));
   assert.ok(headers.every(header => header.seconds <= 25 && header.sampleRate === 16000 && header.channels === 1 && header.bits === 16));
   assert.ok(headers[0].seconds >= 23 && headers[0].seconds <= 23.2);
+});
+
+test('passes a short ADTS AAC clip through without browser decoding', async () => {
+  const source = makeAac(12);
+  const chunks = splitAdtsAacIntoChunks(source);
+  assert.equal(chunks.length, 1);
+  assert.equal(chunks[0].type, 'audio/aac');
+  assert.deepEqual(new Uint8Array(await chunks[0].arrayBuffer()), new Uint8Array(source));
+});
+
+test('splits long ADTS AAC on frame boundaries into sequential sub-30-second chunks', async () => {
+  const chunks = splitAdtsAacIntoChunks(makeAac(60));
+  assert.ok(chunks.length > 1);
+  for (const chunk of chunks) {
+    const bytes = new Uint8Array(await chunk.arrayBuffer());
+    assert.equal(bytes.length % 8, 0);
+    assert.ok(bytes.length / 8 * 1024 / 44100 <= 25.1);
+  }
 });

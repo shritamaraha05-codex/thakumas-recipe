@@ -53,6 +53,7 @@ h1{font-family:'Tiro Bangla',serif;margin:0;color:var(--ink);font-size:clamp(28p
 .guide-backdrop{position:fixed;inset:0;z-index:60;background:rgba(43,27,17,.40);backdrop-filter:blur(5px);display:grid;place-items:center;padding:18px;transition:opacity .25s ease}.guide-backdrop.hidden{display:none}.guide{width:min(630px,100%);background:var(--paper-2);border:1px solid #e5cfad;border-radius:24px;box-shadow:0 24px 70px rgba(33,19,10,.24);overflow:hidden;animation:guideIn .28s ease}.guide-top{padding:22px 25px 18px;background:radial-gradient(circle at 100% 0%,rgba(221,170,101,.18),transparent 45%),linear-gradient(135deg,#fffaf0,#f8ebd8);border-bottom:1px solid #ecddc6}.guide-eyebrow{font-size:11px;font-weight:700;color:var(--leaf);letter-spacing:.04em;display:flex;align-items:center;gap:7px}.guide h2{font-family:'Tiro Bangla',serif;font-size:28px;line-height:1.3;margin:8px 0 5px;color:var(--red-dark)}.guide-intro{font-size:14px;line-height:1.6;color:#725942;margin:0;max-width:540px}.guide-body{padding:20px 25px}.guide-points{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.guide-point{padding:12px 11px;border:1px solid #ecddc6;background:#fffaf1;border-radius:14px;min-height:116px}.guide-point .point-icon{width:31px;height:31px;border-radius:10px;background:#f8e6d5;color:var(--red);display:grid;place-items:center;font-size:16px;margin-bottom:8px}.guide-point strong{display:block;font-size:13px;margin-bottom:3px}.guide-point span{font-size:11px;line-height:1.45;color:var(--muted);display:block}.guide-voice{margin-top:13px;background:#f1f4eb;border:1px solid #dbe5d0;border-radius:13px;padding:11px 13px;display:flex;align-items:center;gap:10px;color:#456743;font-size:12px}.guide-voice-icon{width:31px;height:31px;background:#e1ecd9;border-radius:50%;display:grid;place-items:center;flex:none}.guide-actions{display:flex;align-items:center;justify-content:flex-end;gap:9px;padding:0 25px 22px}.guide-actions .action-btn{padding:11px 17px}.guide-actions .primary{min-width:165px}.guide-footer{font-size:10px;color:#9a856d;padding:0 25px 18px;text-align:center}
 .toast{position:fixed;bottom:24px;left:50%;transform:translate(-50%,12px);opacity:0;pointer-events:none;z-index:100;background:#34231a;color:#fff8ed;padding:10px 16px;border-radius:999px;font-size:12px;box-shadow:0 8px 24px rgba(34,20,12,.24);transition:.22s ease;white-space:nowrap}.toast.show{opacity:1;transform:translate(-50%,0)}
 @keyframes guideIn{from{opacity:0;transform:translateY(9px) scale(.985)}to{opacity:1;transform:translateY(0) scale(1)}}
+.guide-top{position:relative}.guide-close{position:absolute;right:14px;top:13px;width:36px;height:36px;border:1px solid #e4d2b7;border-radius:50%;background:#fffaf1;color:#684b37;font-size:23px;line-height:1}.guide-close:hover{background:#f6e6d3;color:var(--red)}.guide-top .guide-eyebrow,.guide-top h2,.guide-top .guide-intro{padding-right:32px}
 @media(max-width:900px){.workspace{grid-template-columns:1fr}.steps-card{padding:12px 14px}.step-list{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}.step-list:before{display:none}.step-nav{flex-direction:column;justify-content:center;text-align:center;gap:5px;padding:7px 3px;font-size:10px}.step-no{width:27px;height:27px}.active-step{grid-template-columns:1fr 42%;gap:16px}.recipe-head{align-items:flex-start;flex-direction:column}.first-timer-tag{white-space:normal}}
 @media(max-width:650px){.topbar{height:60px;padding:0 13px;gap:8px}.brand-mark{width:31px;height:31px;font-size:19px}.brand-name{font-size:19px}.brand-sub,.mode-pill{display:none}.top-right{gap:7px}.lang-switch button{padding:6px 9px}.exit-btn{width:32px;height:32px}.wrap{width:min(100% - 24px,560px);padding:20px 0 36px}.recipe-head{gap:12px;margin-bottom:14px}.recipe-meta{gap:6px}.meta-chip{font-size:11px;padding:5px 8px}.workspace{gap:10px}.steps-card{border-radius:16px;padding:10px}.section-label{display:none}.step-list{grid-template-columns:repeat(5,minmax(0,1fr))}.step-nav{font-size:9px}.step-no{width:24px;height:24px;font-size:10px}.cook-card{border-radius:17px}.cook-topline{padding:13px 14px 10px}.progress-meta{font-size:10px}.progress{max-width:110px}.active-step{grid-template-columns:1fr;padding:16px 15px 13px;gap:12px}.step-description{font-size:15px;line-height:1.65}.photo-frame{aspect-ratio:16/8.7}.ingredients{padding:0 15px 14px}.ingredient{padding:7px 9px;gap:6px}.ingredient-name{font-size:10px}.ingredient-name strong{font-size:11px}.ingredient-symbol{width:23px;height:23px}.control-area{padding:12px 13px 14px;display:flex;flex-direction:column;align-items:stretch;gap:10px}.timer-box{min-width:0;width:100%}.timer-actions{margin-left:auto}.main-actions{display:grid;grid-template-columns:.8fr 1fr 1fr}.action-btn{padding:10px 7px;font-size:11px;gap:4px}.voice-strip{padding:11px 12px;border-radius:15px;align-items:flex-start;flex-direction:column}.voice-commands{justify-content:flex-start}.guide-top{padding:18px 18px 15px}.guide h2{font-size:24px}.guide-intro{font-size:13px}.guide-body{padding:15px 18px}.guide-points{grid-template-columns:1fr;gap:7px}.guide-point{min-height:0;display:grid;grid-template-columns:30px 1fr;column-gap:9px;align-items:center;padding:9px 10px}.guide-point .point-icon{grid-row:span 2;margin:0}.guide-point strong{margin:0}.guide-point span{font-size:10px}.guide-actions{padding:0 18px 15px;flex-direction:column-reverse;align-items:stretch}.guide-actions .action-btn{width:100%}.guide-footer{padding:0 18px 15px}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}}
@@ -137,7 +138,7 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
         <div class="active-step" id="cook-active-step" style="grid-template-columns:1fr">
         <div class="instruction">
           <div class="instruction-kicker"><span class="kicker-dot"></span><span class="i18n" data-bn="এখন যা করবেন" data-en="What to do now">এখন যা করবেন</span></div>
-          <h2 class="step-title" id="step-title"></h2>
+          <h2 class="step-title" id="step-title" tabindex="-1"></h2>
           <p class="step-description" id="step-desc"></p>
           <div class="step-hint" id="tip-text" hidden></div>
         </div>
@@ -167,30 +168,31 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
   </section>
 
   <section class="voice-strip">
-    <div class="voice-left"><div class="mic-bubble" id="mic-bubble">♬</div><div><div class="voice-title i18n" id="voice-title" data-bn="কথায় বলুন, ঠাকুমার মতো রান্না করুন" data-en="Speak naturally and cook hands-free">কথায় বলুন, ঠাকুমার মতো রান্না করুন</div><div class="voice-sub" id="voice-sub"><span class="i18n" data-bn="ভয়েস কন্ট্রোল বন্ধ · চাইলে চালু করতে পারেন" data-en="Voice control is off · You can enable it anytime">ভয়েস কন্ট্রোল বন্ধ · চাইলে চালু করতে পারেন</span></div></div></div>
-    <div class="voice-commands"><button class="voice-toggle" id="voice-toggle" type="button" onclick="toggleVoiceControls()">ভয়েস চালু করুন</button><span class="voice-command i18n" data-bn="“পরের ধাপ”" data-en="“Next step”">“পরের ধাপ”</span><span class="voice-command i18n" data-bn="“আবার বলো”" data-en="“Repeat that”">“আবার বলো”</span><span class="voice-command i18n" data-bn="“থামো”" data-en="“Pause”">“থামো”</span></div>
+    <div class="voice-left"><div class="mic-bubble" id="mic-bubble">♬</div><div><div class="voice-title i18n" id="voice-title" data-bn="টাচ কন্ট্রোলে ধাপে ধাপে রান্না করুন" data-en="Cook one step at a time with touch controls">টাচ কন্ট্রোলে ধাপে ধাপে রান্না করুন</div><div class="voice-sub" id="voice-sub"><span class="i18n" data-bn="ভয়েস কন্ট্রোল এখন উপলভ্য নয় · বোতাম দিয়ে ধাপ চালান" data-en="Voice control isn’t available yet · Use the step buttons">ভয়েস কন্ট্রোল এখন উপলভ্য নয় · বোতাম দিয়ে ধাপ চালান</span></div></div></div>
+    <div class="voice-commands"><button class="voice-toggle i18n" id="voice-toggle" type="button" disabled title="Voice control is not available in this version" data-bn="ভয়েস কন্ট্রোল উপলভ্য নয়" data-en="Voice control unavailable">ভয়েস কন্ট্রোল উপলভ্য নয়</button><span class="voice-command i18n" data-bn="আগের ধাপ" data-en="Previous step">আগের ধাপ</span><span class="voice-command i18n" data-bn="আবার পড়ুন" data-en="Repeat step">আবার পড়ুন</span><span class="voice-command i18n" data-bn="পরের ধাপ" data-en="Next step">পরের ধাপ</span></div>
   </section>
-  <p class="bottom-hint i18n" data-bn="রান্নার সময় ফোনটি নিরাপদে, চোখের সামনে রাখুন। স্ক্রিনে হাত না দিয়েও ধাপ বদলাতে পারবেন।" data-en="Keep your phone safely within view while cooking. You can move between steps without touching the screen.">রান্নার সময় ফোনটি নিরাপদে, চোখের সামনে রাখুন। স্ক্রিনে হাত না দিয়েও ধাপ বদলাতে পারবেন।</p>
+  <p class="bottom-hint i18n" data-bn="রান্নার সময় ফোনটি নিরাপদে চোখের সামনে রাখুন। আগের, আবার পড়ুন ও পরের বোতাম ব্যবহার করুন।" data-en="Keep your phone safely within view. Use Previous, Repeat, and Next to move through the recipe.">রান্নার সময় ফোনটি নিরাপদে চোখের সামনে রাখুন। আগের, আবার পড়ুন ও পরের বোতাম ব্যবহার করুন।</p>
 </main>
 
 <!-- First-time onboarding: visible on a user's first visit -->
-<div class="guide-backdrop" id="first-guide" role="dialog" aria-modal="true" aria-labelledby="guide-title">
+<div class="guide-backdrop hidden" id="first-guide" role="dialog" aria-modal="true" aria-labelledby="guide-title" aria-hidden="true">
   <section class="guide">
     <div class="guide-top">
+      <button class="guide-close" id="guide-close" type="button" aria-label="Close Cook Mode introduction">×</button>
       <div class="guide-eyebrow"><span>✦</span><span class="i18n" data-bn="আপনার প্রথম রান্না মোড" data-en="Your first Cook Mode session">আপনার প্রথম রান্না মোড</span></div>
       <h2 id="guide-title" class="i18n" data-bn="চলুন, একসঙ্গে রান্না শুরু করি!" data-en="Let’s cook together, one step at a time!">চলুন, একসঙ্গে রান্না শুরু করি!</h2>
-      <p class="guide-intro i18n" data-bn="এই মোডে ঠাকুমার রেসিপি ধাপে ধাপে দেখানো হবে। আপনি চাইলে কণ্ঠে নির্দেশ দিতে পারবেন, আবার স্ক্রিনের বোতাম দিয়েও সব নিয়ন্ত্রণ করতে পারবেন।" data-en="Cook Mode guides you through Thakuma’s recipe one step at a time. You can use voice commands or control everything with the on-screen buttons.">এই মোডে ঠাকুমার রেসিপি ধাপে ধাপে দেখানো হবে। আপনি চাইলে কণ্ঠে নির্দেশ দিতে পারবেন, আবার স্ক্রিনের বোতাম দিয়েও সব নিয়ন্ত্রণ করতে পারবেন।</p>
+      <p class="guide-intro i18n" data-bn="এই মোডে সংরক্ষিত রেসিপি ধাপে ধাপে দেখানো হবে। আগের, আবার পড়ুন এবং পরের বোতাম দিয়ে রান্না চালান।" data-en="Cook Mode guides you through a saved recipe one step at a time. Use Previous, Repeat, and Next to control the steps.">এই মোডে সংরক্ষিত রেসিপি ধাপে ধাপে দেখানো হবে। আগের, আবার পড়ুন এবং পরের বোতাম দিয়ে রান্না চালান।</p>
     </div>
     <div class="guide-body">
       <div class="guide-points">
         <div class="guide-point"><div class="point-icon">◉</div><strong class="i18n" data-bn="ফোনটি সামনে রাখুন" data-en="Place your phone nearby">ফোনটি সামনে রাখুন</strong><span class="i18n" data-bn="রান্নার জায়গা থেকে যেন ধাপগুলো দেখা যায়।" data-en="Keep the steps visible from your cooking area.">রান্নার জায়গা থেকে যেন ধাপগুলো দেখা যায়।</span></div>
-        <div class="guide-point"><div class="point-icon">♬</div><strong class="i18n" data-bn="নির্দেশ শুনুন" data-en="Listen to each step">নির্দেশ শুনুন</strong><span class="i18n" data-bn="‘আবার বলো’ বললে নির্দেশটি আবার শোনাবে।" data-en="Say “Repeat that” to hear the instruction again.">‘আবার বলো’ বললে নির্দেশটি আবার শোনাবে।</span></div>
-        <div class="guide-point"><div class="point-icon">➜</div><strong class="i18n" data-bn="ধাপে ধাপে এগোন" data-en="Move at your own pace">ধাপে ধাপে এগোন</strong><span class="i18n" data-bn="‘পরের ধাপ’ বলুন বা বোতাম চাপুন।" data-en="Say “Next step” or tap the button.">‘পরের ধাপ’ বলুন বা বোতাম চাপুন।</span></div>
+        <div class="guide-point"><div class="point-icon">♬</div><strong class="i18n" data-bn="ধাপ আবার শুনুন" data-en="Hear a step again">ধাপ আবার শুনুন</strong><span class="i18n" data-bn="আবার পড়ুন বোতামটি ব্যবহার করুন।" data-en="Use the Repeat step button.">আবার পড়ুন বোতামটি ব্যবহার করুন।</span></div>
+        <div class="guide-point"><div class="point-icon">➜</div><strong class="i18n" data-bn="নিজের গতিতে এগোন" data-en="Move at your own pace">নিজের গতিতে এগোন</strong><span class="i18n" data-bn="পরের ধাপ বোতামে চাপ দিন।" data-en="Tap Next step when you’re ready.">পরের ধাপ বোতামে চাপ দিন।</span></div>
       </div>
-      <div class="guide-voice"><div class="guide-voice-icon">♩</div><div><strong class="i18n" data-bn="মাইক্রোফোন আপনার অনুমতি ছাড়া চালু হবে না।" data-en="Your microphone won’t turn on without permission.">মাইক্রোফোন আপনার অনুমতি ছাড়া চালু হবে না।</strong><div class="i18n" data-bn="ভয়েস কন্ট্রোল ঐচ্ছিক—না দিলেও টাচ কন্ট্রোল কাজ করবে।" data-en="Voice control is optional; touch controls work either way.">ভয়েস কন্ট্রোল ঐচ্ছিক—না দিলেও টাচ কন্ট্রোল কাজ করবে।</div></div></div>
+      <div class="guide-voice"><div class="guide-voice-icon">♩</div><div><strong class="i18n" data-bn="ভয়েস কন্ট্রোল এখনও তৈরি হয়নি।" data-en="Voice control isn’t available yet.">ভয়েস কন্ট্রোল এখনও তৈরি হয়নি।</strong><div class="i18n" data-bn="রান্না চালাতে নিচের টাচ কন্ট্রোলগুলো ব্যবহার করুন।" data-en="Use the touch controls below to cook.">রান্না চালাতে নিচের টাচ কন্ট্রোলগুলো ব্যবহার করুন।</div></div></div>
     </div>
-    <div class="guide-actions"><button class="action-btn" type="button" onclick="startCook(false)"><span class="i18n" data-bn="টাচ দিয়ে চালাবো" data-en="Use touch controls">টাচ দিয়ে চালাবো</span></button><button class="action-btn primary" type="button" onclick="startCook(true)"><span class="i18n" data-bn="রান্না শুরু করি" data-en="Start cooking">রান্না শুরু করি</span><span>→</span></button></div>
-    <div class="guide-footer i18n" data-bn="আপনি পরে যেকোনো সময় ভয়েস কন্ট্রোল চালু করতে পারবেন।" data-en="You can enable voice control later at any time.">আপনি পরে যেকোনো সময় ভয়েস কন্ট্রোল চালু করতে পারবেন।</div>
+    <div class="guide-actions"><button class="action-btn" id="guide-touch-btn" type="button"><span class="i18n" data-bn="টাচ কন্ট্রোল ব্যবহার করুন" data-en="Use touch controls">টাচ কন্ট্রোল ব্যবহার করুন</span></button><button class="action-btn primary" id="guide-start-btn" type="button"><span class="i18n" data-bn="রান্না শুরু করি" data-en="Start cooking">রান্না শুরু করি</span><span>→</span></button></div>
+    <div class="guide-footer i18n" data-bn="পরিচিতিটি বন্ধ করে যেকোনো সময় রান্নায় ফিরুন।" data-en="Close this introduction and return to cooking anytime.">পরিচিতিটি বন্ধ করে যেকোনো সময় রান্নায় ফিরুন।</div>
   </section>
 </div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
@@ -249,6 +251,7 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
   let synth = typeof window !== 'undefined' ? window.speechSynthesis : null;
   let steps = [];
   let recipeTitle = '';
+  const guideStorageKey = 'thakuma-cook-guide-dismissed';
 
   // Clear the legacy demonstration content before authentication or API checks.
   document.getElementById('step-list')?.replaceChildren();
@@ -304,6 +307,25 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
     toast.textContent = msg;
     toast.classList.add('show');
     setTimeout(() => toast.classList.remove('show'), 3500);
+  }
+
+  function closeCookGuide() {
+    const guide = document.getElementById('first-guide');
+    if (!guide || guide.classList.contains('hidden')) return;
+    guide.classList.add('hidden');
+    guide.setAttribute('aria-hidden', 'true');
+    try { localStorage.setItem(guideStorageKey, 'yes'); } catch { /* Storage may be disabled; the dialog still closes. */ }
+    document.getElementById('step-title')?.focus({ preventScroll: true });
+  }
+
+  function showCookGuideForFirstVisit() {
+    let dismissed = false;
+    try { dismissed = localStorage.getItem(guideStorageKey) === 'yes'; } catch { /* Show it when storage is unavailable. */ }
+    if (dismissed) return;
+    const guide = document.getElementById('first-guide');
+    guide?.classList.remove('hidden');
+    guide?.setAttribute('aria-hidden', 'false');
+    document.getElementById('guide-start-btn')?.focus({ preventScroll: true });
   }
 
   function renderStepsList() {
@@ -707,6 +729,17 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
     document.getElementById('repeat-step-btn')?.addEventListener('click', repeatStep);
     document.getElementById('timer-toggle-btn')?.addEventListener('click', toggleTimer);
     document.getElementById('timer-reset-btn')?.addEventListener('click', () => resetTimer(steps[currentStep]?.duration || 0));
+    document.getElementById('guide-touch-btn')?.addEventListener('click', closeCookGuide);
+    document.getElementById('guide-start-btn')?.addEventListener('click', closeCookGuide);
+    document.getElementById('guide-close')?.addEventListener('click', closeCookGuide);
+    document.getElementById('first-guide')?.addEventListener('click', event => {
+      if (event.target.id === 'first-guide') closeCookGuide();
+    });
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape' && !document.getElementById('first-guide')?.classList.contains('hidden')) {
+        closeCookGuide();
+      }
+    });
 
     // Back to recipe detail link
     const backBtn = document.querySelector('a[href*="detail"], a.back-link');
@@ -716,6 +749,7 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
     }
 
     await loadRecipeForCooking();
+    showCookGuideForFirstVisit();
   }
 
   window.addEventListener('pagehide', () => {

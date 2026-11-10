@@ -78,6 +78,7 @@ All routes below require `Authorization: Bearer <access_token>` (see Authenticat
 - `GET /api/recipes/{id}` -> the latest version if the authenticated user owns it, else `404 NOT_FOUND` (also for malformed/nonexistent ids; malformed UUIDs get `422 INVALID_INPUT`). Shape: `{id, title, version, original_transcript, draft, tags, created_at, updated_at}`. The draft is returned exactly as saved; the parser is never re-run.
 - `PUT /api/recipes/{id}` `{title?, tags?, original_transcript, draft}` -> `{id, version}` with the **new** version number. This always creates a new immutable `recipe_versions` row; previous versions are never overwritten. Omitted `title`/`tags` keep the existing recipe metadata. Only the owner may update, else `404 NOT_FOUND`.
 - `DELETE /api/recipes/{id}` -> `{id, deleted: true}`. Owner only, else `404 NOT_FOUND`. Deleting a recipe cascades to all its versions.
+- `GET /api/recipes/{id}/translation` -> `{translations: string[]}` in recipe-step order. Owner only. Uses the configured Gemini provider on demand; it sends only step text and does not save generated translations. If Gemini is unavailable, returns `503 LLM_UNAVAILABLE` and the client keeps the original Bengali visible.
 
 Versions are sequential per recipe (1, 2, 3, …); `unique(recipe_id, version_number)` and a locked recipe row in the `add_recipe_version` RPC prevent collisions. The latest version is the default view. `hand_profile_id`/`servings` are not part of the recipe endpoints (automatic calibration resolution and scaling remain unavailable).
 
@@ -98,6 +99,7 @@ Multi-person profile and consent management (M-18's original scope) remains post
 - `GET /api/profiles/{id}/suggest?recipe_id=` -> top-3 weighings that would tighten the recipe most
 
 ## Voice
+- `POST /api/narrations/transcribe` (multipart: `audio`, `language`, `consent`, optional `previous_text`) accepts mono 16 kHz PCM16 WAV or ADTS AAC; consent is required. Each request must contain a valid clip of at most 30 seconds. The browser passes ADTS AAC through without decoding and splits longer AAC recordings at complete frame boundaries into sequential clips of at most 25 seconds; WAV recordings are mixed/resampled and split at low-energy boundaries. Audio is processed in memory and discarded after transcription.
 - `POST /api/speak` `{text, language, voice?, speed?}` -> `audio/wav` (cached by hash of text+voice+language+speed). Applies `tts_text` number-to-words first.
 - `GET /api/recipes/{id}/audio?language=` -> full recipe audio (`audio/wav`)
 - `POST /api/cook/command` (multipart: `audio` <=4 s, `language`) -> `{transcript, command:"next|prev|repeat|stop|timer|null", args}`

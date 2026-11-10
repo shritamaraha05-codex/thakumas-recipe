@@ -159,7 +159,8 @@ export const api = {
 
   transcribeAudio: (token, audioFile, { language = 'indic-auto', previousText = '', consent = false, signal } = {}) => {
     const body = new FormData();
-    body.append('audio', audioFile, 'narration.wav');
+    const extension = audioFile.type === 'audio/aac' ? 'aac' : audioFile.type === 'audio/wav' ? 'wav' : 'audio';
+    body.append('audio', audioFile, audioFile.name || `narration.${extension}`);
     body.append('language', language);
     body.append('consent', String(consent));
     if (previousText) body.append('previous_text', previousText);
@@ -179,6 +180,8 @@ export const api = {
     }),
 
   getRecipe: (token, id) => request(`/api/recipes/${encodeURIComponent(id)}`, { token }),
+
+  getRecipeTranslation: (token, id) => request(`/api/recipes/${encodeURIComponent(id)}/translation`, { token }),
 
   createRecipe: (token, payload) =>
     request('/api/recipes', { method: 'POST', token, body: payload }),
