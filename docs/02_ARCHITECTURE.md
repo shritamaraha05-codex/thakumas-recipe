@@ -43,7 +43,7 @@ docs/   scripts/   contributions/   prototype_v0/ (frozen reference)
 
 ## Key flows
 **Narration to recipe**: browser chunks audio -> `POST /api/narrations/transcribe` per chunk (server holds one global Gnani lock) -> merged transcript in review editor -> `POST /api/parse` -> steps with ranges + clarifications -> user answers -> `POST /api/recipes` with the user's access token (owner derived from the token).
-**Cook mode**: `GET /api/recipes/{id}` -> UI plays step audio (`/api/speak`, cached) -> mic to `/ws/cook` (P1) or short clips to `/api/cook/command` (P0).
+**Cook mode**: `GET /api/recipes/{id}` -> optional English step translation (`/api/recipes/{id}/translation`) -> UI requests selected-language step audio from authenticated `/api/speak` (Gnani Timbre, cached in memory; browser speech fallback) -> mic to `/ws/cook` (P1) or short clips to `/api/cook/command` (P0).
 
 ## Configuration (`.env`)
 | Var | Meaning |
@@ -51,6 +51,7 @@ docs/   scripts/   contributions/   prototype_v0/ (frozen reference)
 | GNANI_API_KEY | Gnani key; empty means mock mode only |
 | GNANI_MOCK | `1` returns canned transcripts/audio |
 | GNANI_STT_MODEL, GNANI_TTS_MODEL, GNANI_VOICE | defaults `prisma-v3.0`, `timbre-v3.0`, `Shivani` |
+| GNANI_TTS_URL, GNANI_TTS_TIMEOUT | Gnani Timbre REST endpoint and request timeout |
 | LLM_CHAIN | comma order, e.g. `gemini,ollama,evon_kaggle,rules` (rules is always the last fallback) |
 | GEMINI_API_KEY, GEMINI_MODEL | check current model names; do not hard-code |
 | OLLAMA_BASE_URL, OLLAMA_MODEL | default `http://localhost:11434/v1` |

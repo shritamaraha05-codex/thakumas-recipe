@@ -13,7 +13,7 @@ export class ApiError extends Error {
 
 const REQUEST_TIMEOUT_MS = 30000;
 
-async function request(path, { method = 'GET', token, body, params, signal, timeoutMs = REQUEST_TIMEOUT_MS } = {}) {
+async function request(path, { method = 'GET', token, body, params, signal, timeoutMs = REQUEST_TIMEOUT_MS, responseType = 'json' } = {}) {
   if (!config.isApiConfigured) {
     throw new ApiError(
       config.configError || 'Backend API URL is not configured.',
@@ -59,7 +59,7 @@ async function request(path, { method = 'GET', token, body, params, signal, time
     signal?.removeEventListener('abort', abortFromCaller);
     if (signal?.aborted) throw new ApiError('This request was cancelled.', 0, 'ABORTED');
     if (err?.name === 'TimeoutError' || controller.signal.reason?.name === 'TimeoutError') {
-      throw new ApiError('The request took too long to finish. Please retry.', 0, 'TIMEOUT', 'The backend did not respond within 30 seconds.');
+      throw new ApiError('The request took too long to finish. Please retry.', 0, 'TIMEOUT', 'The backend did not respond before this request timed out.');
     }
     const isLocal = config.isLocalhost;
     const msg = isLocal
@@ -72,12 +72,18 @@ async function request(path, { method = 'GET', token, body, params, signal, time
   }
 
   let text;
+  let binary = null;
   try {
-    text = await response.text();
+    if (responseType === 'blob' && response.ok) {
+      binary = await response.blob();
+      text = '';
+    } else {
+      text = await response.text();
+    }
   } catch (err) {
     if (signal?.aborted) throw new ApiError('This request was cancelled.', 0, 'ABORTED');
     if (controller.signal.reason?.name === 'TimeoutError') {
-      throw new ApiError('The request took too long to finish. Please retry.', 0, 'TIMEOUT', 'The backend did not respond within 30 seconds.');
+      throw new ApiError('The request took too long to finish. Please retry.', 0, 'TIMEOUT', 'The backend did not respond before this request timed out.');
     }
     throw new ApiError('The backend response could not be read. Please retry.', response.status, 'NETWORK_ERROR');
   } finally {
@@ -148,7 +154,7 @@ async function request(path, { method = 'GET', token, body, params, signal, time
     throw new ApiError('The backend returned an unreadable response.', response.status, 'INVALID_RESPONSE', 'Retry the request. If it continues, check the backend logs.');
   }
 
-  return payload;
+  return responseType === 'blob' ? binary : payload;
 }
 
 export const api = {
@@ -187,6 +193,12 @@ export const api = {
   getRecipe: (token, id) => request(`/api/recipes/${encodeURIComponent(id)}`, { token }),
 
   getRecipeTranslation: (token, id) => request(`/api/recipes/${encodeURIComponent(id)}/translation`, { token }),
+
+  speak: (token, text, { language = 'bn-IN', speed = 1, signal } = {}) =>
+    request('/api/speak', {
+      method: 'POST', token, body: { text, language, speed }, signal,
+      timeoutMs: 60000, responseType: 'blob',
+    }),
 
   createRecipe: (token, payload) =>
     request('/api/recipes', { method: 'POST', token, body: payload }),

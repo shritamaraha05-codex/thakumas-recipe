@@ -16,9 +16,14 @@ Facts below come from docs.gnani.ai (read 1-3 Nov 2026). **Nothing has been run 
 ## Text-to-speech (REST)
 - `POST https://api.vachana.ai/api/v1/tts/inference`, JSON, header `X-API-Key-ID`.
 - Body: `text`, `model` (`timbre-v2.5` | `timbre-v3.0`), `voice` (voices are per model), `language` (`auto, hi-IN, en-IN, ta-IN, te-IN, kn-IN, ml-IN, mr-IN, pa-IN, bn-IN, gu-IN, hi-en`), `speed` (0.85-1.15 or `slow|medium|fast`), `audio_config{sample_rate 8000..48000, num_channels, sample_width, encoding, container wav|raw|mp3|ogg|mulaw|alaw, bitrate}`.
-- Returns **binary audio** in the requested container (200), or 400/403/429/500/503 JSON errors.
+- Returns **binary audio** in the requested container (200), or 400/403/429/500/503 JSON errors. The [current official REST guide](https://docs.gnani.ai/api/TTS/tts-inference) confirms `POST /api/v1/tts/inference`, `X-API-Key-ID`, and WAV audio via `audio_config`.
 - Timbre v3.0: 13 voices, each speaks all 10 languages: Avinash, Shivani, Lakshmi, Kalpana, Shubham, Prakash, Devansh, Yashraj, Chetana, Vasudha, Riyaa, Tarika, Harshad; supports inline audio tags (`<pauses>`, `<whispers>`, `<slow>`, ...). v2.5 has 42 voices with a preferred language each (e.g. Nalini, Kaveri, Deepak, Poorvi for Hinglish) and strips audio tags. Default for us: `timbre-v3.0` + `Shivani`; **listen to several voices for Bengali and pick by ear** (record in `08`'s decision log).
 - Pass numbers, dates and IDs as spoken words: raw digits are mispronounced (see their Text Normalization Guide). Implement `gnani/tts_text.py` (COK-3).
+
+## Cook Mode integration status
+- `/api/speak` is implemented as an authenticated backend proxy using `GNANI_TTS_MODEL`, `GNANI_VOICE`, `GNANI_TTS_URL` and `GNANI_TTS_TIMEOUT`; the API key is never sent to the browser. WAV responses are cached in a bounded process-local cache. Gnani calls share one request lock with STT because some accounts permit only one concurrent call.
+- `GNANI_MOCK=1` and upstream failures return an error that tells the frontend to use browser speech. Bengali selection sends the original Bengali step to Timbre (`bn-IN`); English selection sends the generated English translation (`en-IN`) when the translation provider is configured.
+- Live audio output has not been smoke-tested in this workspace because no real Gnani request was made.
 
 ## Pages to read before implementing the related task
 STT WebSocket (`/api/STT/stt-websocket.md`) for COK-2; TTS SSE and WebSocket; Voice Clone Embeddings + Voice Cloned TTS (SHR-4); Available Voices; Text Normalization Guide; Limits; Error Reference; Changelog.

@@ -23,7 +23,7 @@ from .config import Settings, get_settings
 from .errors import ApiError
 from .models import ErrorCode, ErrorDetail, ErrorResponse
 from .providers import StructuredLLMProvider
-from .routers import hands, health, narrations, parse, recipes
+from .routers import hands, health, narrations, parse, recipes, speech
 from .routers.health import DbProbe, make_db_probe
 
 
@@ -68,6 +68,7 @@ def create_app(
     app.include_router(parse.router, prefix=resolved.api_prefix)
     app.include_router(narrations.router, prefix=resolved.api_prefix)
     app.include_router(recipes.router, prefix=resolved.api_prefix)
+    app.include_router(speech.router, prefix=resolved.api_prefix)
     app.include_router(hands.router, prefix=resolved.api_prefix)
 
     @app.exception_handler(RequestValidationError)

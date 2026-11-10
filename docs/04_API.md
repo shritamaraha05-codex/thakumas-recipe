@@ -8,7 +8,7 @@ JSON everywhere unless noted. Errors: `{"error":{"code":"...","message":"...","h
 
 ## Authentication (Supabase Auth)
 
-All recipe-management endpoints require a valid Supabase access token. The parser and speech endpoints stay public.
+All recipe-management endpoints and `/api/speak` require a valid Supabase access token. The parser is public; audio transcription requires authentication and consent.
 
 - Supabase Auth owns registration, login, logout, session management, and (if enabled on the project) Google and email/password sign-in. The frontend uses the Supabase client for all of this; **this API has no custom password signup/login endpoints and we never store passwords.**
 - After sign-in the frontend sends the token on every protected request: `Authorization: Bearer <access_token>`.
@@ -102,7 +102,8 @@ Multi-person profile and consent management (M-18's original scope) remains post
 ## Voice
 - `POST /api/narrations/transcribe` (multipart: `audio`, `language`, `consent`, optional `previous_text`) accepts mono 16 kHz PCM16 WAV or ADTS AAC; consent is required. Each request must contain a valid clip of at most 30 seconds. The browser passes ADTS AAC through without decoding and splits longer AAC recordings at complete frame boundaries into sequential clips of at most 25 seconds; WAV recordings are mixed/resampled and split at low-energy boundaries. Audio is processed in memory and discarded after transcription.
   - The browser allows up to 120 seconds for upload and transcription; the backend Gnani request timeout defaults to 60 seconds and can be set with `GNANI_STT_TIMEOUT`.
-- `POST /api/speak` `{text, language, voice?, speed?}` -> `audio/wav` (cached by hash of text+voice+language+speed). Applies `tts_text` number-to-words first.
+- `POST /api/speak` (authenticated) `{text, language:"bn-IN|en-IN", speed?}` -> binary `audio/wav` from the configured Gnani Timbre model and voice. The Gnani key stays on the backend. Results are cached in a bounded in-memory cache by model, voice, language, speed and text. In mock mode or when Timbre is unavailable, the API returns a documented error and Cook Mode falls back to browser speech.
+- Cook Mode requests `/api/recipes/{id}/translation` when English is selected; the original saved Bengali step stays visible and the English translation appears below it. Step speech follows the selected language: Bengali toggle speaks the original Bengali; English toggle speaks the English translation. If translation is unavailable, it keeps the original visible and reports that English speech is unavailable.
 - `GET /api/recipes/{id}/audio?language=` -> full recipe audio (`audio/wav`)
 - `POST /api/cook/command` (multipart: `audio` <=4 s, `language`) -> `{transcript, command:"next|prev|repeat|stop|timer|null", args}`
 - `POST /api/cook/rescue` `{recipe_id, step_idx, problem_text}` -> `{advice, caveats[]}` (LLM; always labelled advice)

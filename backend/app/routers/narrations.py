@@ -15,10 +15,10 @@ from ..auth import AuthContext, get_auth_context
 from ..config import Settings
 from ..dependencies import get_settings
 from ..errors import ApiError
+from ..gnani import request_lock
 from ..models import ErrorCode
 
 router = APIRouter(tags=["narrations"])
-_gnani_lock = asyncio.Lock()
 MAX_SECONDS = 30
 MAX_WAV_BYTES = 44 + (16_000 * 2 * MAX_SECONDS)
 MOCK_TRANSCRIPT_PATH = Path(__file__).resolve().parents[1] / "fixtures" / "mock_transcript_bn.txt"
@@ -97,7 +97,7 @@ async def _transcribe_with_gnani(
     if previous_text:
         form["previous_text"] = previous_text[-600:]
 
-    async with _gnani_lock:
+    async with request_lock:
         for attempt in range(2):
             try:
                 async with httpx.AsyncClient(timeout=settings.gnani_stt_timeout) as client:

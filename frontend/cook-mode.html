@@ -106,6 +106,11 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
 </style><style id="shared-header-content-offset">main.wrap{padding-top:126px!important}@media(max-width:620px){main.wrap{padding-top:140px!important}}</style><style>.recipe-meta[hidden]{display:none!important}</style><link rel="stylesheet" href="/assets/icons.css">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200">
 <link rel="stylesheet" href="/css/responsive.css">
+<style>
+.translated-step{display:block;margin-top:9px;padding-top:9px;border-top:1px solid #eadbc5;color:#765d46;font-size:.91em}
+.translated-label{display:block;margin-bottom:3px;color:#a3422e;font-size:11px;font-weight:700;letter-spacing:.02em}
+.translation-status{display:block;margin-top:8px;color:#8b7763;font-size:12px;font-style:italic}
+</style>
 </head>
 <body>
 <svg id="spoon" viewBox="0 0 46 46" aria-hidden="true"><g transform="rotate(-40 6 6)"><path d="M6 4 C0 4 0 16 6 18 C12 16 12 4 6 4Z" fill="#e0a526" stroke="#8e5a10" stroke-width="1.2"/><rect x="4.8" y="17" width="2.4" height="26" rx="1.2" fill="#b07a1c"/></g></svg>
@@ -250,7 +255,14 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
   let timeLeft = 0;
   let timerRunning = false;
   let synth = typeof window !== 'undefined' ? window.speechSynthesis : null;
+  let currentAudio = null;
+  let speechRequestId = 0;
+  let speechController = null;
   let steps = [];
+  let translations = [];
+  let translationsLoaded = false;
+  let translationsLoading = false;
+  let translationPromise = null;
   let recipeTitle = '';
   const guideStorageKey = 'thakuma-cook-guide-dismissed';
 
@@ -286,6 +298,7 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
     });
 
     renderStepsList();
+    ensureEnglishTranslations();
     renderCurrentStep();
     initIcons();
   }
@@ -298,9 +311,30 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
       if (v !== undefined) el.textContent = v;
     });
     renderStepsList();
+    ensureEnglishTranslations();
     renderCurrentStep();
     initIcons();
   });
+
+  function ensureEnglishTranslations() {
+    const id = new URLSearchParams(window.location.search).get('id');
+    if (currentLang !== 'en' || !id) return Promise.resolve();
+    if (translationsLoaded) return Promise.resolve();
+    if (translationsLoading) return translationPromise;
+    translationsLoading = true;
+    translationPromise = api.getRecipeTranslation(currentToken, id).then(result => {
+      translations = Array.isArray(result?.translations) ? result.translations : [];
+      translationsLoaded = true;
+      renderCurrentStep();
+    }).catch(error => {
+      console.info('[cook-mode] English step translation is unavailable:', error?.code || error?.message);
+    }).finally(() => {
+      translationsLoading = false;
+      renderCurrentStep();
+    });
+    renderCurrentStep();
+    return translationPromise;
+  }
 
   function notify(msg) {
     const toast = document.getElementById('toast');
@@ -322,11 +356,12 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
   function showCookGuideForFirstVisit() {
     let dismissed = false;
     try { dismissed = localStorage.getItem(guideStorageKey) === 'yes'; } catch { /* Show it when storage is unavailable. */ }
-    if (dismissed) return;
+    if (dismissed) return false;
     const guide = document.getElementById('first-guide');
     guide?.classList.remove('hidden');
     guide?.setAttribute('aria-hidden', 'false');
     document.getElementById('guide-start-btn')?.focus({ preventScroll: true });
+    return true;
   }
 
   function renderStepsList() {
@@ -388,7 +423,32 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
     if (titleEl) titleEl.textContent = s.title[currentLang] || s.title.bn;
 
     const descEl = document.getElementById('step-desc');
-    if (descEl) descEl.textContent = s.desc[currentLang] || s.desc.bn;
+    if (descEl) {
+      descEl.replaceChildren();
+      const original = document.createElement('span');
+      original.className = 'original-step';
+      original.textContent = s.desc.bn || s.desc[currentLang] || '';
+      descEl.appendChild(original);
+      const translated = currentLang === 'en' ? translations[currentStep] : '';
+      if (translated) {
+        const translatedBlock = document.createElement('span');
+        translatedBlock.className = 'translated-step';
+        const label = document.createElement('span');
+        label.className = 'translated-label';
+        label.textContent = 'English translation';
+        const translatedText = document.createElement('span');
+        translatedText.textContent = translated;
+        translatedBlock.append(label, translatedText);
+        descEl.appendChild(translatedBlock);
+      } else if (currentLang === 'en') {
+        const status = document.createElement('span');
+        status.className = 'translation-status';
+        status.textContent = translationsLoaded
+          ? 'English translation is unavailable for this recipe.'
+          : 'Loading English translation…';
+        descEl.appendChild(status);
+      }
+    }
 
     const hintEl = document.getElementById('tip-text');
     if (hintEl) {
@@ -496,6 +556,7 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
     if (idx < 0 || idx >= steps.length) return;
     currentStep = idx;
     renderCurrentStep();
+    speakStep(idx);
   }
 
   function nextStep() {
@@ -512,20 +573,68 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
     }
   }
 
+  function speakStep(idx = currentStep) {
+    const step = steps[idx];
+    if (!step) return;
+    const translated = currentLang === 'en' ? translations[idx] : '';
+    if (currentLang === 'en' && !translated) {
+      ensureEnglishTranslations().then(() => {
+        if (translations[idx]) speakStep(idx);
+        else if (currentLang === 'en') notify('English translation is unavailable. Check the connection and try again.');
+      });
+      return;
+    }
+    const textToSpeak = translated || step.desc.bn || step.desc[currentLang];
+    if (!textToSpeak?.trim()) return;
+    const speechLanguage = currentLang === 'en' && translated ? 'en-IN' : 'bn-IN';
+    const requestId = ++speechRequestId;
+    speechController?.abort();
+    speechController = new AbortController();
+    synth?.cancel();
+    currentAudio?.pause();
+    if (currentAudio) URL.revokeObjectURL(currentAudio.src);
+    currentAudio = null;
+
+    api.speak(currentToken, textToSpeak, { language: speechLanguage, signal: speechController.signal })
+      .then(blob => {
+        if (requestId !== speechRequestId) return;
+        const audio = new Audio(URL.createObjectURL(blob));
+        currentAudio = audio;
+        const release = () => {
+          if (currentAudio === audio) currentAudio = null;
+          URL.revokeObjectURL(audio.src);
+        };
+        audio.addEventListener('ended', release, { once: true });
+        audio.addEventListener('error', () => {
+          release();
+          if (requestId === speechRequestId) fallbackToBrowserSpeech(textToSpeak, speechLanguage);
+        }, { once: true });
+        return audio.play().catch(() => {
+          release();
+          fallbackToBrowserSpeech(textToSpeak, speechLanguage);
+        });
+      })
+      .catch(error => {
+        if (requestId === speechRequestId && error?.code !== 'ABORTED') {
+          fallbackToBrowserSpeech(textToSpeak, speechLanguage);
+        }
+      });
+  }
+
+  function fallbackToBrowserSpeech(text, language) {
+    if (!synth || typeof window.SpeechSynthesisUtterance !== 'function') {
+      notify(currentLang === 'en' ? 'Timbre is unavailable and this browser has no voice playback.' : 'Timbre পাওয়া যাচ্ছে না, এই ব্রাউজারেও কণ্ঠে পড়ার সুবিধা নেই।');
+      return;
+    }
+    const utterance = new window.SpeechSynthesisUtterance(text);
+    utterance.lang = language;
+    synth.speak(utterance);
+  }
+
   function repeatStep() {
     if (steps.length === 0 || !steps[currentStep]) return;
-    const s = steps[currentStep];
-    const textToSpeak = s.desc[currentLang] || s.desc.bn;
-
-    if (synth && 'speechSynthesis' in window) {
-      synth.cancel();
-      const utterance = new SpeechSynthesisUtterance(textToSpeak);
-      utterance.lang = currentLang === 'bn' ? 'bn-IN' : 'en-US';
-      synth.speak(utterance);
-      notify(currentLang === 'en' ? 'Repeating step aloud…' : 'ধাপটি পড়ে শোনানো হচ্ছে…');
-    } else {
-      notify(textToSpeak);
-    }
+    speakStep();
+    notify(currentLang === 'en' ? 'Repeating step aloud…' : 'ধাপটি পড়ে শোনানো হচ্ছে…');
   }
 
   // Timer logic - strictly explicit positive durations only
@@ -650,6 +759,7 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
             renderStepsList();
             renderCurrentStep();
           });
+          ensureEnglishTranslations();
         } else {
           done(() => {
             if (activeStep && _activeStepHTML) { activeStep.innerHTML = _activeStepHTML; hideSkeleton(activeStep); }
@@ -730,8 +840,12 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
     document.getElementById('repeat-step-btn')?.addEventListener('click', repeatStep);
     document.getElementById('timer-toggle-btn')?.addEventListener('click', toggleTimer);
     document.getElementById('timer-reset-btn')?.addEventListener('click', () => resetTimer(steps[currentStep]?.duration || 0));
-    document.getElementById('guide-touch-btn')?.addEventListener('click', closeCookGuide);
-    document.getElementById('guide-start-btn')?.addEventListener('click', closeCookGuide);
+    const startCooking = () => {
+      closeCookGuide();
+      speakStep();
+    };
+    document.getElementById('guide-touch-btn')?.addEventListener('click', startCooking);
+    document.getElementById('guide-start-btn')?.addEventListener('click', startCooking);
     document.getElementById('guide-close')?.addEventListener('click', closeCookGuide);
     document.getElementById('first-guide')?.addEventListener('click', event => {
       if (event.target.id === 'first-guide') closeCookGuide();
@@ -750,12 +864,16 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
     }
 
     await loadRecipeForCooking();
-    showCookGuideForFirstVisit();
+    const guideShown = showCookGuideForFirstVisit();
+    if (!guideShown) speakStep();
   }
 
   window.addEventListener('pagehide', () => {
     clearInterval(timerInterval);
     timerRunning = false;
+    speechController?.abort();
+    currentAudio?.pause();
+    if (currentAudio) URL.revokeObjectURL(currentAudio.src);
     synth?.cancel();
   });
 

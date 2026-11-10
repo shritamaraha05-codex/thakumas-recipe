@@ -47,6 +47,8 @@ class Settings(BaseSettings):
     # above the browser's upload budget to avoid cutting off valid short clips.
     gnani_stt_timeout: float = 60.0
     gnani_tts_model: str = "timbre-v3.0"
+    gnani_tts_url: str = "https://api.vachana.ai/api/v1/tts/inference"
+    gnani_tts_timeout: float = 30.0
     gnani_voice: str = "Shivani"
 
     # LLM provider chain. "rules" is the deterministic floor and must remain last.
