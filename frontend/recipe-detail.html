@@ -250,6 +250,7 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
 </style><style id="shared-header-content-offset">.notice{margin-top:104px!important}@media(max-width:620px){.notice{margin-top:132px!important}}</style><link rel="stylesheet" href="/assets/icons.css">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200">
 <link rel="stylesheet" href="/css/responsive.css">
+<link rel="stylesheet" href="/css/recipe-actions.css">
 </head>
 <body>
 <svg id="spoon" viewBox="0 0 46 46" aria-hidden="true"><g transform="rotate(-40 6 6)"><path d="M6 4 C0 4 0 16 6 18 C12 16 12 4 6 4Z" fill="#e0a526" stroke="#8e5a10" stroke-width="1.2"/><rect x="4.8" y="17" width="2.4" height="26" rx="1.2" fill="#b07a1c"/></g></svg>
@@ -523,6 +524,7 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
 <script type="module">
   import { requireAuth } from './js/session.js';
   import { api } from './js/api.js';
+  import { confirmAndDeleteRecipe } from './js/recipe-actions.js';
   import { initNavigation } from './js/navigation.js';
   import { showSkeleton, hideSkeleton, showError, timedSkeleton } from './js/skeleton.js';
   import { initI18n, getLanguage, setLanguage, applyI18n } from './js/i18n.js';
@@ -930,23 +932,16 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
   document.getElementById('delete-recipe-action')?.addEventListener('click', async (event) => {
     const deleteButton = event.currentTarget;
     if (!recipeId || !currentRecipe) return;
-    const confirmMsg = currentLanguage === 'en'
-      ? `Are you sure you want to delete "${currentRecipe.title}"?`
-      : `আপনি কি নিশ্চিতভাবে "${currentRecipe.title}" মুছে ফেলতে চান?`;
-
-    if (window.confirm(confirmMsg)) {
-      deleteButton.disabled = true;
-      try {
-        await api.deleteRecipe(currentToken, recipeId);
-        notify(currentLanguage === 'en' ? 'Recipe deleted.' : 'রেসিপি মুছে ফেলা হয়েছে।');
-        setTimeout(() => {
-          window.location.href = '/library.html';
-        }, 600);
-      } catch (err) {
-        notify(err.message || 'Delete failed.');
-      } finally {
-        deleteButton.disabled = false;
-      }
+    deleteButton.disabled = true;
+    try {
+      const deleted = await confirmAndDeleteRecipe(currentToken, currentRecipe, currentLanguage);
+      if (!deleted) return;
+      notify(currentLanguage === 'en' ? 'Recipe and saved versions deleted.' : 'রেসিপি ও সংরক্ষিত সংস্করণ মুছে ফেলা হয়েছে।');
+      setTimeout(() => { window.location.href = '/library.html'; }, 600);
+    } catch (err) {
+      notify(err.message || 'Delete failed.');
+    } finally {
+      deleteButton.disabled = false;
     }
   });
 

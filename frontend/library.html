@@ -152,6 +152,7 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
 }
 </style><style id="shared-header-content-offset">.notice{margin-top:104px!important}@media(max-width:620px){.notice{margin-top:132px!important}}</style><link rel="stylesheet" href="/assets/icons.css">
 <link rel="stylesheet" href="/css/responsive.css">
+<link rel="stylesheet" href="/css/recipe-actions.css">
 </head>
 <body>
 <svg id="spoon" viewBox="0 0 46 46" aria-hidden="true"><g transform="rotate(-40 6 6)"><path d="M6 4 C0 4 0 16 6 18 C12 16 12 4 6 4Z" fill="#e0a526" stroke="#8e5a10" stroke-width="1.2"/><rect x="4.8" y="17" width="2.4" height="26" rx="1.2" fill="#b07a1c"/></g></svg>
@@ -257,6 +258,7 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
 <script type="module">
   import { requireAuth } from './js/session.js';
   import { api } from './js/api.js';
+  import { confirmAndDeleteRecipe } from './js/recipe-actions.js';
   import { initNavigation } from './js/navigation.js';
   import { initIcons } from './js/icons.js';
   import { initPWA } from './js/pwa.js';
@@ -299,6 +301,20 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
     toast.textContent = message;
     toast.classList.add('show');
     setTimeout(() => toast.classList.remove('show'), 3500);
+  }
+
+  async function deleteLibraryRecipe(recipe) {
+    try {
+      const deleted = await confirmAndDeleteRecipe(currentToken, recipe, currentLanguage);
+      if (!deleted) return;
+      allRecipes = allRecipes.filter(item => item.id !== recipe.id);
+      updateStats(allRecipes.length);
+      updateDynamicTags();
+      renderRecipes(getFilteredRecipes());
+      showToast(currentLanguage === 'en' ? 'Recipe and saved versions deleted.' : 'রেসিপি ও সংরক্ষিত সংস্করণ মুছে ফেলা হয়েছে।');
+    } catch (error) {
+      showToast(error.message || (currentLanguage === 'en' ? 'Delete failed.' : 'মুছে ফেলা যায়নি।'));
+    }
   }
 
   function updateDynamicTags() {
@@ -529,18 +545,7 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
       deleteAction.addEventListener('click', async (e) => {
         e.stopPropagation();
         dropdown.hidden = true;
-        const confirmMsg = currentLanguage === 'en'
-          ? `Are you sure you want to delete "${item.title}"?`
-          : `আপনি কি নিশ্চিতভাবে "${item.title}" রেসিপিটি মুছে ফেলতে চান?`;
-        if (window.confirm(confirmMsg)) {
-          try {
-            await api.deleteRecipe(currentToken, item.id);
-            showToast(currentLanguage === 'en' ? 'Recipe deleted.' : 'রেসিপি মুছে ফেলা হয়েছে।');
-            await loadLibrary();
-          } catch (delErr) {
-            showToast(delErr.message || 'Delete failed.');
-          }
-        }
+        await deleteLibraryRecipe(item);
       });
 
       dropdown.appendChild(openAction);
@@ -607,8 +612,20 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
         window.location.href = `/recipe-detail.html?id=${encodeURIComponent(item.id)}`;
       });
 
+      const deleteCardAction = document.createElement('button');
+      deleteCardAction.className = 'text-action delete-card-action';
+      deleteCardAction.type = 'button';
+      deleteCardAction.setAttribute('aria-label', currentLanguage === 'en' ? `Delete ${item.title || 'recipe'}` : `${item.title || 'রেসিপি'} মুছে ফেলুন`);
+      deleteCardAction.style.color = '#a32b20';
+      deleteCardAction.innerHTML = `<span>${currentLanguage === 'en' ? 'Delete' : 'মুছুন'}</span><span class="material-symbols-outlined">delete</span>`;
+      deleteCardAction.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        await deleteLibraryRecipe(item);
+      });
+
       footerDiv.appendChild(cookAction);
       footerDiv.appendChild(openBtn);
+      footerDiv.appendChild(deleteCardAction);
       contentDiv.appendChild(footerDiv);
 
       card.appendChild(contentDiv);

@@ -77,6 +77,8 @@ input:not([type="checkbox"]):not([type="radio"]), select, textarea { max-width: 
   .memory-panel { min-width: 0; }
   .memory-copy { min-width: 0; }
   .memory-actions { padding-left: 0; }
+  .recipe-card .card-footer { flex-wrap: wrap; gap: 8px; }
+  .recipe-card .card-footer .text-action { min-height: 40px; }
   .drawer { width: min(400px, 100vw); padding: 20px 16px; }
   .modal { padding: 12px; }
   .modal-card { max-height: calc(100dvh - 24px); overflow-y: auto; padding: 18px 16px; }
