@@ -23,9 +23,9 @@ Facts below come from docs.gnani.ai (read 1-3 Nov 2026). **Nothing has been run 
 STT WebSocket (`/api/STT/stt-websocket.md`) for COK-2; TTS SSE and WebSocket; Voice Clone Embeddings + Voice Cloned TTS (SHR-4); Available Voices; Text Normalization Guide; Limits; Error Reference; Changelog.
 
 ## Chunking rules (CAP-1)
-1. Browser decodes the recording, mixes to mono, resamples to 16 kHz, encodes PCM16 WAV.
-2. Window = 25 s. Cut at the lowest-energy 100 ms frame inside the last 3 s of each window so words are not split.
-3. Send chunks **sequentially**; for v3.0 pass the previous chunk's transcript as `previous_text`.
+1. Browser finishes recording the actual microphone stream, then decodes, mixes to mono, resamples to 16 kHz, and encodes PCM16 WAV.
+2. Clips <=30 s go in one REST request. Longer recordings are held whole while processing, then divided into <=25 s windows. Cut at the lowest-energy 100 ms frame inside the last 3 s of each window so words are less likely to be split.
+3. Send longer-clip segments **sequentially**; for v3.0 pass the previous segment's transcript as `previous_text`. Never upload a recording twice or send parallel STT calls.
 4. Merge transcripts with a single space; mark chunk boundaries as `|` only in debug logs.
 5. Retry once on 429/5xx with 1 s then 3 s backoff; surface `UPSTREAM_BUSY` after that.
 
