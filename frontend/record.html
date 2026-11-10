@@ -6,6 +6,8 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Thakuma's Recipe">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="/assets/icons/pwa-192x192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="/assets/icons/pwa-512x512.png">
 <link rel="manifest" href="/manifest.webmanifest">
 <title>ঠাকুমার রান্না · Record a recipe</title>
 <link rel="stylesheet" href="/css/navigation.css">
@@ -54,6 +56,7 @@ label.f{display:block;font-size:11px;font-weight:600;margin-bottom:5px}
 .acts{display:flex;gap:12px;justify-content:center;margin-top:12px}.acts button{border-radius:8px;padding:11px 22px;font-size:13px;font-weight:600;border:1px solid rgba(179,35,27,.18);background:var(--paper)}.acts .go{background:linear-gradient(180deg,#c6302a,var(--red2));color:#fff;border:0;box-shadow:0 4px 12px rgba(142,23,16,.3)}.acts .go:disabled{opacity:.5;cursor:not-allowed}
 .pane{display:none;padding:22px 0 4px}.pane.on{display:block}
 .drop{border:2px dashed rgba(179,35,27,.3);border-radius:12px;background:var(--beige);padding:34px 16px;text-align:center;color:var(--muted);font-size:13px}.drop u{color:var(--red);font-weight:600;cursor:pointer}
+.audio-upload{border:1px dashed rgba(179,35,27,.3);border-radius:12px;background:var(--beige);padding:18px;display:grid;gap:12px}.audio-file-row{display:flex;align-items:center;gap:10px;min-width:0}.audio-file-row strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.audio-controls{display:flex;gap:8px;flex-wrap:wrap}.audio-status{min-height:22px;color:var(--muted);font-size:12px}.audio-status.error{color:var(--red2)}.audio-status.success{color:var(--green)}.audio-status.warning{color:#76500f;background:#fff1cb;border-radius:7px;padding:8px}.audio-upload button{min-height:42px;border:1px solid rgba(179,35,27,.18);border-radius:8px;padding:8px 14px;background:var(--paper);font-weight:600}.audio-upload button.primary{background:var(--red2);color:#fff}.audio-upload button:disabled{opacity:.55;cursor:not-allowed}
 textarea.in{min-height:140px;resize:vertical}
 .ai h3,.side h3{font-family:'Tiro Bangla';font-weight:400;font-size:16px;color:var(--green)}.ai .hd .tag{background:#F6D9D3}
 .chips{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}.chip{background:var(--beige);border-radius:8px;padding:8px 10px;display:flex;gap:8px;align-items:center;font-size:11px;font-weight:600}.chip em{display:block;font-style:normal;font-weight:400;color:var(--red2);font-size:10px}.chip i{width:22px;height:22px;border-radius:6px;background:#F6D9D3;display:grid;place-items:center;font-style:normal;font-size:11px;flex:none}.ai .note{font-size:11px;color:var(--muted);margin-top:8px}
@@ -127,7 +130,7 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
 <div class="hd"><div><h1><span data-bn="রেসিপিটি বলুন" data-en="Tell the recipe"></span> <span class="pf" data-bn="(Tell the recipe)" data-en=""></span></h1><p class="sub" data-bn="ঠাকুমার মুখের মৌখিক আন্দাজকে নির্ভুল ও চিরস্থায়ী পারিবারিক রন্ধনপ্রণালীতে রূপান্তর করুন।" data-en="Turn grandmother's spoken estimates into an accurate, lasting family recipe."></p></div><div class="badge" data-bn="✓ হাতের আন্দাজ সংরক্ষিত" data-en="✓ Hand estimates preserved"></div></div>
 <div class="row"><div><label class="f"><span data-bn="কে বলছেন?" data-en="Who is telling it?"></span></label><input class="in" id="who" value="" placeholder="" data-ph-bn="যেমন: ঠাকুমা" data-ph-en="e.g. Thakuma"></div>
 <div><label class="f" data-bn="কথ্যভাষার ভাষা" data-en="Spoken dialect"></label><select class="in"><option data-bn="বাংলা + English (Banglish / কলকাতা কথ্য)" data-en="Bangla + English (Banglish / Kolkata spoken)"></option><option data-bn="বাংলা (পূর্ববঙ্গীয়)" data-en="Bangla (East Bengal)"></option><option data-bn="বাংলা (রাঢ়ী)" data-en="Bangla (Rarhi)"></option></select></div></div>
-<label class="consent"><input type="checkbox" id="ok"><span><b style="font-size:12px" data-bn="বক্তার সম্মতি আছে" data-en="The speaker has consented"></b><small data-bn="কথা থেকে লেখা তৈরিতে আপনার ব্রাউজারের স্পিচ পরিষেবা ব্যবহার হতে পারে। অ্যাপ অডিও সংরক্ষণ করে না; শুধু লেখা পার্স করার জন্য সার্ভারে পাঠানো হয়।" data-en="Your browser’s speech service may process audio to create text. The app does not store audio; only text is sent to the backend for parsing."></small></span></label></div>
+<label class="consent"><input type="checkbox" id="ok"><span><b style="font-size:12px" data-bn="বক্তার সম্মতি আছে" data-en="The speaker has consented"></b><small data-bn="আসল ট্রান্সক্রিপশনে অডিও সার্ভার হয়ে Gnani-তে পাঠানো হতে পারে; অ্যাপ অডিও সংরক্ষণ করে না। মক মোডে আসল অডিও প্রক্রিয়া হয় না। সম্মতি না দিলে লিখে চালিয়ে যান।" data-en="For live transcription, audio is sent through the backend to Gnani; the app does not store it. Mock mode does not process the real audio. Type the narration if the speaker does not consent."></small></span></label></div>
 
 <div class="card"><div class="tabs" role="tablist"><button class="on" data-t="rec">🎙 <span data-bn="রেকর্ড" data-en="Record"></span></button><button data-t="up">⇪ <span data-bn="অডিও আপলোড" data-en="Upload"></span></button><button data-t="txt">✎ <span data-bn="লেখা লিখুন" data-en="Paste text"></span></button></div>
 <div class="pane on" id="rec"><div class="stage"><div class="mic" id="mic"><button id="rb" type="button" aria-label="Record">🎙</button></div>
@@ -135,8 +138,16 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
 <div class="wave" id="wv"></div><div class="meta"><span data-bn="ইনপুট লেভেল: −৪৮ dB" data-en="Input level: −48 dB"></span><span data-bn="অডিও স্পষ্ট ও পরিষ্কার" data-en="Audio clear & clean"></span><span>48kHz / 24-bit</span></div>
 <p class="hint" id="hint" data-bn="প্রথমে উপরে সম্মতি দিন, তারপর মাইক বোতাম চাপুন। মাইক ব্যবহারের অনুমতি চাইলে 'Allow' করুন।" data-en="Confirm consent above first, then tap the mic. Choose 'Allow' if your browser asks for microphone access."></p>
 <div class="tr" id="tr"><div class="t"><span id="tp"></span><span id="pc"></span></div><div class="bar" id="br"></div><p id="tx"></p></div>
-<div class="acts"><button class="go" id="stop" disabled>⏺ <span data-bn="রেকর্ডিং থামান" data-en="Stop recording"></span></button><button id="cancel">⊗ <span data-bn="বাতিল" data-en="Cancel"></span></button></div></div></div>
-<div class="pane" id="up"><div class="drop" role="status"><p>⇪</p><p data-bn="অডিও ফাইল আপলোড এখন উপলভ্য নয়" data-en="Audio file upload is not available yet"></p><p style="font-size:12px;margin-top:4px" data-bn="এই সংস্করণে অডিও আপলোড বা ট্রান্সক্রিপশনের ব্যাকএন্ড নেই। লেখা লিখুন, অথবা সম্মতি দিয়ে ব্রাউজারের ডিকটেশন ব্যবহার করুন।" data-en="This release has no backend audio upload or transcription route. Type the narration, or use browser dictation with consent."></p></div></div>
+<div class="acts"><button class="go" id="stop" disabled>⏺ <span data-bn="রেকর্ডিং থামান" data-en="Stop recording"></span></button><button id="cancel">⊗ <span data-bn="বাতিল" data-en="Cancel"></span></button></div><div class="acts"><button class="go" id="analyse-recording-btn" type="button" data-bn="ট্রান্সক্রিপ্ট বিশ্লেষণ করুন" data-en="Analyse transcript" hidden></button></div></div></div>
+<div class="pane" id="up"><div class="audio-upload">
+  <input type="file" id="audio-file-input" accept="audio/*,.wav,.mp3,.ogg,.flac,.aac,.m4a,.webm" hidden>
+  <div class="audio-file-row"><span aria-hidden="true">🎧</span><strong id="audio-file-name" data-bn="কোনো অডিও ফাইল বাছা হয়নি" data-en="No audio file selected">No audio file selected</strong><span id="audio-file-size"></span></div>
+  <audio id="audio-preview" controls preload="metadata" style="width:100%" hidden></audio>
+  <p style="font-size:12px;color:var(--muted)" data-bn="ফাইলটি আপনার ব্রাউজারে WAV-এ রূপান্তরিত হবে এবং সর্বোচ্চ ২৫ সেকেন্ডের অংশে ট্রান্সক্রিপশনের জন্য পাঠানো হবে। অডিও সংরক্ষণ করা হয় না।" data-en="The file is converted to WAV in your browser and sent for transcription in chunks of up to 25 seconds. Audio is not stored."></p>
+  <div class="audio-controls"><button type="button" id="choose-audio-btn" data-bn="অডিও বাছুন" data-en="Choose audio"></button><button type="button" id="transcribe-audio-btn" class="primary" data-bn="ট্রান্সক্রাইব করুন" data-en="Transcribe audio" disabled></button><button type="button" id="cancel-audio-btn" data-bn="বাতিল" data-en="Cancel" hidden></button><button type="button" id="remove-audio-btn" data-bn="ফাইল সরান" data-en="Remove file" hidden></button></div>
+  <p id="audio-status" class="audio-status" role="status" aria-live="polite" data-bn="ফাইল বাছার পর ট্রান্সক্রাইব বোতাম চাপুন।" data-en="Choose a file, then select Transcribe audio."></p>
+  <button type="button" id="review-audio-transcript-btn" class="primary" data-bn="ট্রান্সক্রিপ্ট পর্যালোচনা করুন" data-en="Review transcript" hidden></button>
+</div></div>
 <div class="pane" id="txt"><textarea class="in" data-ph-bn="ঠাকুমার কথা এখানে লিখুন, যেমন: 'একটু তেল দিয়ে এক চিমটি নুন...'" data-ph-en="Paste grandmother's words here, e.g. 'a little oil, one pinch of salt…'"></textarea>
         <!-- Optional Recipe Photo Upload -->
         <div class="photo-upload-container" style="margin-top: 14px; padding: 14px; border: 1px dashed #dfc8a7; border-radius: 10px; background: rgba(255, 253, 248, 0.7);">
@@ -284,6 +295,7 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
   import { initI18n, getLanguage, setLanguage, applyI18n } from './js/i18n.js';
   import { initIcons } from './js/icons.js';
   import { initPWA } from './js/pwa.js';
+  import { audioFileToWavChunks } from './js/audio-transcription.js';
 
   initPWA();
   initI18n();
@@ -296,6 +308,16 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
   let isSaving = false;
   let selectedPhotoUrl = null;
   let selectedPhotoFile = null;
+  let selectedAudioFile = null;
+  let selectedAudioUrl = null;
+  let audioTranscriptionComplete = false;
+  let audioWavChunks = null;
+  let audioChunksFile = null;
+  let audioChunkTranscripts = [];
+  let audioCompletedChunkCount = 0;
+  let audioUsedMock = false;
+  let audioTranscriptionController = null;
+  let isTranscribingAudio = false;
 
   function applyLanguage(lang) {
     if (lang && lang !== getLanguage()) {
@@ -309,6 +331,12 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
     currentLanguage = e.detail?.language || getLanguage();
     applyI18n();
     if (typeof updateConsentState === 'function') updateConsentState();
+  });
+
+  window.addEventListener('pagehide', () => {
+    audioTranscriptionController?.abort();
+    if (selectedAudioUrl) URL.revokeObjectURL(selectedAudioUrl);
+    if (selectedPhotoUrl) URL.revokeObjectURL(selectedPhotoUrl);
   });
 
   // Toast helper
@@ -419,6 +447,151 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
   const transcriptPart = document.getElementById('tp');
   const transcriptText = document.getElementById('tx');
   const hintEl = document.getElementById('hint');
+  const analyseRecordingButton = document.getElementById('analyse-recording-btn');
+
+  const audioInput = document.getElementById('audio-file-input');
+  const audioFileName = document.getElementById('audio-file-name');
+  const audioFileSize = document.getElementById('audio-file-size');
+  const audioPreview = document.getElementById('audio-preview');
+  const chooseAudioButton = document.getElementById('choose-audio-btn');
+  const transcribeAudioButton = document.getElementById('transcribe-audio-btn');
+  const cancelAudioButton = document.getElementById('cancel-audio-btn');
+  const removeAudioButton = document.getElementById('remove-audio-btn');
+  const reviewAudioButton = document.getElementById('review-audio-transcript-btn');
+  const audioStatus = document.getElementById('audio-status');
+
+  function setAudioStatus(message, kind = '') {
+    if (!audioStatus) return;
+    audioStatus.textContent = message;
+    audioStatus.className = `audio-status ${kind}`;
+  }
+
+  function syncAudioControls() {
+    if (transcribeAudioButton) transcribeAudioButton.disabled = !selectedAudioFile || isTranscribingAudio || audioTranscriptionComplete || !okCheckbox?.checked;
+    if (chooseAudioButton) chooseAudioButton.disabled = isTranscribingAudio;
+    if (removeAudioButton) removeAudioButton.hidden = !selectedAudioFile || isTranscribingAudio;
+    if (cancelAudioButton) cancelAudioButton.hidden = !isTranscribingAudio;
+  }
+
+  function selectAudioFile(file) {
+    if (selectedAudioUrl) URL.revokeObjectURL(selectedAudioUrl);
+    selectedAudioUrl = null;
+    selectedAudioFile = file || null;
+    audioTranscriptionComplete = false;
+    audioWavChunks = null;
+    audioChunksFile = null;
+    audioChunkTranscripts = [];
+    audioCompletedChunkCount = 0;
+    audioUsedMock = false;
+    if (audioFileName) audioFileName.textContent = file?.name || (currentLanguage === 'en' ? 'No audio file selected' : 'কোনো অডিও ফাইল বাছা হয়নি');
+    if (audioFileSize) audioFileSize.textContent = file ? `${(file.size / 1048576).toFixed(2)} MB` : '';
+    if (audioPreview) {
+      audioPreview.hidden = !file;
+      audioPreview.removeAttribute('src');
+      if (file) {
+        selectedAudioUrl = URL.createObjectURL(file);
+        audioPreview.src = selectedAudioUrl;
+      }
+    }
+    if (reviewAudioButton) reviewAudioButton.hidden = true;
+    setAudioStatus(file
+      ? (currentLanguage === 'en' ? 'File selected. Give consent above, then transcribe.' : 'ফাইল বাছা হয়েছে। উপরে সম্মতি দিয়ে ট্রান্সক্রাইব করুন।')
+      : (currentLanguage === 'en' ? 'Choose a file, then select Transcribe audio.' : 'ফাইল বাছার পর ট্রান্সক্রাইব বোতাম চাপুন।'));
+    syncAudioControls();
+  }
+
+  chooseAudioButton?.addEventListener('click', () => audioInput?.click());
+  audioInput?.addEventListener('change', () => {
+    const file = audioInput.files?.[0] || null;
+    const extension = file?.name.split('.').pop()?.toLowerCase();
+    const supportedExtension = ['wav', 'mp3', 'ogg', 'flac', 'aac', 'm4a', 'webm'].includes(extension);
+    if (file && (!file.size || (!file.type.startsWith('audio/') && !supportedExtension))) {
+      selectAudioFile(null);
+      audioInput.value = '';
+      setAudioStatus(currentLanguage === 'en' ? 'Choose a supported audio file (WAV, MP3, OGG, FLAC, AAC, M4A or WebM).' : 'সমর্থিত অডিও ফাইল বাছুন (WAV, MP3, OGG, FLAC, AAC, M4A বা WebM)।', 'error');
+      return;
+    }
+    selectAudioFile(file);
+  });
+  removeAudioButton?.addEventListener('click', () => { selectAudioFile(null); if (audioInput) audioInput.value = ''; });
+  cancelAudioButton?.addEventListener('click', () => audioTranscriptionController?.abort());
+  okCheckbox?.addEventListener('change', syncAudioControls);
+
+  reviewAudioButton?.addEventListener('click', () => {
+    document.querySelector('.tabs button[data-t="txt"]')?.click();
+    document.querySelector('#txt textarea')?.focus();
+  });
+
+  analyseRecordingButton?.addEventListener('click', () => {
+    const transcript = speechTranscript.trim();
+    const textArea = document.querySelector('#txt textarea');
+    if (!transcript || !textArea) return;
+    textArea.value = transcript;
+    document.querySelector('.tabs button[data-t="txt"]')?.click();
+    document.getElementById('ps')?.click();
+  });
+
+  transcribeAudioButton?.addEventListener('click', async () => {
+    if (!selectedAudioFile || isTranscribingAudio) return;
+    if (!okCheckbox?.checked) {
+      setAudioStatus(currentLanguage === 'en' ? 'Speaker consent is required before audio is sent.' : 'অডিও পাঠানোর আগে বক্তার সম্মতি প্রয়োজন।', 'error');
+      okCheckbox?.focus();
+      return;
+    }
+    isTranscribingAudio = true;
+    audioTranscriptionController = new AbortController();
+    syncAudioControls();
+    if (reviewAudioButton) reviewAudioButton.hidden = true;
+    try {
+      setAudioStatus(currentLanguage === 'en' ? 'Preparing audio in your browser…' : 'ব্রাউজারে অডিও প্রস্তুত করা হচ্ছে…');
+      if (audioChunksFile !== selectedAudioFile || !audioWavChunks) {
+        audioWavChunks = await audioFileToWavChunks(selectedAudioFile);
+        audioChunksFile = selectedAudioFile;
+        audioChunkTranscripts = [];
+        audioCompletedChunkCount = 0;
+        audioUsedMock = false;
+      }
+      const chunks = audioWavChunks;
+      let previousText = audioChunkTranscripts.join(' ');
+      for (let index = audioCompletedChunkCount; index < chunks.length; index++) {
+        setAudioStatus(currentLanguage === 'en'
+          ? `Transcribing audio chunk ${index + 1} of ${chunks.length}…`
+          : `অডিওর ${index + 1}/${chunks.length} অংশ ট্রান্সক্রাইব হচ্ছে…`);
+        const result = await api.transcribeAudio(currentToken, chunks[index], {
+          language: 'indic-auto', previousText, consent: true, signal: audioTranscriptionController.signal,
+        });
+        audioUsedMock ||= result?.mock === true;
+        if (typeof result?.transcript !== 'string') throw new Error('The transcription service returned an invalid response.');
+        if (result.transcript.trim()) audioChunkTranscripts.push(result.transcript.trim());
+        audioCompletedChunkCount = index + 1;
+        previousText = audioChunkTranscripts.join(' ');
+      }
+      const transcript = audioChunkTranscripts.join(' ');
+      if (!transcript) {
+        audioChunkTranscripts = [];
+        audioCompletedChunkCount = 0;
+        setAudioStatus(currentLanguage === 'en' ? 'No words were recognized. Retry or type the narration.' : 'কোনো শব্দ শনাক্ত হয়নি। আবার চেষ্টা করুন বা লিখে দিন।', 'error');
+        return;
+      }
+      const textArea = document.querySelector('#txt textarea');
+      if (textArea) textArea.value = transcript;
+      audioTranscriptionComplete = true;
+      if (reviewAudioButton) reviewAudioButton.hidden = false;
+      setAudioStatus(audioUsedMock
+        ? (currentLanguage === 'en' ? 'Mock transcript loaded. This fixture was not produced from your audio. Replace or edit it before parsing; configure GNANI_API_KEY and GNANI_MOCK=0 for real transcription.' : 'মক ট্রান্সক্রিপ্ট দেখানো হয়েছে। এটি আপনার অডিও থেকে তৈরি নয়। পার্স করার আগে বদলে বা সম্পাদনা করুন; আসল ট্রান্সক্রিপশনের জন্য GNANI_API_KEY ও GNANI_MOCK=0 সেট করুন।')
+        : (currentLanguage === 'en' ? 'Transcription complete. Review and edit the words before parsing.' : 'ট্রান্সক্রিপশন সম্পূর্ণ। পার্স করার আগে কথাগুলো যাচাই ও সম্পাদনা করুন।'), audioUsedMock ? 'warning' : 'success');
+    } catch (error) {
+      if (error?.code === 'ABORTED' || audioTranscriptionController?.signal.aborted) {
+        setAudioStatus(currentLanguage === 'en' ? 'Transcription cancelled. Your audio file is still selected.' : 'ট্রান্সক্রিপশন বাতিল। অডিও ফাইলটি বাছা অবস্থায় আছে।');
+      } else {
+        setAudioStatus(error?.message || (currentLanguage === 'en' ? 'Transcription failed. Retry or type the narration.' : 'ট্রান্সক্রিপশন ব্যর্থ। আবার চেষ্টা করুন বা লিখে দিন।'), 'error');
+      }
+    } finally {
+      isTranscribingAudio = false;
+      audioTranscriptionController = null;
+      syncAudioControls();
+    }
+  });
 
   let isRecording = false;
   let recordSeconds = 0;
@@ -430,6 +603,7 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
   let audioDataArray = null;
   let speechRecognizer = null;
   let speechTranscript = '';
+  let speechRecognizerEnded = null;
 
   // 1. Initialize live waveform bars in #wv
   const waveformBars = [];
@@ -509,6 +683,8 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
     isRecording = true;
     recordSeconds = 0;
     speechTranscript = '';
+    if (analyseRecordingButton) analyseRecordingButton.hidden = true;
+    if (transcriptText) transcriptText.textContent = '';
 
     // UI Updates
     micContainer?.classList.add('rec');
@@ -558,20 +734,26 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
         speechRecognizer.continuous = true;
         speechRecognizer.interimResults = true;
         speechRecognizer.lang = currentLanguage === 'bn' ? 'bn-BD' : 'en-US';
+        speechRecognizerEnded = new Promise(resolve => { speechRecognizer.onend = resolve; });
 
         speechRecognizer.onresult = (event) => {
-          let liveText = '';
-          for (let i = event.resultIndex; i < event.results.length; ++i) {
-            liveText += event.results[i][0].transcript;
+          const finalText = [];
+          const interimText = [];
+          for (let i = 0; i < event.results.length; ++i) {
+            const segment = event.results[i][0]?.transcript?.trim();
+            if (!segment) continue;
+            (event.results[i].isFinal ? finalText : interimText).push(segment);
           }
-          if (liveText.trim()) {
-            speechTranscript = liveText.trim();
-            if (transcriptText) transcriptText.textContent = speechTranscript;
-          }
+          speechTranscript = finalText.join(' ');
+          if (transcriptText) transcriptText.textContent = [...finalText, ...interimText].join(' ');
         };
 
         speechRecognizer.onerror = (e) => {
           console.debug('[record] Speech recognition note:', e.error);
+          if (e.error !== 'no-speech' && e.error !== 'aborted') {
+            if (transcriptPart) transcriptPart.textContent = currentLanguage === 'en' ? 'Dictation interrupted' : 'ডিকটেশন থেমে গেছে';
+            notify(currentLanguage === 'en' ? 'Browser dictation stopped. You can type the narration or upload an audio file.' : 'ব্রাউজার ডিকটেশন থেমেছে। কথন লিখুন অথবা অডিও ফাইল আপলোড করুন।');
+          }
         };
 
         speechRecognizer.start();
@@ -594,7 +776,9 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
     // Stop speech recognizer
     if (speechRecognizer) {
       try { speechRecognizer.stop(); } catch {}
+      await Promise.race([speechRecognizerEnded, new Promise(resolve => window.setTimeout(resolve, 1200))]);
       speechRecognizer = null;
+      speechRecognizerEnded = null;
     }
 
     // Stop media stream tracks (releases microphone indicator)
@@ -614,19 +798,24 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
     if (recordBtn) recordBtn.removeAttribute('aria-pressed');
     waveformBars.forEach(b => { b.style.height = '6px'; });
     if (stopBtn) stopBtn.disabled = true;
-    if (transcriptBox) transcriptBox.classList.remove('on');
     if (hintEl) hintEl.style.display = '';
 
     recordSeconds = 0;
     updateConsentState();
 
     if (!save) {
+      speechTranscript = '';
+      if (transcriptBox) transcriptBox.classList.remove('on');
+      if (transcriptText) transcriptText.textContent = '';
+      if (analyseRecordingButton) analyseRecordingButton.hidden = true;
       notify(currentLanguage === 'en' ? 'Recording cancelled.' : 'রেকর্ডিং বাতিল করা হয়েছে।');
       return;
     }
 
     // Only use words actually returned by the browser speech service.
     const capturedText = speechTranscript.trim();
+    if (transcriptBox) transcriptBox.classList.toggle('on', Boolean(capturedText));
+    if (transcriptPart) transcriptPart.textContent = currentLanguage === 'en' ? 'Transcript ready' : 'ট্রান্সক্রিপ্ট প্রস্তুত';
 
     // Fill the text input tab
     const txtArea = document.querySelector('#txt textarea');
@@ -635,8 +824,8 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
     }
 
     if (capturedText) {
-      notify(currentLanguage === 'en' ? 'Dictation added. Review the narration, then choose Analyse recipe.' : 'ডিকটেশন যোগ হয়েছে। কথন যাচাই করে রেসিপি বিশ্লেষণ করুন।');
-      document.querySelector('.tabs button[data-t="txt"]')?.click();
+      notify(currentLanguage === 'en' ? 'Transcript ready. Choose Analyse transcript to continue.' : 'ট্রান্সক্রিপ্ট তৈরি। এগোতে ট্রান্সক্রিপ্ট বিশ্লেষণ করুন।');
+      if (analyseRecordingButton) analyseRecordingButton.hidden = false;
     } else {
       notify(currentLanguage === 'en' ? 'No words were captured. Type or correct the narration before parsing.' : 'কোনো কথা ধরা পড়েনি। বিশ্লেষণের আগে কথন লিখুন বা সংশোধন করুন।');
       document.querySelector('.tabs button[data-t="txt"]')?.click();

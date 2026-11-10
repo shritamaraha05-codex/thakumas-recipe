@@ -8,6 +8,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="apple-mobile-web-app-title" content="Thakuma's Recipe" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="/assets/icons/pwa-192x192.png" />
+  <link rel="icon" type="image/png" sizes="512x512" href="/assets/icons/pwa-512x512.png" />
   <link rel="manifest" href="/manifest.webmanifest" />
   <meta name="description" content="Your Thakuma's Recipe profile and cooking preferences." />
   <title>Profile — ঠাকুমার রান্না</title>
@@ -367,6 +369,19 @@
           <h2 class="card-title" id="preferencesTitle" data-i18n="preferencesTitle">রান্নার পছন্দ</h2>
           <p class="section-description" data-i18n="preferencesDescription">রেসিপিতে উপকরণের মাপ কীভাবে দেখতে চান?</p>
         </div>
+        <section aria-labelledby="calibrationTitle" style="padding:14px 0 20px;border-bottom:1px solid var(--line);margin-bottom:20px;">
+          <h3 id="calibrationTitle" class="card-title">Calibrate your hand measures</h3>
+          <p class="section-description">Weigh one measure of an ingredient you use. Your readings are saved to your account; ranges use the documented personal interval rule.</p>
+          <form id="handWeighingForm" style="display:grid;gap:10px;margin-top:14px;">
+            <label>Traditional measure<select name="unit" required><option value="muthi">Muthi (handful)</option><option value="chimti">Chimti (pinch)</option><option value="cup">Cup</option><option value="spoon">Spoon</option><option value="tsp">Tsp</option><option value="tbsp">Tbsp</option><option value="bati">Bati (bowl)</option><option value="glass">Glass</option><option value="poa">Poa</option><option value="chhatak">Chhatak</option><option value="ser">Ser</option></select></label>
+            <label>Ingredient<input name="ingredient" maxlength="120" required placeholder="e.g. rice"></label>
+            <label>Weighed amount<input name="amount" type="number" min="0.01" step="any" required></label>
+            <label>Weight unit<select name="amount_unit"><option value="g">g</option><option value="ml">ml</option></select></label>
+            <button class="primary-button" type="submit">Save weighing</button>
+          </form>
+          <p id="hand-calibration-status" role="status" style="margin:12px 0"></p>
+          <div id="hand-calibration-list" aria-live="polite"></div>
+        </section>
         <span class="preference-label" data-i18n="unitsLabel">পরিমাপের ধরন</span>
         <div class="unit-options" role="group" aria-label="Measurement preference">
           <button class="unit-option" type="button" data-unit="traditional" aria-pressed="true">
@@ -410,7 +425,7 @@
 
     <div class="bottom-note">
       <p data-i18n="bottomNote">আপনার প্রোফাইল হালকা ও সহজ রাখা হয়েছে—রেসিপি, হাতের মাপ ও রান্নার অভিজ্ঞতাই থাকুক মূল জায়গায়।</p>
-      <a href="#/" data-i18n="backToRecipes">রেসিপিতে ফিরে যান ↗</a>
+      <a href="/library.html" data-i18n="backToRecipes">রেসিপিতে ফিরে যান ↗</a>
     </div>
   </main>
 
@@ -418,9 +433,9 @@
     <div class="footer-inner">
       <div class="footer-brand-lockup"><img class="footer-logo" src="/assets/images/thakuma_brand_mark.webp" alt="" aria-hidden="true"><span><span class="footer-brand">ঠাকুমার রান্না</span><span data-i18n="copyright"> · রান্নার স্মৃতি, যত্নে রাখা</span></span></div>
       <nav class="footer-links" aria-label="Footer navigation">
-        <a href="#/" data-i18n="navRecipes">Recipes</a>
-        <a href="#/hands" data-i18n="navHands">Hands</a>
-        <a href="#/accuracy" data-i18n="navAccuracy">Accuracy</a>
+        <a href="/library.html" data-i18n="navRecipes">Recipes</a>
+        <a href="#hand-measures" data-i18n="navHands">Hands</a>
+        <a href="/#accuracy" data-i18n="navAccuracy">Accuracy</a>
       </nav>
     </div>
   </footer>
@@ -489,6 +504,52 @@
   let currentToken = null;
   let currentUser = null;
   let currentUnits = 'traditional';
+
+  async function loadHandCalibration() {
+    const status = document.getElementById('hand-calibration-status');
+    const list = document.getElementById('hand-calibration-list');
+    if (!list || !currentToken) return;
+    status.textContent = 'Loading saved weighings…';
+    try {
+      const data = await api.getHandCalibration(currentToken);
+      list.replaceChildren();
+      if (!data.weighings?.length) {
+        status.textContent = 'No weighings saved yet. Add one above to create your first personal range.';
+        return;
+      }
+      status.textContent = '';
+      data.ranges.forEach(entry => {
+        const p = document.createElement('p');
+        p.textContent = `${entry.unit} of ${entry.ingredient}: ${entry.range.lo}–${entry.range.hi} ${entry.amount_unit} (yours)`;
+        list.append(p);
+      });
+      data.weighings.forEach(row => {
+        const item = document.createElement('div');
+        item.style.cssText = 'display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-top:1px solid var(--line)';
+        const label = document.createElement('span');
+        label.textContent = `${row.amount} ${row.amount_unit} · ${row.unit} · ${row.ingredient}`;
+        const remove = document.createElement('button');
+        remove.type = 'button'; remove.textContent = 'Delete'; remove.setAttribute('aria-label', `Delete ${label.textContent}`);
+        remove.addEventListener('click', async () => { remove.disabled = true; try { await api.deleteHandWeighing(currentToken, row.id); await loadHandCalibration(); } catch (error) { status.textContent = error.message; remove.disabled = false; } });
+        item.append(label, remove); list.append(item);
+      });
+    } catch (error) { status.textContent = `Could not load calibration: ${error.message}`; }
+  }
+
+  document.getElementById('handWeighingForm')?.addEventListener('submit', async event => {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const button = form.querySelector('button[type="submit"]');
+    button.disabled = true;
+    try {
+      const values = new FormData(form);
+      await api.addHandWeighing(currentToken, { unit: values.get('unit'), ingredient: values.get('ingredient'), amount: Number(values.get('amount')), amount_unit: values.get('amount_unit') });
+      form.reset();
+      await loadHandCalibration();
+      document.getElementById('hand-calibration-status').textContent = 'Weighing saved and personal range refreshed.';
+    } catch (error) { document.getElementById('hand-calibration-status').textContent = `Could not save weighing: ${error.message}`; }
+    finally { button.disabled = false; }
+  });
 
   function showToast(msg) {
     const toast = document.getElementById('profileToast') || document.getElementById('toast');
@@ -627,6 +688,7 @@
     const authState = await requireAuth({ redirectTo: '/login.html' });
     currentToken = authState.token;
     currentUser = authState.user;
+    await loadHandCalibration();
 
     const isHandsHash = window.location.hash.includes('hand-measures');
     initNavigation({ activePage: isHandsHash ? 'hands' : 'profile' });

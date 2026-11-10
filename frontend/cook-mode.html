@@ -8,6 +8,8 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Thakuma's Recipe">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="/assets/icons/pwa-192x192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="/assets/icons/pwa-512x512.png">
 <link rel="manifest" href="/manifest.webmanifest">
 <link rel="stylesheet" href="/css/navigation.css">
 <link rel="stylesheet" href="/css/skeleton.css">
@@ -556,7 +558,7 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
     const id = params.get('id');
 
     if (!id) {
-      renderNoStepsState();
+      await loadCookableRecipes();
       return;
     }
 
@@ -654,6 +656,40 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
             ? (currentLang === 'en' ? 'Your session may have expired. Sign in and reopen this recipe.' : 'আপনার সেশনের মেয়াদ শেষ হতে পারে। সাইন ইন করে রেসিপিটি আবার খুলুন।')
             : (currentLang === 'en' ? `${err.message || 'The backend is unavailable.'} You can retry this request.` : `${err.message || 'ব্যাকএন্ডে সংযোগ করা যায়নি।'} আবার চেষ্টা করুন।`);
         renderNoStepsState({ heading, body, retry: !notFound && !unauthorized });
+      });
+    }
+  }
+
+  async function loadCookableRecipes() {
+    const titleEl = document.getElementById('step-title');
+    const descEl = document.getElementById('step-desc');
+    if (titleEl) titleEl.textContent = currentLang === 'en' ? 'Loading your recipes…' : 'আপনার রেসিপি আনা হচ্ছে…';
+    if (descEl) descEl.textContent = '';
+    try {
+      const response = await api.listRecipes(currentToken, { limit: 100 });
+      const recipes = response?.items || [];
+      if (!recipes.length) {
+        renderNoStepsState();
+        return;
+      }
+      renderNoStepsState({
+        heading: currentLang === 'en' ? 'Choose a recipe to cook' : 'রান্নার জন্য একটি রেসিপি বেছে নিন',
+        body: currentLang === 'en' ? 'Your saved recipes are ready. Choose one to start Cook Mode.' : 'আপনার সংরক্ষিত রেসিপিগুলি প্রস্তুত। রান্না মোড শুরু করতে একটি বেছে নিন।'
+      });
+      const actions = descEl?.querySelector('div');
+      if (!actions) return;
+      actions.replaceChildren();
+      recipes.forEach(recipe => {
+        const link = makeActionLink(`/cook-mode.html?id=${encodeURIComponent(recipe.id)}`, recipe.title || (currentLang === 'en' ? 'Untitled recipe' : 'নামহীন রেসিপি'), true);
+        link.classList.remove('primary');
+        actions.append(link);
+      });
+      actions.append(makeActionLink('/library.html', currentLang === 'en' ? 'Recipe library' : 'রেসিপি লাইব্রেরি'));
+    } catch (error) {
+      renderNoStepsState({
+        heading: currentLang === 'en' ? 'Could not load your recipes' : 'আপনার রেসিপি আনা যায়নি',
+        body: error?.message || (currentLang === 'en' ? 'Check your connection and retry.' : 'সংযোগ পরীক্ষা করে আবার চেষ্টা করুন।'),
+        retry: true
       });
     }
   }

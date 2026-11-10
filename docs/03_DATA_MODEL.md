@@ -6,7 +6,7 @@ Audio is **not** stored by default. `consent` gates anything beyond transcript s
 
 1. **Account user** — the owner of the Supabase Auth account (`auth.users`). This identity owns saved recipes. Created only by Supabase Auth at sign-up; we never store passwords ourselves.
 2. **Cook / narrator person** — the family member who prepared or narrated the recipe. A grandmother can narrate a recipe and never have a Thakuma's Recipe login.
-3. **Measurement profile** — the person (hand) whose traditional measures are being calibrated by weighing. Postponed with the calibration tasks (see `docs/12_TASKS.md` §1).
+3. **Measurement profile** — the account's own hand profile whose traditional measures are calibrated by weighing. It is separate from recipe attribution and is not shared across accounts.
 
 An account user can save a recipe narrated by another family member; a narrator needs no account. These three concepts stay in separate structures and are never collapsed into one "user" entity.
 
@@ -108,9 +108,9 @@ How the backend participates:
 
 ## Deferred entities (postponed by the 2026-11-08 planning correction)
 
-These tables exist in the project history (the previous SQLite DDL is preserved in git history) but are **not** part of this release: `person`, `consent`, `hand_profile`, `weighing`, `step`, `quantity`, `clarification`, `tag`, `recipe_tag`, `collection`, `collection_recipe`, `llm_cache`, `api_usage`, `eval_case`, `eval_run`.
+`hand_profiles` and `hand_weighings` are added in `supabase/migrations/0002_hand_calibration.sql`; RLS scopes both to the authenticated account. Other entities in the historical list remain out of release: `person`, `consent`, `step`, `quantity`, `clarification`, `tag`, `recipe_tag`, `collection`, `collection_recipe`, `llm_cache`, `api_usage`, `eval_case`, `eval_run`.
 
-They return only if the postponed tasks (personal measurement calibration, weighing repository, person/profile/consent management, recipe scaling, pantry search, collections, advanced evaluation dashboard) are re-opened after the minimum release journey is green. Notes from the previous schema that still apply when they return:
+The remaining postponed tasks may return after the minimum release journey is green. Notes from the previous schema that still apply:
 
-- Weighing tables must stay keyed to a *person/hand* (identity 3 above), never to the account user (identity 1).
+- Weighings belong to the account's own hand profile; they are never attributed to another person without that person's profile and consent.
 - Deletion of a person should cascade to their consents, hand profiles and weighings; recipes keep attribution text but unlink the person.

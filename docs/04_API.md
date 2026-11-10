@@ -22,9 +22,14 @@ All recipe-management endpoints require a valid Supabase access token. The parse
 - The authenticated identity is the token's `sub` claim. **Never trust a user id supplied in the request body or query parameters** — a client-supplied `owner_user_id`/`user_id` is rejected or ignored, and `owner_user_id` for new recipes is always derived from the verified token.
 - Failures: missing, malformed or expired token -> `401 UNAUTHORIZED`; a valid token that does not own a resource -> `404 NOT_FOUND` on that resource (not 403, to avoid revealing another user's recipe ids).
 - `GET /api/me` -> `{id, display_name, created_at}` — the authenticated user's basic application profile (`profiles` row; created on first use/sign-up if missing). `401 UNAUTHORIZED` without a valid token. No token, password or secret is ever returned.
+- `GET /api/me/hand-calibration` -> `{profile_id, weighings, ranges}` for the authenticated account's hand profile.
+- `POST /api/me/hand-calibration/weighings` `{unit, ingredient, amount, amount_unit:"g|ml"}` -> save a weighing and return refreshed calibration.
+- `DELETE /api/me/hand-calibration/weighings/{weighing_id}` -> delete an owned weighing and return refreshed calibration.
+
+Calibration range entries are grouped by canonical unit, case-insensitive ingredient, and output unit. A single reading `x` yields `[0.85x, 1.15x]`; two or more yield `[0.95 × min, 1.05 × max]`. Responses carry `basis:"yours"`. These ranges are available to the UI; `/api/parse` does not consume them yet.
 
 ## Capture and parse
-- `POST /api/narrations/transcribe` (multipart: `audio` WAV <=30 s, `language` default `indic-auto`, optional `previous_text`, `keyterms` JSON array) -> `{transcript, detected_language_code, chunk_index?}`. Server serialises calls to Gnani (one active request).
+- `POST /api/narrations/transcribe` (authenticated multipart: `audio` mono 16 kHz PCM16 WAV <=30 s, `language` default `indic-auto`, required `consent=true`, optional `previous_text`) -> `{transcript, detected_language_code, mock}`. Audio is handled in memory and is never stored. Server serialises calls to Gnani (one active request). `mock=true` means no real speech was processed; mock mode returns the labelled synthetic fixture on the first chunk (or the test transcript supplied through `X-Mock-Transcript`) and an empty transcript on following chunks.
 - `POST /api/parse` `{text, mode:"auto|rules|llm", hand_profile_id?, servings?}` -> `ParseResult`. Runs the deterministic rules parser (M-08) locally, or the Gemini provider (M-10) when selected.
 - `POST /api/parse/resolve` `{draft: ParseResult, answers:[{clarification_id, answer}], hand_profile_id?}` -> recomputed `ParseResult` (stateless). Not implemented yet (M-16).
 
@@ -32,7 +37,7 @@ All recipe-management endpoints require a valid Supabase access token. The parse
 - `mode="rules"`: run the deterministic offline parser. Makes no external call. This is fully implemented.
 - `mode="auto"` (default): use the first **implemented** parser in the configured `LLM_CHAIN`, walked in order (e.g. `LLM_CHAIN=gemini,rules` selects Gemini first; `LLM_CHAIN=rules` stays offline). `rules` is the documented floor. Auto does not fall back after a provider is chosen: that provider's failure is reported as a documented error.
 - `mode="llm"`: an explicit request for the **Gemini** provider (`GEMINI_MODEL`, default `gemini-3.5-flash-lite`). It is never silently downgraded to `rules`; any failure returns a documented error.
-- `hand_profile_id` and `servings` are accepted for contract compatibility but are **not used**: personal measurement calibration and recipe scaling are postponed by the 2026-11-08 planning correction, so nothing is calibrated or scaled.
+- `hand_profile_id` and `servings` are accepted for contract compatibility but are **not used** by parse. Account-owned personal weighings and intervals can be managed through `/api/me/hand-calibration`; automatic recipe quantity resolution and scaling do not consume them yet.
 - Validation: empty or whitespace-only `text`, an unknown `mode`, and non-positive `servings` return `422 INVALID_INPUT`.
 - Gemini errors (never exposing raw provider messages, keys or the transcript):
   - missing/rejected credentials -> `503 LLM_UNAVAILABLE`;
@@ -51,7 +56,7 @@ All recipe-management endpoints require a valid Supabase access token. The parse
 - Ambiguity: plain `চামচ`/`chamoch` yields `clarification.kind="unit_spoon"` (options `tsp`,`tbsp`); uncalibrated `কাপ`/`cup` yields `clarification.kind="unit_cup"` (options `tea cup`,`measuring cup`,`my cup`). Ids are deterministic (`unit_spoon_1`, `unit_cup_1`, ...). Resolved compounds `ছোট চামচ`/`বড় চামচ` do not trigger a question.
 - Metadata is truthful: `meta.parser_mode="rules"`/`"llm"` matches the parser that answered, `meta.llm_provider` is `"gemini"` only when Gemini produced the result (otherwise `null`), and `meta.mock=false` for real parser/provider output. `language` and `base_servings` stay `null` because they are not inferred. Each `Quantity.source` is `rules` or `llm` accordingly.
 - Gemini structured output: the model may only select request-local evidence ids built from the M-07 lexicon matches. The backend validates every id (existence, category, same-segment, no duplicates) and constructs all canonical names, quantities, surface forms and source spans from that verified evidence. The model never supplies wording, numbers or offsets.
-- Not implemented yet: gram/millilitre ranges, personal hand calibration, recipe scaling, yield/servings inference, and a second LLM provider. (Calibration and scaling are postponed, not dropped for ever; see `docs/12_TASKS.md`.)
+- Not implemented yet: applying gram/millilitre ranges to parsed quantities, recipe scaling, yield/servings inference, and a second LLM provider. Personal hand weighings/intervals are available via the calibration endpoints above.
 
 Example request: `{"text": "এক চামচ তেল দাও। তারপর এক মুঠো চাল আর এক চিমটি নুন দাও, স্বাদমতো নুন। দশ মিনিট ঢিমে আঁচে রান্না করো।", "mode": "rules"}`. The actual response is `docs/fixtures/parse_result.sample.json`, which `backend/tests/test_fixture.py` verifies is byte-for-byte the live response for exactly this request.
 
@@ -74,7 +79,7 @@ All routes below require `Authorization: Bearer <access_token>` (see Authenticat
 - `PUT /api/recipes/{id}` `{title?, tags?, original_transcript, draft}` -> `{id, version}` with the **new** version number. This always creates a new immutable `recipe_versions` row; previous versions are never overwritten. Omitted `title`/`tags` keep the existing recipe metadata. Only the owner may update, else `404 NOT_FOUND`.
 - `DELETE /api/recipes/{id}` -> `{id, deleted: true}`. Owner only, else `404 NOT_FOUND`. Deleting a recipe cascades to all its versions.
 
-Versions are sequential per recipe (1, 2, 3, …); `unique(recipe_id, version_number)` and a locked recipe row in the `add_recipe_version` RPC prevent collisions. The latest version is the default view. `hand_profile_id`/`servings` are not part of the recipe endpoints (calibration and scaling remain postponed).
+Versions are sequential per recipe (1, 2, 3, …); `unique(recipe_id, version_number)` and a locked recipe row in the `add_recipe_version` RPC prevent collisions. The latest version is the default view. `hand_profile_id`/`servings` are not part of the recipe endpoints (automatic calibration resolution and scaling remain unavailable).
 
 ### Postponed recipe endpoints (not in this release)
 
@@ -83,14 +88,13 @@ Kept for the record; they return `501` / are absent until their tasks are re-ope
 - `GET /api/recipes/pantry?items=chal,dal,alu` (pantry search) — postponed.
 - `POST /api/collections`, `POST /api/collections/{id}/recipes/{recipe_id}`, `GET /api/collections` (collections) — postponed.
 
-## People, consent, hands — POSTPONED
+## People and consent — POSTPONED
 
-Person/profile/consent management (M-18's original scope) is moved off the critical path by the 2026-11-08 planning correction; the schema is documented as deferred in `docs/03_DATA_MODEL.md`. Voice-capture consent in the UI (S-05) still applies. These routes are not implemented this release:
+Multi-person profile and consent management (M-18's original scope) remains postponed. Voice-capture consent in the UI (S-05) still applies. The person-scoped routes below are not implemented; account-owned hand calibration has separate routes above.
 
 - `POST /api/persons` `{name, relationship}`; `DELETE /api/persons/{id}` (cascades)
 - `POST /api/persons/{id}/consents` `{scope}`; `DELETE /api/consents/{id}` (revoke)
 - `POST /api/persons/{id}/profiles` `{label}`; `GET /api/profiles/{id}`
-- `POST /api/profiles/{id}/weighings` `{unit, ingredient, amount, amount_unit}`; `DELETE /api/weighings/{id}`
 - `GET /api/profiles/{id}/suggest?recipe_id=` -> top-3 weighings that would tighten the recipe most
 
 ## Voice

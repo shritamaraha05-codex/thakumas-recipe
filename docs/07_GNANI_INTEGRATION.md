@@ -36,4 +36,4 @@ Compare for Bengali and Benglish narrations: `language_code` = `bn-IN` vs `bn-IN
 Credit cost per call is **unknown**. Task M2 makes 5 test calls per endpoint and reads the dashboard to derive credits per audio-second (STT) and per character (TTS). Then set `DAILY_BUDGET` in config, log every call in `api_usage`, cache TTS by hash, and refuse non-essential calls when the budget is low. Never loop calls in tests; `GNANI_MOCK=1`.
 
 ## Mock mode
-`GNANI_MOCK=1`: STT returns a transcript from `backend/tests/fixtures/transcripts/` chosen by audio length hash or `X-Mock-Transcript` header; TTS returns a short silent WAV. All CI tests run in mock mode.
+`GNANI_MOCK=1`: STT returns the clearly labelled synthetic transcript in `backend/app/fixtures/mock_transcript_bn.txt` for the first chunk (and an empty transcript for later chunks); tests may override it with `X-Mock-Transcript`. The response has `mock: true`, so the frontend warns that it was not derived from the selected audio. No request is sent to Gnani. All CI tests run in mock mode.

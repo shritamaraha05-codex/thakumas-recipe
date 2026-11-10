@@ -42,6 +42,8 @@ class Settings(BaseSettings):
     gnani_api_key: str = ""
     gnani_mock: bool = True
     gnani_stt_model: str = "prisma-v3.0"
+    gnani_stt_url: str = "https://api.vachana.ai/stt/v3"
+    gnani_stt_timeout: float = 5.0
     gnani_tts_model: str = "timbre-v3.0"
     gnani_voice: str = "Shivani"
 

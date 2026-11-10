@@ -42,9 +42,8 @@ That nine-step list is the **minimum release journey and the P0 acceptance gate*
 - Consent before capturing another person's voice; audio is not retained by default.
 - Automated tests, an evaluation note with sample size and limitations, working demo video, public post and submission materials.
 
-### Moved to postponed (2026-11-08 planning correction — do not start until the journey above is green)
+### Still postponed (2026-11-08 planning correction)
 
-- Personal measurement calibration (M-17, S-12; QTY-2) and the weighing repository (M-17).
 - Full person / profile / consent management (M-18's original person/consent scope and the people/consent API).
 - Recipe scaling, including servings UI and salt-like staged guidance (S-13; QTY-3, QTY-4).
 - Pantry search (LIB-2).
@@ -182,10 +181,10 @@ Manual Gemini smoke test (not run automatically, no key needed to run the suite)
 | M-14 | M | Implement ingredient classes and range lookup fallback | M-12, M-13 | Rice, flour, salt, liquid and unknown ingredient paths have tests |
 | M-15 | M | Implement ambiguity detection for spoon and cup, with stable IDs/questions/options | M-08, M-13 | Ambiguous spoon/cup creates clarification rather than choosing a default |
 | M-16 | M | Implement `/api/parse/resolve` as a stateless recomputation from draft + answers | M-15 | Selecting tsp/tbsp or cup type changes the parsed result and clears resolved clarification |
-| M-17 | M | **POSTPONED** (2026-11-08 correction) hand profile + weighing repository/service; one weighing uses a visibly labelled personal interval | M-13 | Weighing persists; recalculation changes only the matching profile/unit/ingredient range |
+| M-17 | M | **DONE 2026-11-10** account-owned hand profile + weighing repository/service and documented personal interval | M-13 | Weighing persists; recalculation changes only the matching account/unit/ingredient range |
 | S-10 | S | Build Recipe Review screen: ordered steps, ingredient chips, range bars, raw phrase and `typical/yours/exact` labels | S-03, M-04 | UI displays all fields from response; no frontend-invented quantity values |
 | S-11 | S | Build clarification cards with answer options and Resolve action | S-10, M-16 | User answers each clarification and sees updated ranges |
-| S-12 | S | **POSTPONED** (2026-11-08 correction) hand calibration wizard (choose unit → enter weighed amount → save → refresh range) | S-10, M-17 | A measurement updates only that user's matching range |
+| S-12 | S | **DONE 2026-11-10** profile calibration form and landing-page weighing slider (choose unit/ingredient → weigh → save → refresh range) | M-17 | A measurement updates only that user's matching range |
 | S-13 | S | **POSTPONED** (2026-11-08 correction) servings control and display scaled low/high interval, preserving unit and rounding | S-10, M-13 | 2x servings doubles both bounds; `start low, taste, add more` appears for scaled salt/spice/chilli |
 | S-14 | S | Continue evaluation collection toward the target in `10_EVAL_PLAN.md` (25 cases × 3 replicates); if time/access prevents this, report the actual smaller n as a pilot | S-09 | Measurements include unit, ingredient, cook/person, replicate and date; do not fabricate missing data |
 | J-04 | Both | Integrate parser + ranges + clarifications in the real UI (calibration and scaling are postponed) | M-16 | A typed Bengali/Benglish sample becomes editable steps with labelled ranges and answerable ambiguity |
@@ -201,7 +200,7 @@ Manual Gemini smoke test (not run automatically, no key needed to run the suite)
 | M-21 | M | Add `/api/speak` with Timbre client, text/voice/language cache and browser-speech fallback signal | M-11 | Mock TTS returns audio; live TTS result is verified manually or clearly marked unavailable |
 | M-22 | M | Add cook command normaliser for keyboard/button commands; keep voice command clips optional | M-08 | `next`, `prev`, `repeat`, `stop` map to stable command names |
 | S-15 | S | Supabase Auth + recipe library: sign-in/sign-up screen with the Supabase Auth client (Google login if enabled on the project, email/password otherwise), session persistence across reloads, logout; save recipe flow (title + tags from a parse result), library list, open recipe, delete recipe. The frontend forwards the access token to protected FastAPI routes and never writes to the database directly | S-10, M-20, M-18B | A signed-in user saves a recipe, sees it in the library after closing and reopening the app, opens and deletes it; another account's recipes are never listed or openable |
-| S-16 | S | Build Cook Mode: one step at a time, large Next/Back/Repeat buttons, progress indicator and keep-screen-awake attempt | S-15 | Navigation works by touch and keyboard; does not require microphone permission |
+| S-16 | S | Build Cook Mode with backend recipe selection when no id is supplied, honest empty/error states, and step navigation | S-15 | Saved recipes appear as choices; an empty account sees the record/library actions; navigation works by touch and keyboard |
 | S-17 | S | Add one or more timers with visible countdown and completion alert | S-16 | Two timers can run independently; timer state does not reset on step navigation |
 | S-18 | S | Connect step speech playback to `/api/speak`; fall back to browser speech and visible text | S-16, M-21 | A step can be heard or read; failure never leaves a blank screen |
 | S-19 | S | Create a clean recipe share-card layout (print CSS first; PNG only if reliable Bengali rendering is available) | S-10 | Recipe title, original phrase, steps and range labels are legible; no false exact numbers |

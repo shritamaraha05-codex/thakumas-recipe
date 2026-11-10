@@ -33,7 +33,8 @@ async function request(path, { method = 'GET', token, body, params, signal, time
   }
 
   const headers = {};
-  if (body !== undefined) {
+  const isFormData = typeof FormData !== 'undefined' && body instanceof FormData;
+  if (body !== undefined && !isFormData) {
     headers['Content-Type'] = 'application/json';
   }
   if (token) {
@@ -50,7 +51,7 @@ async function request(path, { method = 'GET', token, body, params, signal, time
     response = await fetch(url.toString(), {
       method,
       headers,
-      body: body !== undefined ? JSON.stringify(body) : undefined,
+      body: body === undefined ? undefined : isFormData ? body : JSON.stringify(body),
       signal: controller.signal,
     });
   } catch (err) {
@@ -156,7 +157,20 @@ export const api = {
   parse: (text, mode = 'rules') =>
     request('/api/parse', { method: 'POST', body: { text, mode } }),
 
+  transcribeAudio: (token, audioFile, { language = 'indic-auto', previousText = '', consent = false, signal } = {}) => {
+    const body = new FormData();
+    body.append('audio', audioFile, 'narration.wav');
+    body.append('language', language);
+    body.append('consent', String(consent));
+    if (previousText) body.append('previous_text', previousText);
+    return request('/api/narrations/transcribe', { method: 'POST', token, body, signal, timeoutMs: 30000 });
+  },
+
   me: (token) => request('/api/me', { token }),
+
+  getHandCalibration: (token) => request('/api/me/hand-calibration', { token }),
+  addHandWeighing: (token, payload) => request('/api/me/hand-calibration/weighings', { method: 'POST', token, body: payload }),
+  deleteHandWeighing: (token, id) => request(`/api/me/hand-calibration/weighings/${encodeURIComponent(id)}`, { method: 'DELETE', token }),
 
   listRecipes: (token, { query, tag, limit = 50, offset = 0 } = {}) =>
     request('/api/recipes', {
