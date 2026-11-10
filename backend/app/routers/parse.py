@@ -18,6 +18,7 @@ are not used: calibration and scaling are later tasks.
 
 from __future__ import annotations
 
+from copy import deepcopy
 from collections.abc import Callable
 
 from fastapi import APIRouter, Depends
@@ -25,7 +26,14 @@ from fastapi import APIRouter, Depends
 from ..config import Settings
 from ..dependencies import get_llm_provider_factory, get_settings
 from ..errors import ApiError
-from ..models import ErrorCode, ErrorResponse, ParseMode, ParseRequest, ParseResult
+from ..models import (
+    ErrorCode,
+    ErrorResponse,
+    ParseMode,
+    ParseRequest,
+    ParseResolveRequest,
+    ParseResult,
+)
 from ..parse.llm import parse_llm
 from ..parse.normalize import normalize
 from ..parse.rules import parse_rules
@@ -122,3 +130,53 @@ async def parse(
     except ProviderError as exc:
         raise _provider_api_error(exc) from exc
     return to_api_result(internal, original=normalized.original)
+
+
+@router.post("/parse/resolve", response_model=ParseResult)
+async def resolve_parse(request: ParseResolveRequest) -> ParseResult:
+    """Apply only explicit, offered answers to the user's parser draft.
+
+    Spoon choices become canonical tsp/tbsp units. Cup choices are preserved
+    as a resolution label because no sourced cup conversion is available yet.
+    """
+    draft = deepcopy(request.draft)
+    available = {
+        quantity.clarification.id: quantity
+        for step in draft.recipe.steps
+        for quantity in step.quantities
+        if quantity.clarification is not None
+    }
+    answers: dict[str, str] = {}
+    for item in request.answers:
+        if item.clarification_id in answers:
+            raise ApiError(422, ErrorCode.INVALID_INPUT, "A clarification can only be answered once.")
+        quantity = available.get(item.clarification_id)
+        if quantity is None:
+            raise ApiError(422, ErrorCode.INVALID_INPUT, "The clarification is not present in this draft.")
+        clarification = quantity.clarification
+        if item.answer not in clarification.options:
+            raise ApiError(422, ErrorCode.INVALID_INPUT, "Choose one of the options shown for this clarification.")
+        if clarification.kind not in {"unit_spoon", "unit_cup"}:
+            raise ApiError(422, ErrorCode.INVALID_INPUT, "This clarification type cannot be resolved yet.")
+        answers[item.clarification_id] = item.answer
+
+    resolved_steps = []
+    for step in draft.recipe.steps:
+        quantities = []
+        for quantity in step.quantities:
+            clarification = quantity.clarification
+            answer = answers.get(clarification.id) if clarification else None
+            if answer is None:
+                quantities.append(quantity)
+                continue
+            unit = answer if clarification.kind == "unit_spoon" else quantity.unit
+            quantities.append(quantity.model_copy(update={
+                "unit": unit,
+                "clarification": None,
+                "resolution": answer,
+            }))
+        resolved_steps.append(step.model_copy(update={"quantities": quantities}))
+
+    return draft.model_copy(update={
+        "recipe": draft.recipe.model_copy(update={"steps": resolved_steps})
+    })

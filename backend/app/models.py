@@ -94,6 +94,7 @@ class Quantity(BaseModel):
     orig_end: int | None = None
     range: QuantityRange | None = None
     clarification: Clarification | None = None
+    resolution: str | None = None
 
 
 class Duration(BaseModel):
@@ -158,6 +159,18 @@ class ParseResult(BaseModel):
 
     recipe: Recipe
     meta: Metadata
+
+
+class ClarificationAnswer(BaseModel):
+    clarification_id: str = Field(min_length=1, max_length=80)
+    answer: str = Field(min_length=1, max_length=120)
+
+
+class ParseResolveRequest(BaseModel):
+    """A parsed draft plus explicit user answers; no transcript is re-sent."""
+
+    draft: ParseResult
+    answers: list[ClarificationAnswer] = Field(min_length=1, max_length=50)
 
 
 class ParseRequest(BaseModel):

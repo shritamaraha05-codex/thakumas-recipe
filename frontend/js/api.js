@@ -157,6 +157,9 @@ export const api = {
   parse: (text, mode = 'rules') =>
     request('/api/parse', { method: 'POST', body: { text, mode } }),
 
+  resolveParse: (draft, answers) =>
+    request('/api/parse/resolve', { method: 'POST', body: { draft, answers } }),
+
   transcribeAudio: (token, audioFile, { language = 'indic-auto', previousText = '', consent = false, signal } = {}) => {
     const body = new FormData();
     const extension = audioFile.type === 'audio/aac' ? 'aac' : audioFile.type === 'audio/wav' ? 'wav' : 'audio';

@@ -37,7 +37,8 @@
                 "tsp",
                 "tbsp"
               ]
-            }
+            },
+            "resolution": null
           }
         ]
       },
@@ -66,7 +67,8 @@
             "orig_start": 23,
             "orig_end": 34,
             "range": null,
-            "clarification": null
+            "clarification": null,
+            "resolution": null
           },
           {
             "id": "q3",
@@ -85,7 +87,8 @@
             "orig_start": 38,
             "orig_end": 50,
             "range": null,
-            "clarification": null
+            "clarification": null,
+            "resolution": null
           },
           {
             "id": "q4",
@@ -104,7 +107,8 @@
             "orig_start": 56,
             "orig_end": 68,
             "range": null,
-            "clarification": null
+            "clarification": null,
+            "resolution": null
           }
         ]
       },

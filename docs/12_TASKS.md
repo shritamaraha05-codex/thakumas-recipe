@@ -77,6 +77,8 @@ That nine-step list is the **minimum release journey and the P0 acceptance gate*
 
 **Folder boundaries:** M owns `backend/**`; S owns `frontend/**` and `eval/**`. Shared changes to `docs/04_API.md`, fixtures, `README.md` and `docs/12_TASKS.md` are agreed in a short joint review. Neither person commits under the other's Git identity.
 
+**Joint gap-fix ownership note (2026-11-10):** this fix updates `backend/**` for M-16 answer validation and `frontend/**` for S-11 clarification UI, Cook Mode empty/loading presentation, and calibration sliders. The API contract is updated in `docs/04_API.md`; backend and frontend changes need review by their respective owners before commit/merge.
+
 ### Required branch and commit convention
 
 - Mrinmoy: `m/<task-id>-short-name`
@@ -180,11 +182,11 @@ Manual Gemini smoke test (not run automatically, no key needed to run the suite)
 | M-13 | M | Implement `units/ranges.py` for exact units and low/high intervals | M-12 | Exact g/kg/ml/litre remain exact; vague units return intervals, never a single fake-precise value |
 | M-14 | M | Implement ingredient classes and range lookup fallback | M-12, M-13 | Rice, flour, salt, liquid and unknown ingredient paths have tests |
 | M-15 | M | Implement ambiguity detection for spoon and cup, with stable IDs/questions/options | M-08, M-13 | Ambiguous spoon/cup creates clarification rather than choosing a default |
-| M-16 | M | Implement `/api/parse/resolve` as a stateless recomputation from draft + answers | M-15 | Selecting tsp/tbsp or cup type changes the parsed result and clears resolved clarification |
+| M-16 | M | **DONE 2026-11-10 (joint gap fix)** — `/api/parse/resolve` validates offered answers; spoon answers set tsp/tbsp, cup type is retained as an explicit resolution without inventing a conversion | M-15 | Selecting an offered option updates the draft and clears only the answered clarification |
 | M-17 | M | **DONE 2026-11-10** account-owned hand profile + weighing repository/service and documented personal interval | M-13 | Weighing persists; recalculation changes only the matching account/unit/ingredient range |
 | S-10 | S | Build Recipe Review screen: ordered steps, ingredient chips, range bars, raw phrase and `typical/yours/exact` labels | S-03, M-04 | UI displays all fields from response; no frontend-invented quantity values |
-| S-11 | S | Build clarification cards with answer options and Resolve action | S-10, M-16 | User answers each clarification and sees updated ranges |
-| S-12 | S | **DONE 2026-11-10** profile calibration form and landing-page weighing slider (choose unit/ingredient → weigh → save → refresh range) | M-17 | A measurement updates only that user's matching range |
+| S-11 | S | **DONE 2026-11-10 (joint gap fix)** — review page renders each parser clarification as answer buttons and blocks saving while any question remains | S-10, M-16 | User answers each clarification and sees the updated quantity; unresolved cups remain without a fabricated range |
+| S-12 | S | **DONE 2026-11-10** profile calibration form with numeric input and linked slider; landing slider loads and displays the backend's saved aggregate range, then refreshes from the save response | M-17 | A measurement updates only that user's matching range |
 | S-13 | S | **POSTPONED** (2026-11-08 correction) servings control and display scaled low/high interval, preserving unit and rounding | S-10, M-13 | 2x servings doubles both bounds; `start low, taste, add more` appears for scaled salt/spice/chilli |
 | S-14 | S | Continue evaluation collection toward the target in `10_EVAL_PLAN.md` (25 cases × 3 replicates); if time/access prevents this, report the actual smaller n as a pilot | S-09 | Measurements include unit, ingredient, cook/person, replicate and date; do not fabricate missing data |
 | J-04 | Both | Integrate parser + ranges + clarifications in the real UI (calibration and scaling are postponed) | M-16 | A typed Bengali/Benglish sample becomes editable steps with labelled ranges and answerable ambiguity |

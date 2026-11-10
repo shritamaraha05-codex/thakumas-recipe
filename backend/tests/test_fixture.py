@@ -34,6 +34,7 @@ QUANTITY_FIELDS = [
     "source",
     "range",
     "clarification",
+    "resolution",
 ]
 
 

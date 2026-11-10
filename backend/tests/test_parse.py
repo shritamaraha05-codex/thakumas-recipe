@@ -133,6 +133,44 @@ def test_cup_produces_a_clarification(client: TestClient) -> None:
     assert clarification["options"] == ["tea cup", "measuring cup", "my cup"]
 
 
+def test_resolve_spoon_answer_updates_unit_and_keeps_spoken_wording(client: TestClient) -> None:
+    draft = _parse(client, "এক চামচ তেল")
+    response = client.post("/api/parse/resolve", json={
+        "draft": draft,
+        "answers": [{"clarification_id": "unit_spoon_1", "answer": "tbsp"}],
+    })
+    assert response.status_code == 200
+    quantity = response.json()["recipe"]["steps"][0]["quantities"][0]
+    assert quantity["unit"] == "tbsp"
+    assert quantity["raw_unit"] == "চামচ"
+    assert quantity["resolution"] == "tbsp"
+    assert quantity["clarification"] is None
+
+
+def test_resolve_cup_records_choice_without_claiming_a_conversion(client: TestClient) -> None:
+    draft = _parse(client, "আধা কাপ দুধ")
+    response = client.post("/api/parse/resolve", json={
+        "draft": draft,
+        "answers": [{"clarification_id": "unit_cup_1", "answer": "my cup"}],
+    })
+    assert response.status_code == 200
+    quantity = response.json()["recipe"]["steps"][0]["quantities"][0]
+    assert quantity["unit"] == "cup"
+    assert quantity["resolution"] == "my cup"
+    assert quantity["range"] is None
+    assert quantity["clarification"] is None
+
+
+def test_resolve_rejects_an_answer_not_offered(client: TestClient) -> None:
+    draft = _parse(client, "এক চামচ তেল")
+    response = client.post("/api/parse/resolve", json={
+        "draft": draft,
+        "answers": [{"clarification_id": "unit_spoon_1", "answer": "cup"}],
+    })
+    assert response.status_code == 422
+    assert response.json()["error"]["code"] == "INVALID_INPUT"
+
+
 def test_resolved_spoon_compound_has_no_clarification(client: TestClient) -> None:
     quantity = _parse(client, "এক ছোট চামচ নুন")["recipe"]["steps"][0]["quantities"][0]
     assert quantity["unit"] == "tsp"

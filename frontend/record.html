@@ -116,6 +116,7 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
 }
 </style><style id="shared-header-content-offset">.banner{margin-top:104px!important}@media(max-width:620px){.banner{margin-top:132px!important}}</style><link rel="stylesheet" href="/assets/icons.css">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200">
+<link rel="stylesheet" href="/css/responsive.css">
 </head><body>
 <svg id="spoon" viewBox="0 0 46 46" aria-hidden="true"><g transform="rotate(-40 6 6)"><path d="M6 4 C0 4 0 16 6 18 C12 16 12 4 6 4Z" fill="#e0a526" stroke="#8e5a10" stroke-width="1.2"/><rect x="4.8" y="17" width="2.4" height="26" rx="1.2" fill="#b07a1c"/></g></svg>
 <div id="app-navigation"></div>
@@ -226,6 +227,14 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
           <span class="en" style="display:none;">Parsed Ingredients & Measures</span>
         </h4>
         <div id="parsed-ingredients-list" class="chips" style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px;"></div>
+
+        <section id="clarifications-section" hidden aria-labelledby="clarifications-title" style="margin: 12px 0 16px;padding:12px;border:1px solid #e2c18a;border-radius:10px;background:#fffaf0;">
+          <h4 id="clarifications-title" style="margin:0 0 8px;font-size:14px;color:#7e4b16;">
+            <span class="bn">একটু নিশ্চিত করুন</span><span class="en" style="display:none;">Please clarify these measures</span>
+          </h4>
+          <div id="clarifications-list" style="display:grid;gap:10px" aria-live="polite"></div>
+          <p id="clarifications-status" role="status" style="margin:8px 0 0"></p>
+        </section>
 
         <h4 style="margin: 14px 0 8px; font-size: 14px; color: var(--red);">
           <span class="bn">রান্নার ধাপসমূহ (Ordered Steps)</span>
@@ -904,10 +913,89 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
   const tagsInput = document.getElementById('recipe-tags-input');
   const ingredientsList = document.getElementById('parsed-ingredients-list');
   const stepsList = document.getElementById('parsed-steps-list');
+  const clarificationsSection = document.getElementById('clarifications-section');
+  const clarificationsList = document.getElementById('clarifications-list');
+  const clarificationsStatus = document.getElementById('clarifications-status');
   const saveBtn = document.getElementById('save-recipe-btn');
   const saveErrorEl = document.getElementById('save-error');
   const saveComplete = document.getElementById('save-complete');
   const openSavedRecipe = document.getElementById('open-saved-recipe');
+
+  function parsedQuantities(result) {
+    return (result?.recipe?.steps || []).flatMap(step => step.quantities || []);
+  }
+
+  function renderParsedIngredients(result) {
+    ingredientsList.replaceChildren();
+    const quantities = parsedQuantities(result);
+    if (!quantities.length) {
+      const empty = document.createElement('p');
+      empty.style.cssText = 'font-size:12px;color:#826b57';
+      empty.textContent = currentLanguage === 'en' ? 'No specific measurements detected.' : 'কোনো সুনির্দিষ্ট মাপ চিহ্নিত করা যায়নি।';
+      ingredientsList.appendChild(empty);
+      return;
+    }
+    quantities.forEach(quantity => {
+      const chip = document.createElement('div');
+      chip.className = 'chip';
+      const name = document.createElement('span');
+      name.textContent = quantity.ingredient || quantity.raw_phrase;
+      const measure = document.createElement('em');
+      const value = quantity.range
+        ? `${quantity.range.lo}–${quantity.range.hi} ${quantity.range.unit}`
+        : quantity.qty !== null && quantity.qty !== undefined
+          ? `${quantity.qty}${quantity.qty_max !== null && quantity.qty_max !== undefined ? `–${quantity.qty_max}` : ''} ${quantity.unit || ''}`.trim()
+          : quantity.raw_phrase;
+      measure.textContent = quantity.resolution ? `${value} · ${quantity.resolution}` : value;
+      const content = document.createElement('div');
+      content.append(name, measure);
+      const icon = document.createElement('i');
+      icon.textContent = '✻';
+      chip.append(icon, content);
+      ingredientsList.appendChild(chip);
+    });
+  }
+
+  function renderClarifications(result) {
+    clarificationsList.replaceChildren();
+    clarificationsStatus.textContent = '';
+    const pending = parsedQuantities(result).filter(quantity => quantity.clarification);
+    clarificationsSection.hidden = pending.length === 0;
+    pending.forEach(quantity => {
+      const clarification = quantity.clarification;
+      const card = document.createElement('div');
+      card.style.cssText = 'padding:10px;border:1px solid #ecd9b6;border-radius:8px;background:#fff';
+      const question = document.createElement('p');
+      question.style.margin = '0 0 8px';
+      question.textContent = `${clarification.question} (${quantity.raw_phrase})`;
+      const options = document.createElement('div');
+      options.style.cssText = 'display:flex;flex-wrap:wrap;gap:8px';
+      clarification.options.forEach(answer => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'secondary-btn';
+        button.textContent = answer;
+        button.addEventListener('click', async () => {
+          if (!latestParseResult) return;
+          options.querySelectorAll('button').forEach(option => { option.disabled = true; });
+          clarificationsStatus.textContent = currentLanguage === 'en' ? 'Updating the recipe…' : 'রেসিপি হালনাগাদ হচ্ছে…';
+          try {
+            latestParseResult = await api.resolveParse(latestParseResult, [{ clarification_id: clarification.id, answer }]);
+            renderParsedIngredients(latestParseResult);
+            renderClarifications(latestParseResult);
+            saveBtn.disabled = parsedQuantities(latestParseResult).some(item => item.clarification);
+            notify(currentLanguage === 'en' ? `Measure recorded as ${answer}.` : `মাপ ${answer} হিসেবে রাখা হয়েছে।`);
+          } catch (error) {
+            options.querySelectorAll('button').forEach(option => { option.disabled = false; });
+            clarificationsStatus.textContent = `${currentLanguage === 'en' ? 'Could not update this measure.' : 'মাপটি হালনাগাদ করা যায়নি।'} ${error.message || ''}`;
+          }
+        });
+        options.appendChild(button);
+      });
+      card.append(question, options);
+      clarificationsList.appendChild(card);
+    });
+  }
 
   function openTranscriptForReview(text, message) {
     if (!textarea || !text?.trim()) return;
@@ -970,30 +1058,10 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
       const recipe = result.recipe || {};
       titleInput.value = recipe.title && recipe.title !== 'Untitled recipe' ? recipe.title : '';
 
-      // Populate ingredients
-      ingredientsList.innerHTML = '';
-      const allQuantities = [];
-      (recipe.steps || []).forEach(step => {
-        (step.quantities || []).forEach(q => allQuantities.push(q));
-      });
-
-      if (allQuantities.length === 0) {
-        ingredientsList.innerHTML = `<p style="font-size: 12px; color: #826b57;">${currentLanguage === 'en' ? 'No specific measurements detected.' : 'কোনো সুনির্দিষ্ট মাপ চিহ্নিত করা যায়নি।'}</p>`;
-      } else {
-        allQuantities.forEach(q => {
-          const chip = document.createElement('div');
-          chip.className = 'chip';
-          const name = q.ingredient || q.raw_phrase;
-          let measure = q.raw_phrase;
-          if (q.range) {
-            measure = `${q.range.lo}–${q.range.hi} ${q.range.unit}`;
-          } else if (q.qty !== null && q.qty !== undefined) {
-            measure = `${q.qty} ${q.unit || ''}`;
-          }
-          chip.innerHTML = `<i>✻</i><div><span>${escapeHtml(name)}</span><em>${escapeHtml(measure)}</em></div>`;
-          ingredientsList.appendChild(chip);
-        });
-      }
+      // Render parser quantities and ask before accepting ambiguous measures.
+      renderParsedIngredients(result);
+      renderClarifications(result);
+      saveBtn.disabled = parsedQuantities(result).some(item => item.clarification);
 
       // Populate steps
       stepsList.innerHTML = '';
@@ -1033,6 +1101,11 @@ html.lang-en .site-header .brand-name,body.lang-en .site-header .brand-name{font
     if (isSaving) return;
     if (!latestParseResult) {
       notify(currentLanguage === 'en' ? 'Please analyse the recipe before saving.' : 'সংরক্ষণের আগে রেসিপি বিশ্লেষণ করুন।');
+      return;
+    }
+    if (parsedQuantities(latestParseResult).some(item => item.clarification)) {
+      notify(currentLanguage === 'en' ? 'Please answer the measure questions before saving.' : 'সংরক্ষণের আগে মাপের প্রশ্নগুলোর উত্তর দিন।');
+      clarificationsSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
       return;
     }
 

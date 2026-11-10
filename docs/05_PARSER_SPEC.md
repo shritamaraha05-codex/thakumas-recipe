@@ -8,7 +8,7 @@ Starting point: `prototype_v0/core.py` (tables, fuzzy matching, clause logic). R
 3. **rules**: lexicon passes over clauses (split on `,` and `ar/ও/aur/and`): numbers (words, digits, fractions, `sarhe N`, `N-M` and `N M ta` ranges), units, ingredients, durations, taste phrases, self-correction. Suffix stripping (`-ta, -ti, -tuku, -gulo`) and fuzzy matching (cutoff 0.85, ASCII tokens >=4 letters).
 4. **llm_extract** (optional): see contract below.
 5. **merge/validate**: items found by both -> `source:"both"`, confidence up. LLM-only items kept only if `raw_phrase` is a substring of the normalised transcript and the unit/ingredient are in the lexicon or the LLM marks `unknown_unit`. Rules-only items kept. Numeric disagreement -> `qty_conflict` clarification.
-6. **ambiguity**: see table.
+6. **ambiguity**: see table. The user-facing review renders each clarification and submits only an offered answer to `/api/parse/resolve`; the spoken `raw_unit` and original step text remain intact. Cup-type answers do not create a volume or weight estimate until a documented conversion is available.
 7. **ranges**: `units.ranges.interval(...)` for every quantity with a unit.
 
 ## Ambiguity triggers
